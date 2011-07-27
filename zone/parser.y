@@ -164,7 +164,7 @@ type rrHead struct{
 	uint16
 	uint32
 
-%left NotQSTR
+%left notQSTR
 %left tQSTR
 
 %%
@@ -629,7 +629,7 @@ txt:
 
 
 txt2:
-	%prec NotQSTR
+	%prec notQSTR
 	{
 		$$ = "" 
 	}

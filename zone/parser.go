@@ -91,7 +91,7 @@ const tCLASS = 57392
 const tIPV4 = 57393
 const tIPV6 = 57394
 const tDECADIC = 57395
-const NotQSTR = 57396
+const notQSTR = 57396
 
 var yyToknames = []string{
 	"tDLR_TTL",
@@ -144,7 +144,7 @@ var yyToknames = []string{
 	"tIPV4",
 	"tIPV6",
 	"tDECADIC",
-	"NotQSTR",
+	"notQSTR",
 }
 var yyStatenames = []string{}
 
