@@ -1,0 +1,32 @@
+  
+  1.2.3.44 localohost
+1.2.3.4 localohost.x
+1.2.3.4 localohost.x.y
+1.2.3.4 localohost.x.y.z
+1.2.3.4 localohost.x.y.z a
+1.2.3.4 localohost.x.y.z a b
+1.2.3.4 localohost.x.y.z a b c
+
+ 1.2.3.4  localohost
+     1.2.3.4         localohost.x
+1.2.3.4 localohost.x.y
+1.2.3.4 localohost.x.y.z
+1.2.3.4 localohost.x.y.z a
+1.2.3.4 localohost.x.y.z a b
+1.2.3.4 localohost.x.y.z a b c
+
+#
+
+ #
+
+# comment
+
+1.2.3.4 lo#calohost
+1.2.3.4 localohost.x#
+1.2.3.4 localohost.x#.y
+1.2.3.4 localohost.x.y.z #
+1.2.3.4 localohost.x.y.z a #
+1.2.3.4 localohost.x.y.z a b # comment
+1.2.3.4 localohost.x.y.z a b c
+
+
