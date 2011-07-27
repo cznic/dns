@@ -1,0 +1,5 @@
+This is a goinstall-able mirror of modified code already published at:
+http://git.nic.cz/redmine/projects/godns/repository/show/zone
+
+Online godoc documentation for this package (should be) available at:
+http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns/zone

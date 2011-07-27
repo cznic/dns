@@ -1,0 +1,56 @@
+;
+
+ ;
+
+example.com        IN 0	A 1.2.3.4
+ IN A 1.2.3.4
+ IN A 1.2.3.4
+ 1 IN A 1.2.3.4
+ IN AAAA ::1
+ IN CNAME cname.example.com
+ IN DNSKEY 2 3 4 CwwNDg8QERIT
+ IN DS 4660 86 1 000102030405060708090a0b0c0d0e0f10111213
+ IN MX 4660 exchange.example.com.
+ IN NS ns.example.com
+ IN NSEC3 1 2 772 0b0c0d0e0f10111213 041GA1OB A MX RRSIG NSEC
+ IN NSEC3PARAM 1 2 772 0b0c0d0e0f10111213
+ IN PTR ptr.example.com
+ IN RRSIG A 3 2 3 20101231205012 20001231235959 4660 signer.example.com. AAZAAQAAAAM=
+ IN SOA mname.example.com. rname.example.com. 305419896 1193046 624485 4913 38930
+             86400 IN DNSKEY 256 3 5 ( AQPSKmynfzW4kyBv015MUG2DeIQ3
+                                       Cbl+BBZH4b/0PY1kxkmvHjcZc8no
+                                       kfzj31GajIQKY+5CptLr3buXA10h
+                                       WqTkF7H6RfoRqXQeogmMHfpftf6z
+                                       Mv1LyBUgia7za6ZEzOJBOztyvhjL
+                                       742iU/TpPSEDhm2SNKLijfUppn1U
+                                       aNvv4w==  )
+ IN TXT;
+ IN TXT ;
+ IN TXT
+ IN TXT 
+ IN TXT "abc"
+ IN TXT "abc" "DEF"
+ IN TXT "abc" ( "DEF" )
+ IN TXT "abc" ( 
+  	  "DEF" )
+ IN TXT "abc" ( 
+  	  "DEF" 
+         )
+ IN TXT ( "abc"
+  	    "DEF" 
+         )
+ IN TXT ( 
+          "abc"
+  	    "DEF" 
+         )
+ IN TXT ""
+ IN TXT "\a"
+ IN TXT "a\\"
+ IN TXT "a\z"
+ IN TXT "\z"
+ IN TXT "\""
+ IN TXT "a\""
+ IN TXT "\"z"
+ IN TXT "a\"z"
+
+
