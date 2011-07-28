@@ -9,11 +9,18 @@ package rr
 
 import (
 	"bytes"
+	"flag"
 	"net"
 	"strconv"
 	"strings"
 	"testing"
 )
+
+var optDev = flag.Bool("dev", false, "enable dev helpers")
+
+func init() {
+	flag.Parse()
+}
 
 type enctest struct {
 	t []Type

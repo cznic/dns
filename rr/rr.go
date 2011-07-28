@@ -154,7 +154,7 @@ var classStr = map[Class]string{
 func (n Class) String() (s string) {
 	var ok bool
 	if s, ok = classStr[n]; !ok {
-		panic(fmt.Errorf("unexpected Class %d", uint16(n)))
+		return fmt.Sprintf("CLASS%d", uint16(n))
 	}
 	return
 }
@@ -574,6 +574,114 @@ func (d *NSEC3PARAM) String() string {
 	return fmt.Sprintf("%d %d %d %s", d.HashAlgorithm, d.Flags, d.Iterations, s)
 }
 
+// OPT_DATA holds an {attribute, value} pair of the OPT RR
+type OPT_DATA struct {
+	Code uint16
+	Data []byte
+}
+
+// Implementation of dns.Wirer
+func (d *OPT_DATA) Encode(b *dns.Wirebuf) {
+	dns.Octets2(d.Code).Encode(b)
+	dns.Octets2(len(d.Data)).Encode(b)
+	b.Buf = append(b.Buf, d.Data...)
+}
+
+// Implementation of dns.Wirer
+func (d *OPT_DATA) Decode(b []byte, pos *int) (err os.Error) {
+	if err = (*dns.Octets2)(&d.Code).Decode(b, pos); err != nil {
+		return
+	}
+	var n dns.Octets2
+	if err = n.Decode(b, pos); err != nil {
+		return
+	}
+	p := *pos
+	next := p + int(n)
+	if next > len(b) {
+		return fmt.Errorf("OPT_DATA.Decode() - buffer underflow")
+	}
+	d.Data = b[p:next]
+	*pos = next
+	return
+}
+
+func (d *OPT_DATA) String() string {
+	return fmt.Sprintf("%04x:% x", d.Code, d.Data)
+}
+
+// OPT holds the RFC2671 OPT pseudo RR RData
+type OPT struct {
+	Values []OPT_DATA
+}
+
+// Implementation of dns.Wirer
+func (d *OPT) Encode(b *dns.Wirebuf) {
+	for _, v := range d.Values {
+		v.Encode(b)
+	}
+}
+
+// Implementation of dns.Wirer
+func (d *OPT) Decode(b []byte, pos *int) (err os.Error) {
+	for *pos < len(b) {
+		v := OPT_DATA{}
+		if err = v.Decode(b, pos); err != nil {
+			return
+		}
+
+		d.Values = append(d.Values, v)
+	}
+	return
+}
+
+func (d *OPT) String() string {
+	a := make([]string, len(d.Values))
+	for i, v := range d.Values {
+		a[i] = v.String()
+	}
+	return strings.Join(a, " ")
+}
+
+// EXT_RCODE type holds the EDNS extended RCODE (in the RR.TTL field)
+type EXT_RCODE struct {
+	RCODE   byte
+	Version byte
+	Z       uint16
+}
+
+// FromTTL sets up the fields of EXT_RCODE from an int32 value (as is e.g. RR.TTL)
+func (d *EXT_RCODE) FromTTL(n int32) {
+	d.RCODE = byte(n >> 24)
+	d.Version = byte(n >> 16)
+	d.Z = uint16(n)
+}
+
+// ToTTL returns d as the value of a RR.TTL
+func (d *EXT_RCODE) ToTTL() int32 {
+	return int32(d.RCODE)<<24 | int32(d.Version)<<16 | int32(d.Z)
+}
+
+// Implementation of dns.Wirer
+func (d *EXT_RCODE) Encode(b *dns.Wirebuf) {
+	n := dns.Octets4(uint32(d.RCODE<<24) | uint32(d.Version<<16) | uint32(d.Z))
+	n.Encode(b)
+}
+
+// Implementation of dns.Wirer
+func (d *EXT_RCODE) Decode(b []byte, pos *int) (err os.Error) {
+	var n dns.Octets4
+	if err = n.Decode(b, pos); err != nil {
+		return
+	}
+	d.FromTTL(int32(n))
+	return
+}
+
+func (d *EXT_RCODE) String() string {
+	return fmt.Sprintf("EXT_RCODE:%02xx Ver:%d Z:%d", d.RCODE, d.Version, d.Z)
+}
+
 // PTR holds the zone PTR RData
 type PTR struct {
 	// A <domain-name> which points to some location in the
@@ -637,7 +745,22 @@ type RR struct {
 }
 
 func (rr *RR) String() string {
-	return fmt.Sprintf("%s\t%s\t%d\t%s %s", rr.Name, rr.Class, rr.TTL, rr.Type, rr.RData)
+	switch rr.Type {
+	default:
+		return fmt.Sprintf("%s\t%s\t%d\t%s %s", rr.Name, rr.Class, rr.TTL, rr.Type, rr.RData)
+	case TYPE_OPT:
+		r := &EXT_RCODE{}
+		r.FromTTL(rr.TTL)
+		return fmt.Sprintf(
+			"%s\t%d\t%s\t%s %s",
+			rr.Name,
+			uint16(rr.Class),
+			r,
+			rr.Type,
+			rr.RData,
+		)
+	}
+	panic("unreachable")
 }
 
 // Implementation of dns.Wirer
@@ -703,6 +826,8 @@ func (rr *RR) Decode(b []byte, pos *int) (err os.Error) {
 		rr.RData = &NSEC3{}
 	case TYPE_NSEC3PARAM:
 		rr.RData = &NSEC3PARAM{}
+	case TYPE_OPT:
+		rr.RData = &OPT{}
 	case TYPE_PTR:
 		rr.RData = &PTR{}
 	case TYPE_RRSIG:
@@ -1130,6 +1255,7 @@ const (
 	TYPE_MX                         //  15: mail exchange
 	TYPE_TXT                        //  16: text strings
 	TYPE_AAAA       Type = 28       //  28: a host address (IPv6)
+	TYPE_OPT        Type = 41       //  41: OPT pseudo type (RFC2671)
 	TYPE_DS         Type = 43       //  43: delegation signer
 	TYPE_RRSIG      Type = 46       //  46: RR set signature
 	TYPE_NSEC       Type = 47       //  47: authenticated denial of existence
@@ -1160,6 +1286,7 @@ var typeStr = map[Type]string{
 	TYPE_NSEC3:      "NSEC3",
 	TYPE_NSEC3PARAM: "NSEC3PARAM",
 	TYPE_NULL:       "NULL",
+	TYPE_OPT:        "OPT",
 	TYPE_PTR:        "PTR",
 	TYPE_RRSIG:      "RRSIG",
 	TYPE_SOA:        "SOA",
@@ -1172,7 +1299,7 @@ var typeStr = map[Type]string{
 func (n Type) String() (s string) {
 	var ok bool
 	if s, ok = typeStr[n]; !ok {
-		panic(fmt.Errorf("unexpected Type %d", uint16(n)))
+		return fmt.Sprintf("TYPE%d", uint16(n))
 	}
 	return
 }
