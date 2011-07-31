@@ -7,31 +7,31 @@ Install: $ goinstall github.com/cznic/dns
 Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns
 
 Install: $ goinstall github.com/cznic/dns/cache
-Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/cache
+Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns/cache
 
 Install: $ goinstall github.com/cznic/dns/hosts
-Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/hosts
+Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns/hosts
 
 Install: $ goinstall github.com/cznic/dns/msg
-Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/msg
+Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns/msg
 
 Install: $ goinstall github.com/cznic/dns/named
-Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/named
+Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns/named
 
 Install: $ goinstall github.com/cznic/dns/resolv
-Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/resolv
+Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns/resolv
 
 Install: $ goinstall github.com/cznic/dns/resolver
-Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/resolevr
+Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns/resolevr
 
 Install: $ goinstall github.com/cznic/dns/rr
-Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/rr
+Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns/rr
 
 Install: $ goinstall github.com/cznic/dns/zdb
-Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/zdb
+Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns/zdb
 
 Install: $ goinstall github.com/cznic/dns/zone
-Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/zone
+Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns/zone
 
 Install: $ goinstall github.com/cznic/dns/xfr
-Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/xfr
+Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns/xfr
