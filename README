@@ -22,7 +22,7 @@ Install: $ goinstall github.com/cznic/dns/resolv
 Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns/resolv
 
 Install: $ goinstall github.com/cznic/dns/resolver
-Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns/resolevr
+Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns/resolver
 
 Install: $ goinstall github.com/cznic/dns/rr
 Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns/rr
