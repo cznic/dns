@@ -27,11 +27,11 @@ Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns/resolver
 Install: $ goinstall github.com/cznic/dns/rr
 Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns/rr
 
+Install: $ goinstall github.com/cznic/dns/xfr
+Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns/xfr
+
 Install: $ goinstall github.com/cznic/dns/zdb
 Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns/zdb
 
 Install: $ goinstall github.com/cznic/dns/zone
 Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns/zone
-
-Install: $ goinstall github.com/cznic/dns/xfr
-Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns/xfr

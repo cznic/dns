@@ -457,7 +457,8 @@ const (
 	QUERY  Opcode = iota // 0: a standard query (QUERY)
 	IQUERY               // 1: an inverse query (IQUERY)
 	STATUS               // 2: a server status request (STATUS)
-	_                    // 3-15: reserved for future use
+	_                    // 3: Unassigned
+	NOTIFY               // 4: Notify [RFC1996]
 )
 
 func (o Opcode) String() string {
@@ -468,8 +469,10 @@ func (o Opcode) String() string {
 		return "IQUERY"
 	case STATUS:
 		return "STATUS"
+	case NOTIFY:
+		return "NOTIFY"
 	}
-	return fmt.Sprintf("%d!", o)
+	return fmt.Sprintf("%d!", byte(o))
 }
 
 // QTYPE fields appear in the question part of a query.  QTYPES are a
