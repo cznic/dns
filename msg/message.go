@@ -12,6 +12,7 @@ import (
 	"github.com/cznic/dns/rr"
 	"github.com/cznic/mathutil"
 	"fmt"
+	"io"
 	"math"
 	"net"
 	"os"
@@ -310,6 +311,73 @@ func (m *Message) additionalString() string {
 		a = append(a, fmt.Sprintf("Additional[%d]: %s", i, it))
 	}
 	return strings.Join(a, "\n")
+}
+
+// Send sends m through conn and returns an Error of any.
+// If the conn is a *net.TCPConn then the 2 byte msg len is prepended.
+func (m *Message) Send(conn net.Conn) (err os.Error) {
+	//TODO use this from Exchange and friends
+	w := dns.NewWirebuf()
+	m.Encode(w)
+
+	var nw int
+	if _, ok := conn.(*net.TCPConn); ok {
+		n := len(w.Buf)
+		b := []byte{byte(n >> 8), byte(n)}
+		if nw, err = conn.Write(b); err != nil {
+			return
+		}
+
+		if nw != len(w.Buf) {
+			err = fmt.Errorf("Message.Send: write %d != %d", nw, len(b))
+		}
+	}
+
+	if nw, err = conn.Write(w.Buf); err != nil {
+		return
+	}
+
+	if nw != len(w.Buf) {
+		err = fmt.Errorf("Message.Send: write %d != %d", nw, len(w.Buf))
+	}
+	return
+}
+
+// ReceiveBuf attempts to read a DNS message m through conn and returns an Error if any.
+// ReceiveBuf uses rxbuf for receiving the message. ReceiveBuf can hang forever if the
+// conn doesn't have appropriate read timeout already set.
+// Returned n reflects the number of bytes revecied to rxbuf.
+// If the conn is a *net.TCPConn then the 2 byte msg len prefix is expected firstly.
+// The two prefix bytes are not reflected in the returned size 'n'.
+func (m *Message) ReceiveBuf(conn net.Conn, rxbuf []byte) (n int, err os.Error) {
+	//TODO use this from Exchange and friends.
+	if _, ok := conn.(*net.TCPConn); ok {
+		b := make([]byte, 2)
+		if n, err = io.ReadFull(conn, b); err != nil {
+			return
+		}
+
+		n = int(b[0])<<8 | int(b[1])
+		nr := 0
+		//fmt.Printf("TCP msg rx sz %xx(%d)\n", n, n) //TODO-
+		rxbuf = rxbuf[:n]
+		if nr, err = io.ReadFull(conn, rxbuf); err != nil {
+			//fmt.Printf("msg.ReceiveBuf size=%d(got %d): %s", n, nr, err) //TODO-
+			return nr, fmt.Errorf("msg.ReceiveBuf size=%d(got %d): %s", n, nr, err)
+		}
+
+		p := 0
+		err = m.Decode(rxbuf, &p)
+		return
+	}
+
+	if n, err = conn.Read(rxbuf); err != nil {
+		return
+	}
+
+	p := 0
+	err = m.Decode(rxbuf[:n], &p)
+	return
 }
 
 // ExchangeBuf exchanges m through conn and returns a reply or an Error if any.

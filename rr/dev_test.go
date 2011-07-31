@@ -12,6 +12,10 @@ import (
 )
 
 func TestEDNS0(t *testing.T) {
+	if !*optDev {
+		return
+	}
+
 	const ttl = 0x01021001
 	var ext EXT_RCODE
 	ext.FromTTL(ttl)

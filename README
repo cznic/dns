@@ -1,5 +1,37 @@
 This is a goinstall-able mirror of modified code already published at:
 http://git.nic.cz/redmine/projects/godns/repository
 
-Online godoc documentation for this package (should be) available at:
-http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns
+Packages in this repository:
+
+Install: $ goinstall github.com/cznic/dns
+Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns
+
+Install: $ goinstall github.com/cznic/dns/cache
+Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/cache
+
+Install: $ goinstall github.com/cznic/dns/hosts
+Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/hosts
+
+Install: $ goinstall github.com/cznic/dns/msg
+Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/msg
+
+Install: $ goinstall github.com/cznic/dns/named
+Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/named
+
+Install: $ goinstall github.com/cznic/dns/resolv
+Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/resolv
+
+Install: $ goinstall github.com/cznic/dns/resolver
+Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/resolevr
+
+Install: $ goinstall github.com/cznic/dns/rr
+Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/rr
+
+Install: $ goinstall github.com/cznic/dns/zdb
+Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/zdb
+
+Install: $ goinstall github.com/cznic/dns/zone
+Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/zone
+
+Install: $ goinstall github.com/cznic/dns/xfr
+Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/xfr
