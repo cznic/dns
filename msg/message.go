@@ -343,35 +343,36 @@ func (m *Message) Send(conn net.Conn) (err os.Error) {
 	return
 }
 
-// ReceiveBuf attempts to read a DNS message m through conn and returns an Error if any.
-// ReceiveBuf uses rxbuf for receiving the message. ReceiveBuf can hang forever if the
+// ReceiveTCP attempts to read a DNS message m through conn and returns an Error if any.
+// ReceiveTCP uses rxbuf for receiving the message. ReceiveTCP can hang forever if the
 // conn doesn't have appropriate read timeout already set.
 // Returned n reflects the number of bytes revecied to rxbuf.
-// If the conn is a *net.TCPConn then the 2 byte msg len prefix is expected firstly.
+// The 2 byte msg len prefix is expected firstly.
 // The two prefix bytes are not reflected in the returned size 'n'.
-func (m *Message) ReceiveBuf(conn net.Conn, rxbuf []byte) (n int, err os.Error) {
-	//TODO use this from Exchange and friends.
-	if _, ok := conn.(*net.TCPConn); ok {
-		b := make([]byte, 2)
-		if n, err = io.ReadFull(conn, b); err != nil {
-			return
-		}
-
-		n = int(b[0])<<8 | int(b[1])
-		nr := 0
-		//fmt.Printf("TCP msg rx sz %xx(%d)\n", n, n) //TODO-
-		rxbuf = rxbuf[:n]
-		if nr, err = io.ReadFull(conn, rxbuf); err != nil {
-			//fmt.Printf("msg.ReceiveBuf size=%d(got %d): %s", n, nr, err) //TODO-
-			return nr, fmt.Errorf("msg.ReceiveBuf size=%d(got %d): %s", n, nr, err)
-		}
-
-		p := 0
-		err = m.Decode(rxbuf, &p)
+func (m *Message) ReceiveTCP(conn *net.TCPConn, rxbuf []byte) (n int, err os.Error) {
+	b := make([]byte, 2)
+	if n, err = io.ReadFull(conn, b); err != nil {
 		return
 	}
 
-	if n, err = conn.Read(rxbuf); err != nil {
+	n = int(b[0])<<8 | int(b[1])
+	nr := 0
+	rxbuf = rxbuf[:n]
+	if nr, err = io.ReadFull(conn, rxbuf); err != nil {
+		return nr, fmt.Errorf("msg.ReceiveBuf size=%d(got %d): %s", n, nr, err)
+	}
+
+	p := 0
+	err = m.Decode(rxbuf, &p)
+	return
+}
+
+// ReadceiveUDP reads a UDP packet from conn, copying the payload into rxbuf.
+// It returns the number of bytes copied into b and the address that was on the packet.
+// ReceiveUDP can hang forever if the conn doesn't have appropriate read timeout already set.
+// Returned n reflects the number of bytes revecied to rxbuf.
+func (m *Message) ReceiveUDP(conn *net.UDPConn, rxbuf []byte) (n int, addr *net.UDPAddr, err os.Error) {
+	if n, addr, err = conn.ReadFromUDP(rxbuf); err != nil {
 		return
 	}
 

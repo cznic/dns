@@ -69,7 +69,7 @@ func RxAll(conn *net.TCPConn, zone string, msgHandler RxMsgHandler, errHandler E
 
 	for serial := 0; ; serial++ {
 		rxbuf = rxbuf[:cap(rxbuf)]
-		if _, err = m.ReceiveBuf(conn, rxbuf); err != nil && (errHandler == nil || !errHandler(serial, err)) {
+		if _, err = m.ReceiveTCP(conn, rxbuf); err != nil && (errHandler == nil || !errHandler(serial, err)) {
 			return
 		}
 
