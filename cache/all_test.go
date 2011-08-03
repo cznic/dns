@@ -220,3 +220,24 @@ func TestAddNames(t *testing.T) {
 	}
 
 }
+
+func BenchmarkCacheGet(b *testing.B) {
+	b.StopTimer()
+	c := New()
+	domains := make([]string, b.N)
+	rdA := &rr.A{}
+	rrA := &rr.RR{"", rr.TYPE_A, rr.CLASS_IN, 24 * 3600, rdA}
+	rrs := rr.RRs{rrA}
+	for i := range domains {
+		domain := fmt.Sprintf("i%d.example.com.", i)
+		domains[i] = domain
+		rdA.Address = net.ParseIP(fmt.Sprintf("%d.%d.%d.%d", byte(i>>24), byte(i>>16), byte(i>>8), byte(i)))
+		rrA.Name = domain
+		c.Add(rrs)
+	}
+
+	b.StartTimer()
+	for _, domain := range domains {
+		c.Get(domain)
+	}
+}
