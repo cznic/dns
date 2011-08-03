@@ -118,7 +118,7 @@ func (c *Cache) get0(name string) (parts rr.Parts, hit, expired bool) {
 func (c *Cache) get(name string) (parts rr.Parts, hit bool) {
 	expired := false
 	if parts, hit, expired = c.get0(name); hit {
-		if expired && !c.pending[name] { // Schedule removal
+		if expired { // Schedule removal
 			go func() {
 				c.rwm.Lock()         // W++
 				defer c.rwm.Unlock() // W--
