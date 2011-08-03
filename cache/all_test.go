@@ -9,12 +9,19 @@ package cache
 
 import (
 	"github.com/cznic/dns/rr"
+	"flag"
 	"fmt"
 	"net"
 	"runtime"
 	"testing"
 	"time"
 )
+
+var optPerc = flag.Int("perc", 0, "% of domains with one expired RR in BenchmarkCacheGetExpired")
+
+func init() {
+	flag.Parse()
+}
 
 func TestSecs0(t *testing.T) {
 	if delta := Secs0() - time.Seconds(); delta < 0 || delta > 1 {
@@ -235,6 +242,50 @@ func BenchmarkCacheGet(b *testing.B) {
 		rrA.Name = domain
 		c.Add(rrs)
 	}
+
+	b.StartTimer()
+	for _, domain := range domains {
+		c.Get(domain)
+	}
+}
+
+func BenchmarkCacheGetExpired(b *testing.B) {
+	b.StopTimer()
+	perc := *optPerc
+	switch {
+	case perc < 0:
+		perc = 0
+	case perc > 100:
+		perc = 100
+	}
+	c := New()
+	domains := make([]string, b.N)
+
+	// The NS record will not expire.
+	rdNS := &rr.NS{}
+	rrNS := &rr.RR{"", rr.TYPE_NS, rr.CLASS_IN, 24 * 3600, rdNS}
+
+	// The A record will be expired in perc %. That forces unpack/update/repack of the RR set.
+	rdA := &rr.A{}
+	rrA := &rr.RR{"", rr.TYPE_A, rr.CLASS_IN, 0, rdA}
+
+	rrs := rr.RRs{rrA, rrNS}
+	for i := range domains {
+		domain := fmt.Sprintf("i%d.example.com.", i)
+		domains[i] = domain
+		rdA.Address = net.ParseIP(fmt.Sprintf("%d.%d.%d.%d", byte(i>>24), byte(i>>16), byte(i>>8), byte(i)))
+		rdNS.NSDName = "ns." + domain
+		rrA.Name = domain
+		rrNS.Name = domain
+		switch m := i % 100; {
+		case m < perc:
+			rrA.TTL = 1
+		default:
+			rrA.TTL = 24 * 3600
+		}
+		c.Add(rrs)
+	}
+	<-time.After(1.1e9)
 
 	b.StartTimer()
 	for _, domain := range domains {
