@@ -115,10 +115,10 @@ yystart1:
 	switch {
 	default:
 		goto yyabort
-	case c == '#':
-		goto yystate3
 	case c == '\t' || c == ' ':
 		goto yystate2
+	case c == '#':
+		goto yystate3
 	}
 
 yystate2:
@@ -126,10 +126,10 @@ yystate2:
 	switch {
 	default:
 		goto yyrule22
-	case c == '#':
-		goto yystate3
 	case c == '\t' || c == ' ':
 		goto yystate2
+	case c == '#':
+		goto yystate3
 	}
 
 yystate3:
@@ -148,28 +148,28 @@ yystart4:
 	switch {
 	default:
 		goto yyabort
-	case c == 'n':
-		goto yystate57
-	case c == '#':
-		goto yystate3
-	case c == 'd':
-		goto yystate6
-	case c == 'i':
-		goto yystate33
-	case c == 'a':
-		goto yystate20
 	case c == 'e':
 		goto yystate28
-	case c == 'r':
-		goto yystate85
 	case c == '\t' || c == ' ':
 		goto yystate11
-	case c == ':':
-		goto yystate12
-	case c >= '0' && c <= '9':
-		goto yystate5
+	case c == 'n':
+		goto yystate57
+	case c == 'a':
+		goto yystate20
+	case c == '#':
+		goto yystate3
+	case c == 'r':
+		goto yystate85
+	case c == 'i':
+		goto yystate33
 	case c == 't':
 		goto yystate13
+	case c == ':':
+		goto yystate12
+	case c == 'd':
+		goto yystate6
+	case c >= '0' && c <= '9':
+		goto yystate5
 	}
 
 yystate5:
@@ -226,10 +226,10 @@ yystate11:
 	switch {
 	default:
 		goto yyrule22
-	case c == '#':
-		goto yystate3
 	case c == '\t' || c == ' ':
 		goto yystate11
+	case c == '#':
+		goto yystate3
 	case c == ':':
 		goto yystate12
 	}
@@ -442,10 +442,10 @@ yystate36:
 	switch {
 	default:
 		goto yyabort
-	case c == 'b':
-		goto yystate43
 	case c == 'd':
 		goto yystate37
+	case c == 'b':
+		goto yystate43
 	}
 
 yystate37:
@@ -638,10 +638,10 @@ yystate59:
 	switch {
 	default:
 		goto yyabort
-	case c == 'i':
-		goto yystate71
 	case c == 'c':
 		goto yystate60
+	case c == 'i':
+		goto yystate71
 	}
 
 yystate60:
@@ -910,18 +910,18 @@ yystart91:
 	switch {
 	default:
 		goto yyabort
+	case c == 'd':
+		goto yystate112
+	case c == 's':
+		goto yystate99
 	case c == '#':
 		goto yystate3
+	case c == 'n':
+		goto yystate119
 	case c == '\t' || c == ' ':
 		goto yystate118
 	case c == 'o':
 		goto yystate92
-	case c == 'd':
-		goto yystate112
-	case c == 'n':
-		goto yystate119
-	case c == 's':
-		goto yystate99
 	}
 
 yystate92:
@@ -1243,16 +1243,16 @@ yystart129:
 	switch {
 	default:
 		goto yyabort
-	case c == ':':
-		goto yystate156
-	case c >= '0' && c <= '9':
-		goto yystate130
-	case c == '#':
-		goto yystate3
 	case c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
 		goto yystate135
 	case c == '\t' || c == ' ':
 		goto yystate2
+	case c == '#':
+		goto yystate3
+	case c >= '0' && c <= '9':
+		goto yystate130
+	case c == ':':
+		goto yystate156
 	}
 
 yystate130:
@@ -1260,14 +1260,14 @@ yystate130:
 	switch {
 	default:
 		goto yyrule7
+	case c == '.':
+		goto yystate144
+	case c >= '0' && c <= '9':
+		goto yystate131
 	case c == ':':
 		goto yystate134
 	case c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
 		goto yystate136
-	case c >= '0' && c <= '9':
-		goto yystate131
-	case c == '.':
-		goto yystate144
 	}
 
 yystate131:
@@ -1275,14 +1275,14 @@ yystate131:
 	switch {
 	default:
 		goto yyrule7
-	case c >= '0' && c <= '9':
-		goto yystate132
+	case c == '.':
+		goto yystate144
 	case c == ':':
 		goto yystate134
 	case c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
 		goto yystate137
-	case c == '.':
-		goto yystate144
+	case c >= '0' && c <= '9':
+		goto yystate132
 	}
 
 yystate132:
@@ -1290,12 +1290,12 @@ yystate132:
 	switch {
 	default:
 		goto yyrule7
-	case c == ':':
-		goto yystate134
 	case c == '.':
 		goto yystate144
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
 		goto yystate133
+	case c == ':':
+		goto yystate134
 	}
 
 yystate133:
@@ -1312,10 +1312,10 @@ yystate134:
 	switch {
 	default:
 		goto yyabort
-	case c == ':':
-		goto yystate138
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
 		goto yystate135
+	case c == ':':
+		goto yystate138
 	}
 
 yystate135:
@@ -1345,10 +1345,10 @@ yystate137:
 	switch {
 	default:
 		goto yyrule7
-	case c == ':':
-		goto yystate134
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
 		goto yystate133
+	case c == ':':
+		goto yystate134
 	}
 
 yystate138:
@@ -1387,10 +1387,10 @@ yystate141:
 	switch {
 	default:
 		goto yyrule7
-	case c == ':':
-		goto yystate143
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
 		goto yystate142
+	case c == ':':
+		goto yystate143
 	}
 
 yystate142:
@@ -1465,10 +1465,10 @@ yystate149:
 	switch {
 	default:
 		goto yyabort
-	case c >= '0' && c <= '9':
-		goto yystate150
 	case c == '.':
 		goto yystate152
+	case c >= '0' && c <= '9':
+		goto yystate150
 	}
 
 yystate150:
@@ -1538,12 +1538,12 @@ yystart157:
 	switch {
 	default:
 		goto yyabort
-	case c == '#':
-		goto yystate3
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z':
 		goto yystate158
 	case c == '\t' || c == ' ':
 		goto yystate2
+	case c == '#':
+		goto yystate3
 	}
 
 yystate158:
@@ -1551,12 +1551,12 @@ yystate158:
 	switch {
 	default:
 		goto yyrule8
+	case c >= '0' && c <= '9' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z':
+		goto yystate158
 	case c == '.':
 		goto yystate160
 	case c == '-':
 		goto yystate159
-	case c >= '0' && c <= '9' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z':
-		goto yystate158
 	}
 
 yystate159:
@@ -1564,10 +1564,10 @@ yystate159:
 	switch {
 	default:
 		goto yyabort
-	case c == '-':
-		goto yystate159
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z':
 		goto yystate158
+	case c == '-':
+		goto yystate159
 	}
 
 yystate160:
@@ -1587,27 +1587,22 @@ yyrule1: // [ \t]+
 yyrule2: // domain
 	{
 		return tDOMAIN
-		goto yystate0
 	}
 yyrule3: // nameserver
 	{
 		return tNAMESERVER
-		goto yystate0
 	}
 yyrule4: // options
 	{
 		return tOPTIONS
-		goto yystate0
 	}
 yyrule5: // search
 	{
 		return tSEARCH
-		goto yystate0
 	}
 yyrule6: // sortlist
 	{
 		return tSORTLIST
-		goto yystate0
 	}
 yyrule7: // {ip_address}
 	{
@@ -1618,7 +1613,6 @@ yyrule7: // {ip_address}
 		}
 		lval.ip = ip
 		return tIP_ADDRESS
-		goto yystate0
 	}
 yyrule8: // {hostname}
 	{
@@ -1628,63 +1622,51 @@ yyrule8: // {hostname}
 yyrule9: // attempts
 	{
 		return tATTEMPTS
-		goto yystate0
 	}
 yyrule10: // debug
 	{
 		return tDEBUG
-		goto yystate0
 	}
 yyrule11: // edns0
 	{
 		return tEDNS0
-		goto yystate0
 	}
 yyrule12: // inet6
 	{
 		return tINET6
-		goto yystate0
 	}
 yyrule13: // ip6-bytestring
 	{
 		return tIP6_BYTESTRING
-		goto yystate0
 	}
 yyrule14: // ip6-dotint
 	{
 		return tIP6_DOTINT
-		goto yystate0
 	}
 yyrule15: // ndots
 	{
 		return tNDOTS
-		goto yystate0
 	}
 yyrule16: // no-check-names
 	{
 		return tNO_CHECK_NAMES
-		goto yystate0
 	}
 yyrule17: // no-ip6-dotint
 	{
 		return tNO_IP6_DOTINT
-		goto yystate0
 	}
 yyrule18: // rotate
 	{
 		return tROTATE
-		goto yystate0
 	}
 yyrule19: // timeout
 	{
 		return tTIMEOUT
-		goto yystate0
 	}
 yyrule20: // [ \t]*:[ \t]*
 	{
 
 		return ':'
-		goto yystate0
 	}
 yyrule21: // [0-9]+
 	{

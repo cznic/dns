@@ -103,12 +103,12 @@ yystart1:
 	switch {
 	default:
 		goto yyabort
+	case c == '\t' || c == ' ':
+		goto yystate5
 	case c == '#':
 		goto yystate6
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z':
 		goto yystate2
-	case c == '\t' || c == ' ':
-		goto yystate5
 	}
 
 yystate2:
@@ -116,12 +116,12 @@ yystate2:
 	switch {
 	default:
 		goto yyrule3
+	case c == '-':
+		goto yystate3
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z':
 		goto yystate2
 	case c == '.':
 		goto yystate4
-	case c == '-':
-		goto yystate3
 	}
 
 yystate3:
@@ -129,10 +129,10 @@ yystate3:
 	switch {
 	default:
 		goto yyabort
-	case c >= '0' && c <= '9' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z':
-		goto yystate2
 	case c == '-':
 		goto yystate3
+	case c >= '0' && c <= '9' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z':
+		goto yystate2
 	}
 
 yystate4:
@@ -149,10 +149,10 @@ yystate5:
 	switch {
 	default:
 		goto yyrule4
-	case c == '#':
-		goto yystate6
 	case c == '\t' || c == ' ':
 		goto yystate5
+	case c == '#':
+		goto yystate6
 	}
 
 yystate6:
@@ -173,14 +173,14 @@ yystart7:
 		goto yyabort
 	case c == '#':
 		goto yystate6
-	case c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
-		goto yystate13
-	case c == '\t' || c == ' ':
-		goto yystate34
 	case c >= '0' && c <= '9':
 		goto yystate8
 	case c == ':':
 		goto yystate35
+	case c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
+		goto yystate13
+	case c == '\t' || c == ' ':
+		goto yystate34
 	}
 
 yystate8:
@@ -188,14 +188,14 @@ yystate8:
 	switch {
 	default:
 		goto yyrule2
-	case c == '.':
-		goto yystate22
+	case c == ':':
+		goto yystate12
 	case c >= '0' && c <= '9':
 		goto yystate9
 	case c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
 		goto yystate14
-	case c == ':':
-		goto yystate12
+	case c == '.':
+		goto yystate22
 	}
 
 yystate9:
@@ -203,14 +203,14 @@ yystate9:
 	switch {
 	default:
 		goto yyrule2
-	case c == '.':
-		goto yystate22
 	case c == ':':
 		goto yystate12
 	case c >= '0' && c <= '9':
 		goto yystate10
 	case c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
 		goto yystate15
+	case c == '.':
+		goto yystate22
 	}
 
 yystate10:
@@ -218,12 +218,12 @@ yystate10:
 	switch {
 	default:
 		goto yyrule2
+	case c == ':':
+		goto yystate12
 	case c == '.':
 		goto yystate22
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
 		goto yystate11
-	case c == ':':
-		goto yystate12
 	}
 
 yystate11:
@@ -251,10 +251,10 @@ yystate13:
 	switch {
 	default:
 		goto yyrule2
-	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
-		goto yystate14
 	case c == ':':
 		goto yystate12
+	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
+		goto yystate14
 	}
 
 yystate14:
@@ -273,10 +273,10 @@ yystate15:
 	switch {
 	default:
 		goto yyrule2
-	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
-		goto yystate11
 	case c == ':':
 		goto yystate12
+	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
+		goto yystate11
 	}
 
 yystate16:
@@ -304,10 +304,10 @@ yystate18:
 	switch {
 	default:
 		goto yyrule2
-	case c == ':':
-		goto yystate21
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
 		goto yystate19
+	case c == ':':
+		goto yystate21
 	}
 
 yystate19:
@@ -315,10 +315,10 @@ yystate19:
 	switch {
 	default:
 		goto yyrule2
-	case c == ':':
-		goto yystate21
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
 		goto yystate20
+	case c == ':':
+		goto yystate21
 	}
 
 yystate20:
@@ -393,10 +393,10 @@ yystate27:
 	switch {
 	default:
 		goto yyabort
-	case c >= '0' && c <= '9':
-		goto yystate28
 	case c == '.':
 		goto yystate30
+	case c >= '0' && c <= '9':
+		goto yystate28
 	}
 
 yystate28:
@@ -404,10 +404,10 @@ yystate28:
 	switch {
 	default:
 		goto yyabort
-	case c >= '0' && c <= '9':
-		goto yystate29
 	case c == '.':
 		goto yystate30
+	case c >= '0' && c <= '9':
+		goto yystate29
 	}
 
 yystate29:
@@ -483,7 +483,6 @@ yyrule2: // {ip_address}
 		lval.ip = ip
 		l.begin(0)
 		return tIP_ADDRESS
-		goto yystate0
 	}
 yyrule3: // {hostname}
 	{
@@ -495,7 +494,6 @@ yyrule4: // [ \t]+
 	{
 
 		return ' '
-		goto yystate0
 	}
 yyrule5: // [ \t]*#.*
 

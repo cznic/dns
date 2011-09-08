@@ -381,21 +381,18 @@ func (m *Message) ReceiveUDP(conn *net.UDPConn, rxbuf []byte) (n int, addr *net.
 	return
 }
 
-// ExchangeBuf exchanges m through conn and returns a reply or an Error if any.
-// ExchangeBuf uses rxbuf for receiving the reply. ExchangeBuf can hang forever if the
+// ExchangeWire exchanges a msg 'w' already in wire format through conn and returns a reply or an Error if any.
+// ExchangeBuf uses rxbuf for receiving the reply. ExchangeWire can hang forever if the
 // conn doesn't have appropriate read and/or write timeouts already set.
 // Returned n reflects the number of bytes revecied to rxbuf.
-func (m *Message) ExchangeBuf(conn net.Conn, rxbuf []byte) (n int, reply *Message, err os.Error) {
-	w := dns.NewWirebuf()
-	m.Encode(w)
-
+func ExchangeWire(conn net.Conn, w, rxbuf []byte) (n int, reply *Message, err os.Error) {
 	var nw int
-	if nw, err = conn.Write(w.Buf); err != nil {
+	if nw, err = conn.Write(w); err != nil {
 		return
 	}
 
-	if nw != len(w.Buf) {
-		return 0, nil, fmt.Errorf("Message.Exchange: write %d != %d", nw, len(w.Buf))
+	if nw != len(w) {
+		return 0, nil, fmt.Errorf("ExchangeWire: write %d != %d", nw, len(w))
 	}
 
 	if n, err = conn.Read(rxbuf); err != nil {
@@ -408,6 +405,16 @@ func (m *Message) ExchangeBuf(conn net.Conn, rxbuf []byte) (n int, reply *Messag
 		reply = nil
 	}
 	return
+}
+
+// ExchangeBuf exchanges m through conn and returns a reply or an Error if any.
+// ExchangeBuf uses rxbuf for receiving the reply. ExchangeBuf can hang forever if the
+// conn doesn't have appropriate read and/or write timeouts already set.
+// Returned n reflects the number of bytes revecied to rxbuf.
+func (m *Message) ExchangeBuf(conn net.Conn, rxbuf []byte) (n int, reply *Message, err os.Error) {
+	w := dns.NewWirebuf()
+	m.Encode(w)
+	return ExchangeWire(conn, w.Buf, rxbuf)
 }
 
 // Exchange invokes ExchangeBuf with a private rxbuf of rxbufsize bytes.
