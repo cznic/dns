@@ -88,6 +88,26 @@ func (c CNAME) String() string {
 	return c.Name
 }
 
+// DNAME holds the zone DNAME RData
+type DNAME struct {
+	Name string
+}
+
+// Implementation of dns.Wirer
+func (c DNAME) Encode(b *dns.Wirebuf) {
+	(dns.DomainName)(c.Name).Encode(b)
+}
+
+// Implementation of dns.Wirer
+func (c *DNAME) Decode(b []byte, pos *int) (err os.Error) {
+	err = (*dns.DomainName)(&c.Name).Decode(b, pos)
+	return
+}
+
+func (c DNAME) String() string {
+	return c.Name
+}
+
 // DNSSEC Algorithm Types
 // 
 // The DNSKEY, RRSIG, and DS RRs use an 8-bit number to identify the
@@ -810,6 +830,8 @@ func (rr *RR) Decode(b []byte, pos *int) (err os.Error) {
 		rr.RData = &AAAA{}
 	case TYPE_CNAME:
 		rr.RData = &CNAME{}
+	case TYPE_DNAME:
+		rr.RData = &DNAME{}
 	case TYPE_DNSKEY:
 		rr.RData = &DNSKEY{}
 	case TYPE_DS:
@@ -862,6 +884,8 @@ func (a *RR) Equal(b *RR) (equal bool) {
 		return x.Address.String() == b.RData.(*AAAA).Address.String()
 	case *CNAME:
 		return strings.ToLower(x.Name) == strings.ToLower(b.RData.(*CNAME).Name)
+	case *DNAME:
+		return strings.ToLower(x.Name) == strings.ToLower(b.RData.(*DNAME).Name)
 	case *DNSKEY:
 		y := b.RData.(*DNSKEY)
 		return x.Flags == y.Flags &&
@@ -1255,6 +1279,7 @@ const (
 	TYPE_MX                         //  15: mail exchange
 	TYPE_TXT                        //  16: text strings
 	TYPE_AAAA       Type = 28       //  28: a host address (IPv6)
+	TYPE_DNAME      Type = 39       //  39: map an entire subtree of the DNS name space to another domain.
 	TYPE_OPT        Type = 41       //  41: OPT pseudo type (RFC2671)
 	TYPE_DS         Type = 43       //  43: delegation signer
 	TYPE_RRSIG      Type = 46       //  46: RR set signature
@@ -1271,6 +1296,7 @@ var typeStr = map[Type]string{
 	TYPE_A:          "A",
 	TYPE_AAAA:       "AAAA",
 	TYPE_CNAME:      "CNAME",
+	TYPE_DNAME:      "DNAME",
 	TYPE_DNSKEY:     "DNSKEY",
 	TYPE_DS:         "DS",
 	TYPE_HINFO:      "HINFO",

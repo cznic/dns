@@ -506,6 +506,7 @@ const (
 	QTYPE_MX                          //  15: mail exchange
 	QTYPE_TXT                         //  16: text strings
 	QTYPE_AAAA       QType = 28       //  28: a host address (IPv6)
+	QTYPE_DNAME      QType = 39       //  39: map to a DNS subtree
 	QTYPE_DS         QType = 43       //  43: delegation signer
 	QTYPE_RRSIG      QType = 46       //  46: RR set signature
 	QTYPE_DNSKEY     QType = 48       //  48: DNS key
@@ -526,6 +527,7 @@ var qtypeStr = map[QType]string{
 	QTYPE_AAAA:       "AAAA",
 	QTYPE_AXFR:       "AXFR",
 	QTYPE_CNAME:      "CNAME",
+	QTYPE_DNAME:      "DNAME",
 	QTYPE_DNSKEY:     "DNSKEY",
 	QTYPE_DS:         "DS",
 	QTYPE_HINFO:      "HINFO",

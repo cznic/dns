@@ -8,6 +8,7 @@ example.com        IN 0	A 1.2.3.4
  1 IN A 1.2.3.4
  IN AAAA ::1
  IN CNAME cname.example.com
+ IN DNAME dname.example.com
  IN DNSKEY 2 3 4 CwwNDg8QERIT
  IN DS 4660 86 1 000102030405060708090a0b0c0d0e0f10111213
  IN MX 4660 exchange.example.com.

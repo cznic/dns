@@ -58,6 +58,7 @@ type rrHead struct{
 	tAPL
 	tCERT
 	tCNAME
+	tDNAME
 	tDHCID
 	tDNAME
 	tDNSKEY
@@ -126,6 +127,7 @@ type rrHead struct{
 	a
 	aaaa
 	cname
+	dname
 	dnskey
 	ds
 	mx
@@ -252,6 +254,17 @@ cname:
 	tDOMAIN_NAME
 	{
 		$$ = &rr.CNAME{$3}
+	}
+
+
+dname:
+	tDNAME
+	{
+		yylex.begin(sc_DOMAIN)
+	}
+	tDOMAIN_NAME
+	{
+		$$ = &rr.DNAME{$3}
 	}
 
 
@@ -432,6 +445,10 @@ rr2:
 |	rrHead cname
 	{
 		$$ = &rr.RR{"", rr.TYPE_CNAME, $1.class, $1.ttl, $2}
+	}
+|	rrHead dname
+	{
+		$$ = &rr.RR{"", rr.TYPE_DNAME, $1.class, $1.ttl, $2}
 	}
 |	rrHead dnskey
 	{

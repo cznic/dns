@@ -50,8 +50,8 @@ const tAFSDB = 57351
 const tAPL = 57352
 const tCERT = 57353
 const tCNAME = 57354
-const tDHCID = 57355
-const tDNAME = 57356
+const tDNAME = 57355
+const tDHCID = 57356
 const tDNSKEY = 57357
 const tDS = 57358
 const tGPOS = 57359
@@ -103,8 +103,8 @@ var yyToknames = []string{
 	"tAPL",
 	"tCERT",
 	"tCNAME",
-	"tDHCID",
 	"tDNAME",
+	"tDHCID",
 	"tDNSKEY",
 	"tDS",
 	"tGPOS",
@@ -156,130 +156,132 @@ var yyExca = []int{
 	-1, 1,
 	1, -1,
 	-2, 0,
-	-1, 136,
-	1, 38,
-	4, 38,
-	5, 38,
-	48, 38,
-	55, 38,
-	56, 38,
-	-2, 65,
+	-1, 140,
+	1, 40,
+	4, 40,
+	5, 40,
+	48, 40,
+	55, 40,
+	56, 40,
+	-2, 68,
 }
 
-const yyNprod = 98
+const yyNprod = 101
 const yyPrivate = 57344
 
 var yyTokenNames []string
 var yyStates []string
 
-const yyLast = 146
+const yyLast = 150
 
 var yyAct = []int{
 
-	112, 120, 61, 53, 14, 128, 97, 98, 115, 79,
-	80, 4, 6, 137, 123, 81, 121, 20, 82, 83,
-	21, 84, 122, 16, 54, 130, 49, 85, 16, 70,
-	86, 87, 88, 89, 67, 90, 66, 48, 91, 96,
-	65, 92, 144, 107, 104, 93, 94, 95, 76, 73,
-	68, 124, 133, 125, 2, 5, 8, 111, 63, 71,
-	72, 69, 3, 7, 11, 62, 74, 75, 35, 36,
-	142, 77, 13, 12, 37, 17, 60, 38, 39, 99,
-	59, 132, 101, 102, 103, 58, 40, 57, 100, 41,
-	56, 42, 43, 10, 44, 9, 116, 45, 55, 105,
-	46, 52, 114, 127, 47, 108, 109, 106, 51, 50,
-	1, 110, 129, 136, 78, 119, 64, 117, 118, 113,
-	19, 18, 131, 34, 33, 32, 31, 30, 29, 28,
-	27, 26, 25, 135, 134, 138, 24, 140, 139, 141,
-	23, 22, 143, 15, 126, 145,
+	116, 124, 64, 56, 14, 132, 101, 102, 119, 4,
+	6, 127, 83, 84, 141, 125, 57, 20, 85, 126,
+	21, 86, 87, 16, 88, 134, 51, 16, 74, 70,
+	89, 69, 50, 90, 91, 92, 93, 100, 94, 68,
+	148, 95, 111, 108, 96, 99, 80, 77, 97, 98,
+	72, 71, 115, 5, 128, 137, 129, 11, 66, 65,
+	3, 7, 75, 76, 73, 13, 146, 81, 17, 78,
+	79, 36, 37, 2, 12, 8, 63, 38, 39, 62,
+	40, 41, 136, 103, 61, 60, 105, 106, 107, 42,
+	104, 59, 43, 10, 44, 45, 9, 46, 120, 58,
+	47, 109, 55, 48, 54, 118, 131, 49, 53, 112,
+	113, 110, 52, 1, 133, 114, 140, 82, 67, 123,
+	117, 121, 122, 19, 18, 35, 135, 34, 33, 32,
+	31, 30, 29, 28, 27, 26, 25, 139, 138, 142,
+	24, 144, 143, 145, 23, 22, 147, 15, 130, 149,
 }
 var yyPact = []int{
 
-	7, 7, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -25,
-	-1000, -1000, -30, -1000, -1000, -1000, -1000, -1000, -1000, 62,
-	-13, -25, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -29, -1000,
-	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -9, -1000, -1000,
-	-15, -18, 2, -24, -1000, -29, -29, 1, -24, -24,
-	0, -1000, 3, -1, -10, -1000, -1000, -1000, -1000, -24,
-	-1000, -24, -1000, -1000, -24, -24, -1000, -24, -1000, -1000,
+	5, 5, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -26,
+	-1000, -1000, -30, -1000, -1000, -1000, -1000, -1000, -1000, 65,
+	-18, -26, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
 	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000, -1000, -1000, -1000, -1000, -4, -1000, -1000, -1000, -24,
-	-5, -29, -29, -24, -1000, -1000, -1000, -1000, -1000, -1000,
-	-25, -37, -1000, -33, 4, -1000, 8, -1000, -1000, -28,
-	-37, -1000, -1000, -1000, -1000, -1000, -1000, 6, -28, -1000,
-	-1000, -37, -42, -1000, -29, -37, -1000, -1000, -1000, -1000,
-	-37, -1000, -6, -1000, -1000, -1000,
+	-37, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -10,
+	-1000, -1000, -20, -23, 3, 2, -25, -1000, -37, -37,
+	-1, -25, -25, -2, -1000, 6, -3, -12, -1000, -1000,
+	-1000, -1000, -1000, -25, -1000, -25, -1000, -1000, -25, -25,
+	-1000, -25, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -5,
+	-1000, -1000, -1000, -25, -6, -37, -37, -25, -1000, -1000,
+	-1000, -1000, -1000, -1000, -26, -38, -1000, -36, 7, -1000,
+	11, -1000, -1000, -28, -38, -1000, -1000, -1000, -1000, -1000,
+	-1000, 9, -28, -1000, -1000, -38, -41, -1000, -37, -38,
+	-1000, -1000, -1000, -1000, -38, -1000, -8, -1000, -1000, -1000,
 }
 var yyPgo = []int{
 
-	0, 6, 144, 0, 8, 4, 143, 141, 140, 136,
-	132, 131, 130, 129, 128, 127, 126, 125, 124, 123,
-	64, 121, 120, 119, 116, 2, 114, 113, 112, 5,
-	7, 3, 1, 110, 54, 109, 108, 103, 102, 101,
-	99, 98, 96, 95, 93, 90, 88, 87, 85, 81,
-	80, 76, 73, 71, 70, 65, 58, 57,
+	0, 6, 148, 0, 8, 4, 147, 145, 144, 140,
+	136, 135, 134, 133, 132, 131, 130, 129, 128, 127,
+	125, 57, 124, 123, 120, 118, 2, 117, 116, 114,
+	5, 7, 3, 1, 113, 73, 112, 108, 106, 105,
+	104, 102, 101, 99, 98, 96, 93, 91, 90, 85,
+	84, 82, 79, 76, 74, 67, 66, 59, 58, 52,
 }
 var yyR1 = []int{
 
-	0, 33, 33, 35, 7, 36, 8, 1, 37, 2,
-	3, 38, 23, 23, 39, 9, 40, 10, 41, 11,
-	28, 29, 42, 4, 34, 43, 34, 44, 34, 34,
-	34, 45, 46, 12, 47, 13, 48, 49, 14, 50,
-	15, 51, 16, 52, 20, 21, 21, 21, 21, 21,
-	21, 21, 21, 21, 21, 21, 21, 21, 22, 22,
-	22, 22, 53, 54, 17, 55, 25, 27, 27, 27,
-	26, 26, 26, 26, 26, 26, 26, 26, 26, 26,
-	26, 26, 26, 26, 26, 26, 56, 57, 18, 5,
-	19, 24, 24, 24, 30, 31, 6, 32,
+	0, 34, 34, 36, 7, 37, 8, 1, 38, 2,
+	3, 39, 24, 24, 40, 9, 41, 10, 42, 11,
+	43, 12, 29, 30, 44, 4, 35, 45, 35, 46,
+	35, 35, 35, 47, 48, 13, 49, 14, 50, 51,
+	15, 52, 16, 53, 17, 54, 21, 22, 22, 22,
+	22, 22, 22, 22, 22, 22, 22, 22, 22, 22,
+	22, 23, 23, 23, 23, 55, 56, 18, 57, 26,
+	28, 28, 28, 27, 27, 27, 27, 27, 27, 27,
+	27, 27, 27, 27, 27, 27, 27, 27, 27, 58,
+	59, 19, 5, 20, 25, 25, 25, 31, 32, 6,
+	33,
 }
 var yyR2 = []int{
 
 	0, 1, 2, 0, 3, 0, 3, 1, 0, 2,
-	2, 0, 2, 2, 0, 3, 0, 6, 0, 6,
-	1, 1, 0, 2, 1, 0, 3, 0, 3, 2,
-	2, 0, 0, 5, 0, 3, 0, 0, 9, 0,
-	6, 0, 3, 0, 2, 2, 2, 2, 2, 2,
+	2, 0, 2, 2, 0, 3, 0, 3, 0, 6,
+	0, 6, 1, 1, 0, 2, 1, 0, 3, 0,
+	3, 2, 2, 0, 0, 5, 0, 3, 0, 0,
+	9, 0, 6, 0, 3, 0, 2, 2, 2, 2,
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-	1, 1, 0, 0, 12, 0, 2, 1, 1, 2,
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-	1, 1, 1, 1, 1, 1, 0, 0, 10, 1,
-	2, 0, 1, 2, 1, 1, 1, 1,
+	2, 2, 2, 1, 1, 0, 0, 12, 0, 2,
+	1, 1, 2, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+	0, 10, 1, 2, 0, 1, 2, 1, 1, 1,
+	1,
 }
 var yyChk = []int{
 
-	-1000, -33, -34, 55, 4, 48, 5, 56, -34, -43,
-	-44, -20, -52, -20, -5, -6, 53, -20, -21, -22,
+	-1000, -34, -35, 55, 4, 48, 5, 56, -35, -45,
+	-46, -21, -54, -21, -5, -6, 53, -21, -22, -23,
 	-5, 50, -7, -8, -9, -10, -11, -12, -13, -14,
-	-15, -16, -17, -18, -19, 6, 7, 12, 15, 16,
-	24, 27, 29, 30, 32, 35, 38, 42, 50, -5,
-	-35, -36, -39, -31, 53, -41, -45, -47, -48, -50,
-	-51, -25, -55, -56, -24, 49, 51, 52, 48, -30,
-	53, -31, -31, 48, -30, -30, 48, -53, -26, 6,
-	7, 12, 15, 16, 18, 24, 27, 28, 29, 30,
-	32, 35, 38, 42, 43, 48, 49, -1, -30, -30,
-	-46, -30, -30, -1, 48, -40, -30, 48, -31, -31,
-	-30, -57, -3, -23, -38, -4, -42, -4, -4, -5,
-	-32, 53, 55, 47, 47, 45, -2, -37, -29, -28,
-	53, -32, -49, 46, -29, -32, -27, 55, -25, -31,
-	-32, -25, -54, -32, 48, -3,
+	-15, -16, -17, -18, -19, -20, 6, 7, 12, 13,
+	15, 16, 24, 27, 29, 30, 32, 35, 38, 42,
+	50, -5, -36, -37, -40, -41, -32, 53, -43, -47,
+	-49, -50, -52, -53, -26, -57, -58, -25, 49, 51,
+	52, 48, 48, -31, 53, -32, -32, 48, -31, -31,
+	48, -55, -27, 6, 7, 12, 15, 16, 18, 24,
+	27, 28, 29, 30, 32, 35, 38, 42, 43, 48,
+	49, -1, -31, -31, -48, -31, -31, -1, 48, -42,
+	-31, 48, -32, -32, -31, -59, -3, -24, -39, -4,
+	-44, -4, -4, -5, -33, 53, 55, 47, 47, 45,
+	-2, -38, -30, -29, 53, -33, -51, 46, -30, -33,
+	-28, 55, -26, -32, -33, -26, -56, -33, 48, -3,
 }
 var yyDef = []int{
 
-	0, -2, 1, 24, 25, 27, 43, 43, 2, 0,
-	43, 29, 0, 30, 26, 89, 96, 28, 44, 0,
-	60, 61, 45, 46, 47, 48, 49, 50, 51, 52,
-	53, 54, 55, 56, 57, 3, 5, 14, 0, 18,
-	31, 34, 36, 39, 41, 65, 86, 91, 58, 59,
-	0, 0, 0, 0, 95, 0, 0, 0, 0, 0,
-	0, 62, 0, 0, 90, 92, 4, 6, 15, 0,
-	94, 0, 32, 35, 0, 0, 42, 0, 66, 70,
-	71, 72, 73, 74, 75, 76, 77, 78, 79, 80,
-	81, 82, 83, 84, 85, 0, 93, 16, 7, 0,
-	0, 0, 0, 0, 87, 11, 22, 33, 22, 22,
-	0, 0, 17, 0, 0, 19, 0, 8, 40, 0,
-	0, 97, 10, 13, 12, 23, 37, 0, 0, 21,
-	20, 0, 65, 9, 0, 0, -2, 67, 68, 63,
-	0, 69, 0, 88, 11, 64,
+	0, -2, 1, 26, 27, 29, 45, 45, 2, 0,
+	45, 31, 0, 32, 28, 92, 99, 30, 46, 0,
+	63, 64, 47, 48, 49, 50, 51, 52, 53, 54,
+	55, 56, 57, 58, 59, 60, 3, 5, 14, 16,
+	0, 20, 33, 36, 38, 41, 43, 68, 89, 94,
+	61, 62, 0, 0, 0, 0, 0, 98, 0, 0,
+	0, 0, 0, 0, 65, 0, 0, 93, 95, 4,
+	6, 15, 17, 0, 97, 0, 34, 37, 0, 0,
+	44, 0, 69, 73, 74, 75, 76, 77, 78, 79,
+	80, 81, 82, 83, 84, 85, 86, 87, 88, 0,
+	96, 18, 7, 0, 0, 0, 0, 0, 90, 11,
+	24, 35, 24, 24, 0, 0, 19, 0, 0, 21,
+	0, 8, 42, 0, 0, 100, 10, 13, 12, 25,
+	39, 0, 0, 23, 22, 0, 68, 9, 0, 0,
+	-2, 70, 71, 66, 0, 72, 0, 91, 11, 67,
 }
 var yyTok1 = []int{
 
@@ -591,19 +593,27 @@ yydefault:
 		}
 	case 16:
 		{
+			yylex.begin(sc_DOMAIN)
+		}
+	case 17:
+		{
+			yyVAL.rrData = &rr.DNAME{yyS[yypt-0].str}
+		}
+	case 18:
+		{
 			if yyS[yypt-1].uint != 3 {
 				yylex.Error(`protocol must be "3"`)
 			}
 		}
-	case 17:
+	case 19:
 		{
 			yyVAL.rrData = &rr.DNSKEY{uint16(yyS[yypt-4].uint), byte(yyS[yypt-3].uint), yyS[yypt-2].alg, yyS[yypt-0].data}
 		}
-	case 18:
+	case 20:
 		{
 			yylex.begin(sc_NUM)
 		}
-	case 19:
+	case 21:
 		{
 			if yyS[yypt-1].uint != 1 || len(yyS[yypt-0].data) != 20 {
 				yylex.Error(`digest type must be "1" and digest must be exactly 20 bytes (40 hex chars)`)
@@ -611,7 +621,7 @@ yydefault:
 				yyVAL.rrData = &rr.DS{uint16(yyS[yypt-3].uint), rr.AlgorithmType(yyS[yypt-2].uint), rr.HashAlgorithm(yyS[yypt-1].uint), yyS[yypt-0].data}
 			}
 		}
-	case 20:
+	case 22:
 		{
 			if t, err := dns.String2Seconds(yyS[yypt-0].str); err != nil {
 				yylex.Error(err.String())
@@ -619,61 +629,53 @@ yydefault:
 				yyVAL.u64 = uint64(t)
 			}
 		}
-	case 21:
+	case 23:
 		{
 			yyVAL.uint = uint(yyS[yypt-0].u64)
 		}
-	case 22:
+	case 24:
 		{
 			yylex.begin(sc_HEX)
 		}
-	case 23:
+	case 25:
 		{
 			yyVAL.data = yyS[yypt-0].data
 		}
-	case 24:
+	case 26:
 		{
 			yylex.begin(sc_INITIAL)
 		}
-	case 25:
+	case 27:
 		{
 			yylex.begin(sc_NUM)
 		}
-	case 27:
+	case 29:
 		{
 			yylex.begin(sc_RRHEAD)
 		}
-	case 28:
+	case 30:
 		{
 			yyS[yypt-0].rr.Name = yyS[yypt-2].str
 			if !yylex.rrHandler(yyS[yypt-0].rr) {
 				goto ret0
 			}
 		}
-	case 29:
+	case 31:
 		{
 			if !yylex.rrHandler(yyS[yypt-0].rr) {
 				goto ret0
 			}
 		}
-	case 30:
+	case 32:
 		{
 			yyS[yypt-0].rr.Name = "@"
 			if !yylex.rrHandler(yyS[yypt-0].rr) {
 				goto ret0
 			}
 		}
-	case 31:
-		{
-			yylex.begin(sc_NUM)
-		}
-	case 32:
-		{
-			yylex.begin(sc_DOMAIN)
-		}
 	case 33:
 		{
-			yyVAL.rrData = &rr.MX{uint16(yyS[yypt-2].uint), yyS[yypt-0].str}
+			yylex.begin(sc_NUM)
 		}
 	case 34:
 		{
@@ -681,240 +683,252 @@ yydefault:
 		}
 	case 35:
 		{
-			yyVAL.rrData = &rr.NS{yyS[yypt-0].str}
+			yyVAL.rrData = &rr.MX{uint16(yyS[yypt-2].uint), yyS[yypt-0].str}
 		}
 	case 36:
 		{
-			yylex.begin(sc_NUM)
+			yylex.begin(sc_DOMAIN)
 		}
 	case 37:
 		{
-			yylex.begin(sc_TYPE)
+			yyVAL.rrData = &rr.NS{yyS[yypt-0].str}
 		}
 	case 38:
 		{
-			yyVAL.rrData = &rr.NSEC3{rr.NSEC3PARAM{rr.HashAlgorithm(yyS[yypt-6].uint), byte(yyS[yypt-5].uint), uint16(yyS[yypt-4].uint), yyS[yypt-3].data}, yyS[yypt-2].data, rr.TypesEncode(yyS[yypt-0].types)}
+			yylex.begin(sc_NUM)
 		}
 	case 39:
 		{
-			yylex.begin(sc_NUM)
+			yylex.begin(sc_TYPE)
 		}
 	case 40:
 		{
-			yyVAL.rrData = &rr.NSEC3PARAM{rr.HashAlgorithm(yyS[yypt-3].uint), byte(yyS[yypt-2].uint), uint16(yyS[yypt-1].uint), yyS[yypt-0].data}
+			yyVAL.rrData = &rr.NSEC3{rr.NSEC3PARAM{rr.HashAlgorithm(yyS[yypt-6].uint), byte(yyS[yypt-5].uint), uint16(yyS[yypt-4].uint), yyS[yypt-3].data}, yyS[yypt-2].data, rr.TypesEncode(yyS[yypt-0].types)}
 		}
 	case 41:
 		{
-			yylex.begin(sc_DOMAIN)
+			yylex.begin(sc_NUM)
 		}
 	case 42:
 		{
-			yyVAL.rrData = &rr.PTR{yyS[yypt-0].str}
+			yyVAL.rrData = &rr.NSEC3PARAM{rr.HashAlgorithm(yyS[yypt-3].uint), byte(yyS[yypt-2].uint), uint16(yyS[yypt-1].uint), yyS[yypt-0].data}
 		}
 	case 43:
 		{
-			yylex.begin(sc_RRHEAD)
+			yylex.begin(sc_DOMAIN)
 		}
 	case 44:
 		{
-			yyVAL.rr = yyS[yypt-0].rr
+			yyVAL.rrData = &rr.PTR{yyS[yypt-0].str}
 		}
 	case 45:
 		{
-			yyVAL.rr = &rr.RR{"", rr.TYPE_A, yyS[yypt-1].rrh.class, yyS[yypt-1].rrh.ttl, yyS[yypt-0].rrData}
+			yylex.begin(sc_RRHEAD)
 		}
 	case 46:
 		{
-			yyVAL.rr = &rr.RR{"", rr.TYPE_AAAA, yyS[yypt-1].rrh.class, yyS[yypt-1].rrh.ttl, yyS[yypt-0].rrData}
+			yyVAL.rr = yyS[yypt-0].rr
 		}
 	case 47:
 		{
-			yyVAL.rr = &rr.RR{"", rr.TYPE_CNAME, yyS[yypt-1].rrh.class, yyS[yypt-1].rrh.ttl, yyS[yypt-0].rrData}
+			yyVAL.rr = &rr.RR{"", rr.TYPE_A, yyS[yypt-1].rrh.class, yyS[yypt-1].rrh.ttl, yyS[yypt-0].rrData}
 		}
 	case 48:
 		{
-			yyVAL.rr = &rr.RR{"", rr.TYPE_DNSKEY, yyS[yypt-1].rrh.class, yyS[yypt-1].rrh.ttl, yyS[yypt-0].rrData}
+			yyVAL.rr = &rr.RR{"", rr.TYPE_AAAA, yyS[yypt-1].rrh.class, yyS[yypt-1].rrh.ttl, yyS[yypt-0].rrData}
 		}
 	case 49:
 		{
-			yyVAL.rr = &rr.RR{"", rr.TYPE_DS, yyS[yypt-1].rrh.class, yyS[yypt-1].rrh.ttl, yyS[yypt-0].rrData}
+			yyVAL.rr = &rr.RR{"", rr.TYPE_CNAME, yyS[yypt-1].rrh.class, yyS[yypt-1].rrh.ttl, yyS[yypt-0].rrData}
 		}
 	case 50:
 		{
-			yyVAL.rr = &rr.RR{"", rr.TYPE_MX, yyS[yypt-1].rrh.class, yyS[yypt-1].rrh.ttl, yyS[yypt-0].rrData}
+			yyVAL.rr = &rr.RR{"", rr.TYPE_DNAME, yyS[yypt-1].rrh.class, yyS[yypt-1].rrh.ttl, yyS[yypt-0].rrData}
 		}
 	case 51:
 		{
-			yyVAL.rr = &rr.RR{"", rr.TYPE_NS, yyS[yypt-1].rrh.class, yyS[yypt-1].rrh.ttl, yyS[yypt-0].rrData}
+			yyVAL.rr = &rr.RR{"", rr.TYPE_DNSKEY, yyS[yypt-1].rrh.class, yyS[yypt-1].rrh.ttl, yyS[yypt-0].rrData}
 		}
 	case 52:
 		{
-			yyVAL.rr = &rr.RR{"", rr.TYPE_NSEC3, yyS[yypt-1].rrh.class, yyS[yypt-1].rrh.ttl, yyS[yypt-0].rrData}
+			yyVAL.rr = &rr.RR{"", rr.TYPE_DS, yyS[yypt-1].rrh.class, yyS[yypt-1].rrh.ttl, yyS[yypt-0].rrData}
 		}
 	case 53:
 		{
-			yyVAL.rr = &rr.RR{"", rr.TYPE_NSEC3PARAM, yyS[yypt-1].rrh.class, yyS[yypt-1].rrh.ttl, yyS[yypt-0].rrData}
+			yyVAL.rr = &rr.RR{"", rr.TYPE_MX, yyS[yypt-1].rrh.class, yyS[yypt-1].rrh.ttl, yyS[yypt-0].rrData}
 		}
 	case 54:
 		{
-			yyVAL.rr = &rr.RR{"", rr.TYPE_PTR, yyS[yypt-1].rrh.class, yyS[yypt-1].rrh.ttl, yyS[yypt-0].rrData}
+			yyVAL.rr = &rr.RR{"", rr.TYPE_NS, yyS[yypt-1].rrh.class, yyS[yypt-1].rrh.ttl, yyS[yypt-0].rrData}
 		}
 	case 55:
 		{
-			yyVAL.rr = &rr.RR{"", rr.TYPE_RRSIG, yyS[yypt-1].rrh.class, yyS[yypt-1].rrh.ttl, yyS[yypt-0].rrData}
+			yyVAL.rr = &rr.RR{"", rr.TYPE_NSEC3, yyS[yypt-1].rrh.class, yyS[yypt-1].rrh.ttl, yyS[yypt-0].rrData}
 		}
 	case 56:
 		{
-			yyVAL.rr = &rr.RR{"", rr.TYPE_SOA, yyS[yypt-1].rrh.class, yyS[yypt-1].rrh.ttl, yyS[yypt-0].rrData}
+			yyVAL.rr = &rr.RR{"", rr.TYPE_NSEC3PARAM, yyS[yypt-1].rrh.class, yyS[yypt-1].rrh.ttl, yyS[yypt-0].rrData}
 		}
 	case 57:
 		{
-			yyVAL.rr = &rr.RR{"", rr.TYPE_TXT, yyS[yypt-1].rrh.class, yyS[yypt-1].rrh.ttl, yyS[yypt-0].rrData}
+			yyVAL.rr = &rr.RR{"", rr.TYPE_PTR, yyS[yypt-1].rrh.class, yyS[yypt-1].rrh.ttl, yyS[yypt-0].rrData}
 		}
 	case 58:
 		{
-			yyVAL.rrh = rrHead{int32(yyS[yypt-1].int), yyS[yypt-0].class}
+			yyVAL.rr = &rr.RR{"", rr.TYPE_RRSIG, yyS[yypt-1].rrh.class, yyS[yypt-1].rrh.ttl, yyS[yypt-0].rrData}
 		}
 	case 59:
 		{
-			yyVAL.rrh = rrHead{int32(yyS[yypt-0].int), yyS[yypt-1].class}
+			yyVAL.rr = &rr.RR{"", rr.TYPE_SOA, yyS[yypt-1].rrh.class, yyS[yypt-1].rrh.ttl, yyS[yypt-0].rrData}
 		}
 	case 60:
 		{
-			yyVAL.rrh = rrHead{int32(yyS[yypt-0].int), 0}
+			yyVAL.rr = &rr.RR{"", rr.TYPE_TXT, yyS[yypt-1].rrh.class, yyS[yypt-1].rrh.ttl, yyS[yypt-0].rrData}
 		}
 	case 61:
 		{
-			yyVAL.rrh = rrHead{-1, yyS[yypt-0].class}
+			yyVAL.rrh = rrHead{int32(yyS[yypt-1].int), yyS[yypt-0].class}
 		}
 	case 62:
 		{
-			yylex.begin(sc_NUM)
+			yyVAL.rrh = rrHead{int32(yyS[yypt-0].int), yyS[yypt-1].class}
 		}
 	case 63:
 		{
-			yylex.begin(sc_DOMAIN)
+			yyVAL.rrh = rrHead{int32(yyS[yypt-0].int), 0}
 		}
 	case 64:
 		{
-			yyVAL.rrData = &rr.RRSIG{yyS[yypt-10].typ, yyS[yypt-8].alg, byte(yyS[yypt-7].uint), int32(yyS[yypt-6].int), uint32(yyS[yypt-5].uint), uint32(yyS[yypt-4].uint), uint16(yyS[yypt-3].uint), yyS[yypt-1].str, yyS[yypt-0].data}
+			yyVAL.rrh = rrHead{-1, yyS[yypt-0].class}
 		}
 	case 65:
 		{
-			yylex.begin(sc_TYPE)
+			yylex.begin(sc_NUM)
 		}
 	case 66:
 		{
-			yyVAL.typ = yyS[yypt-0].typ
+			yylex.begin(sc_DOMAIN)
 		}
 	case 67:
+		{
+			yyVAL.rrData = &rr.RRSIG{yyS[yypt-10].typ, yyS[yypt-8].alg, byte(yyS[yypt-7].uint), int32(yyS[yypt-6].int), uint32(yyS[yypt-5].uint), uint32(yyS[yypt-4].uint), uint16(yyS[yypt-3].uint), yyS[yypt-1].str, yyS[yypt-0].data}
+		}
+	case 68:
+		{
+			yylex.begin(sc_TYPE)
+		}
+	case 69:
+		{
+			yyVAL.typ = yyS[yypt-0].typ
+		}
+	case 70:
 		{
 			yyVAL.types = nil
 			yylex.begin(sc_INITIAL)
 		}
-	case 68:
+	case 71:
 		{
 			yyVAL.types = []rr.Type{yyS[yypt-0].typ}
 		}
-	case 69:
+	case 72:
 		{
 			yyVAL.types = append(yyVAL.types, yyS[yypt-0].typ)
 		}
-	case 70:
+	case 73:
 		{
 			yyVAL.typ = rr.TYPE_A
 		}
-	case 71:
+	case 74:
 		{
 			yyVAL.typ = rr.TYPE_AAAA
 		}
-	case 72:
+	case 75:
 		{
 			yyVAL.typ = rr.TYPE_CNAME
 		}
-	case 73:
+	case 76:
 		{
 			yyVAL.typ = rr.TYPE_DNSKEY
 		}
-	case 74:
+	case 77:
 		{
 			yyVAL.typ = rr.TYPE_DS
 		}
-	case 75:
+	case 78:
 		{
 			yyVAL.typ = rr.TYPE_HINFO
 		}
-	case 76:
+	case 79:
 		{
 			yyVAL.typ = rr.TYPE_MX
 		}
-	case 77:
+	case 80:
 		{
 			yyVAL.typ = rr.TYPE_NS
 		}
-	case 78:
+	case 81:
 		{
 			yyVAL.typ = rr.TYPE_NSEC
 		}
-	case 79:
+	case 82:
 		{
 			yyVAL.typ = rr.TYPE_NSEC3
 		}
-	case 80:
+	case 83:
 		{
 			yyVAL.typ = rr.TYPE_NSEC3PARAM
 		}
-	case 81:
+	case 84:
 		{
 			yyVAL.typ = rr.TYPE_PTR
 		}
-	case 82:
+	case 85:
 		{
 			yyVAL.typ = rr.TYPE_RRSIG
 		}
-	case 83:
+	case 86:
 		{
 			yyVAL.typ = rr.TYPE_SOA
 		}
-	case 84:
+	case 87:
 		{
 			yyVAL.typ = rr.TYPE_TXT
 		}
-	case 85:
+	case 88:
 		{
 			yyVAL.typ = rr.TYPE_WKS
 		}
-	case 86:
+	case 89:
 		{
 			yylex.begin(sc_DOMAIN)
 		}
-	case 87:
+	case 90:
 		{
 			yylex.begin(sc_NUM)
 		}
-	case 88:
+	case 91:
 		{
 			yyVAL.rrData = &rr.SOA{yyS[yypt-7].str, yyS[yypt-6].str, uint32(yyS[yypt-4].uint), uint32(yyS[yypt-3].uint), uint32(yyS[yypt-2].uint), uint32(yyS[yypt-1].uint), uint32(yyS[yypt-0].uint)}
 		}
-	case 89:
+	case 92:
 		yyVAL.int = yyS[yypt-0].int
-	case 90:
+	case 93:
 		{
 			yyVAL.rrData = &rr.TXT{yyS[yypt-0].str}
 		}
-	case 91:
+	case 94:
 		{
 			yyVAL.str = ""
 		}
-	case 92:
+	case 95:
 		{
 			yyVAL.str = yyS[yypt-0].str
 		}
-	case 93:
+	case 96:
 		{
 			yyVAL.str += yyS[yypt-0].str
 		}
-	case 94:
+	case 97:
 		{
 			if yyS[yypt-0].u64 > math.MaxUint8 {
 				yylex.Error("number out of range")
@@ -923,7 +937,7 @@ yydefault:
 				yyVAL.uint = uint(yyS[yypt-0].u64)
 			}
 		}
-	case 95:
+	case 98:
 		{
 			if yyS[yypt-0].u64 > math.MaxUint16 {
 				yylex.Error("number out of range")
@@ -932,7 +946,7 @@ yydefault:
 				yyVAL.uint = uint(yyS[yypt-0].u64)
 			}
 		}
-	case 96:
+	case 99:
 		{
 			if yyS[yypt-0].u64 > math.MaxInt32 {
 				yylex.Error("number out of range")
@@ -941,7 +955,7 @@ yydefault:
 				yyVAL.int = int(yyS[yypt-0].u64)
 			}
 		}
-	case 97:
+	case 100:
 		{
 			if yyS[yypt-0].u64 > math.MaxUint32 {
 				yylex.Error("number out of range")
