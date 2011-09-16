@@ -86,7 +86,16 @@ type Header struct {
 	RA bool
 	// Reserved for future use.  Must be zero in all queries
 	// and responses.
-	Z byte
+	Z bool
+	// rfc2535: The AD (authentic data) bit indicates
+	// in a response that all the data included in the answer and authority
+	// portion of the response has been authenticated by the server
+	// according to the policies of that server.
+	AD bool
+	// The CD (checking disabled)
+	// bit indicates in a query that Pending (non-authenticated) data is
+	// acceptable to the resolver sending the query.
+	CD bool
 	// Response code - this 4 bit field is set as part of
 	// responses.
 	RCODE
@@ -105,10 +114,18 @@ type Header struct {
 	ARCOUNT uint16
 }
 
+func b2i(b bool) int {
+	if b {
+		return 1
+	}
+
+	return 0
+}
+
 func (h *Header) String() string {
 	return fmt.Sprintf(
-		"ID:%d QR:%t OPCODE:%s AA:%t TC:%t RD:%t RA:%t Z:%d RCODE:%s QDCOUNT:%d ANCOUNT:%d NSCOUNT:%d ARCOUNT:%d",
-		h.ID, h.QR, h.Opcode, h.AA, h.TC, h.RD, h.RA, h.Z, h.RCODE, h.QDCOUNT, h.ANCOUNT, h.NSCOUNT, h.ARCOUNT,
+		"ID:%d QR:%t OPCODE:%s AA:%t TC:%t RD:%t RA:%t Z:%d AD:%d CD:%d RCODE:%s QDCOUNT:%d ANCOUNT:%d NSCOUNT:%d ARCOUNT:%d",
+		h.ID, h.QR, h.Opcode, h.AA, h.TC, h.RD, h.RA, b2i(h.Z), b2i(h.AD), b2i(h.CD), h.RCODE, h.QDCOUNT, h.ANCOUNT, h.NSCOUNT, h.ARCOUNT,
 	)
 }
 
@@ -140,7 +157,22 @@ func (m *Header) Encode(b *dns.Wirebuf) {
 		w |= 1
 	}
 
-	w <<= 7
+	w <<= 1
+	if m.Z {
+		w |= 1
+	}
+
+	w <<= 1
+	if m.AD {
+		w |= 1
+	}
+
+	w <<= 1
+	if m.CD {
+		w |= 1
+	}
+
+	w <<= 4
 	w |= uint16(m.RCODE) & 0xF
 	dns.Octets2(w).Encode(b)
 	dns.Octets2(m.QDCOUNT).Encode(b)
@@ -162,8 +194,12 @@ func (m *Header) Decode(b []byte, pos *int) (err os.Error) {
 
 	m.RCODE = RCODE(w & 0xF)
 	w >>= 4
-	m.Z = byte(w & 7)
-	w >>= 3
+	m.CD = w&1 != 0
+	w >>= 1
+	m.AD = w&1 != 0
+	w >>= 1
+	m.Z = w&1 != 0
+	w >>= 1
 	m.RA = w&1 != 0
 	w >>= 1
 	m.RD = w&1 != 0
@@ -200,13 +236,13 @@ func (m *Header) Decode(b []byte, pos *int) (err os.Error) {
 
 	m.ARCOUNT = uint16(w)
 
-	if m.Z != 0 {
-		err = fmt.Errorf("invalid DNS message header Z:%d", m.Z)
+	if m.Z {
+		err = fmt.Errorf("invalid DNS message header Z:%t", m.Z)
 	}
 	return
 }
 
-// Message is a DNS message. (RFC 1035, Chapter 4)
+// Message is a DNS message. (RFC 1035, Chapter 4, RFC2535)
 type Message struct {
 	Header
 	Question          // the question for the name server

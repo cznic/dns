@@ -77,7 +77,7 @@ func RxAll(conn *net.TCPConn, zone string, msgHandler RxMsgHandler, errHandler E
 			!h.QR ||
 			h.Opcode != m.Header.Opcode ||
 			h.TC ||
-			h.Z != 0 ||
+			h.Z ||
 			h.QDCOUNT != 1 {
 			if errHandler == nil || !errHandler(serial, &Error{"invalid msg received", m}) {
 				return
