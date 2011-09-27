@@ -149,52 +149,52 @@ yystate0:
 		if yyb {
 			goto yystart1
 		}
-		goto yystart164
+		goto yystart212
 	case 4: // start condition: ipv4
 		if yyb {
 			goto yystart32
 		}
-		goto yystart165
+		goto yystart213
 	case 8: // start condition: type
 		if yyb {
 			goto yystart50
 		}
-		goto yystart166
+		goto yystart214
 	case 1: // start condition: rrHead
 		if yyb {
-			goto yystart167
+			goto yystart215
 		}
-		goto yystart191
+		goto yystart239
 	case 5: // start condition: ipv6
 		if yyb {
-			goto yystart175
+			goto yystart223
 		}
-		goto yystart192
+		goto yystart240
 	case 9: // start condition: hex
 		if yyb {
-			goto yystart188
+			goto yystart236
 		}
-		goto yystart193
+		goto yystart241
 	case 2: // start condition: domain
 		if yyb {
-			goto yystart194
+			goto yystart242
 		}
-		goto yystart201
+		goto yystart249
 	case 6: // start condition: base32ext
 		if yyb {
-			goto yystart199
+			goto yystart247
 		}
-		goto yystart202
+		goto yystart250
 	case 3: // start condition: num
 		if yyb {
-			goto yystart203
+			goto yystart251
 		}
-		goto yystart206
+		goto yystart254
 	case 7: // start condition: base64
 		if yyb {
-			goto yystart204
+			goto yystart252
 		}
-		goto yystart207
+		goto yystart255
 	}
 
 	goto yystate1 // silence unused label error
@@ -204,24 +204,24 @@ yystart1:
 	switch {
 	default:
 		goto yyabort
-	case c == ';':
-		goto yystate11
-	case c == '.':
-		goto yystate13
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z':
 		goto yystate2
+	case c == '"':
+		goto yystate6
 	case c == '\t' || c == ' ':
 		goto yystate9
+	case c == '.':
+		goto yystate13
+	case c == '\n' || c == '\r':
+		goto yystate12
 	case c == ')':
 		goto yystate5
 	case c == '$':
 		goto yystate14
-	case c == '"':
-		goto yystate6
+	case c == ';':
+		goto yystate11
 	case c == '(':
 		goto yystate31
-	case c == '\n' || c == '\r':
-		goto yystate12
 	}
 
 yystate2:
@@ -266,12 +266,12 @@ yystate6:
 	switch {
 	default:
 		goto yyabort
+	case c >= '\x01' && c <= '\t' || c == '\v' || c == '\f' || c >= '\x0e' && c <= '!' || c >= '#' && c <= '[' || c >= ']' && c <= 'ÿ':
+		goto yystate6
 	case c == '"':
 		goto yystate7
 	case c == '\\':
 		goto yystate8
-	case c >= '\x01' && c <= '\t' || c == '\v' || c == '\f' || c >= '\x0e' && c <= '!' || c >= '#' && c <= '[' || c >= ']' && c <= 'ÿ':
-		goto yystate6
 	}
 
 yystate7:
@@ -292,12 +292,12 @@ yystate9:
 	switch {
 	default:
 		goto yyrule11
-	case c == ';':
-		goto yystate11
-	case c == '\x00' || c == '\n':
-		goto yystate10
 	case c == '\t' || c == ' ':
 		goto yystate9
+	case c == '\x00' || c == '\n':
+		goto yystate10
+	case c == ';':
+		goto yystate11
 	}
 
 yystate10:
@@ -325,12 +325,12 @@ yystate14:
 	switch {
 	default:
 		goto yyabort
+	case c == 'T':
+		goto yystate21
 	case c == 'I':
 		goto yystate24
 	case c == 'O':
 		goto yystate15
-	case c == 'T':
-		goto yystate21
 	}
 
 yystate15:
@@ -473,20 +473,20 @@ yystart32:
 	switch {
 	default:
 		goto yyabort
-	case c == ';':
-		goto yystate11
 	case c == '\t' || c == ' ':
 		goto yystate48
-	case c == ')':
-		goto yystate5
 	case c == '"':
 		goto yystate6
-	case c >= '0' && c <= '9':
-		goto yystate33
-	case c == '(':
-		goto yystate31
 	case c == '\n' || c == '\r':
 		goto yystate12
+	case c == ')':
+		goto yystate5
+	case c >= '0' && c <= '9':
+		goto yystate33
+	case c == ';':
+		goto yystate11
+	case c == '(':
+		goto yystate31
 	}
 
 yystate33:
@@ -494,10 +494,10 @@ yystate33:
 	switch {
 	default:
 		goto yyabort
-	case c >= '0' && c <= '9':
-		goto yystate34
 	case c == '.':
 		goto yystate36
+	case c >= '0' && c <= '9':
+		goto yystate34
 	}
 
 yystate34:
@@ -534,10 +534,10 @@ yystate37:
 	switch {
 	default:
 		goto yyabort
-	case c == '.':
-		goto yystate40
 	case c >= '0' && c <= '9':
 		goto yystate38
+	case c == '.':
+		goto yystate40
 	}
 
 yystate38:
@@ -545,10 +545,10 @@ yystate38:
 	switch {
 	default:
 		goto yyabort
-	case c == '.':
-		goto yystate40
 	case c >= '0' && c <= '9':
 		goto yystate39
+	case c == '.':
+		goto yystate40
 	}
 
 yystate39:
@@ -585,10 +585,10 @@ yystate42:
 	switch {
 	default:
 		goto yyabort
-	case c >= '0' && c <= '9':
-		goto yystate43
 	case c == '.':
 		goto yystate44
+	case c >= '0' && c <= '9':
+		goto yystate43
 	}
 
 yystate43:
@@ -613,7 +613,7 @@ yystate45:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule58
+		goto yyrule73
 	case c >= '0' && c <= '9':
 		goto yystate46
 	}
@@ -622,26 +622,26 @@ yystate46:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule58
+		goto yyrule73
 	case c >= '0' && c <= '9':
 		goto yystate47
 	}
 
 yystate47:
 	c = l.getc(c)
-	goto yyrule58
+	goto yyrule73
 
 yystate48:
 	c = l.getc(c)
 	switch {
 	default:
 		goto yyrule14
-	case c == ';':
-		goto yystate11
 	case c == '\t' || c == ' ':
 		goto yystate48
 	case c == '\x00' || c == '\n':
 		goto yystate49
+	case c == ';':
+		goto yystate11
 	}
 
 yystate49:
@@ -654,50 +654,54 @@ yystart50:
 	switch {
 	default:
 		goto yyabort
-	case c == 'W':
-		goto yystate105
-	case c == ';':
-		goto yystate11
-	case c == 'L':
-		goto yystate127
+	case c == 'C':
+		goto yystate91
 	case c == '\t' || c == ' ':
 		goto yystate48
+	case c == 'E':
+		goto yystate185
 	case c == 'N':
 		goto yystate51
-	case c == 'A':
-		goto yystate140
-	case c == 'M':
-		goto yystate162
-	case c == 'K':
-		goto yystate88
-	case c == 'H':
-		goto yystate122
-	case c == ')':
-		goto yystate5
 	case c == '"':
 		goto yystate6
-	case c == 'T':
-		goto yystate134
-	case c == 'C':
-		goto yystate76
+	case c == 'A':
+		goto yystate171
+	case c == 'S':
+		goto yystate111
 	case c == 'D':
-		goto yystate108
-	case c == 'I':
-		goto yystate151
-	case c == '(':
-		goto yystate31
-	case c == 'P':
-		goto yystate130
-	case c == 'X':
-		goto yystate137
+		goto yystate127
+	case c == 'T':
+		goto yystate154
 	case c == 'R':
-		goto yystate69
+		goto yystate81
+	case c == 'I':
+		goto yystate188
+	case c == 'W':
+		goto yystate124
+	case c == 'U':
+		goto yystate201
+	case c == 'M':
+		goto yystate199
+	case c == 'H':
+		goto yystate141
 	case c == '\n' || c == '\r':
 		goto yystate12
-	case c == 'S':
-		goto yystate92
 	case c == 'G':
-		goto yystate84
+		goto yystate101
+	case c == ')':
+		goto yystate5
+	case c == 'K':
+		goto yystate107
+	case c == 'L':
+		goto yystate147
+	case c == 'P':
+		goto yystate150
+	case c == 'X':
+		goto yystate168
+	case c == ';':
+		goto yystate11
+	case c == '(':
+		goto yystate31
 	}
 
 yystate51:
@@ -705,21 +709,23 @@ yystate51:
 	switch {
 	default:
 		goto yyabort
-	case c == 'A':
-		goto yystate65
+	case c == 'X':
+		goto yystate67
 	case c == 'S':
 		goto yystate52
-	case c == 'X':
-		goto yystate63
+	case c == 'I':
+		goto yystate73
+	case c == 'A':
+		goto yystate69
 	}
 
 yystate52:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule40
+		goto yyrule46
 	case c == 'E':
-		goto yystate55
+		goto yystate59
 	case c == 'A':
 		goto yystate53
 	}
@@ -735,14 +741,19 @@ yystate53:
 
 yystate54:
 	c = l.getc(c)
-	goto yyrule39
+	switch {
+	default:
+		goto yyrule47
+	case c == '-':
+		goto yystate55
+	}
 
 yystate55:
 	c = l.getc(c)
 	switch {
 	default:
 		goto yyabort
-	case c == 'C':
+	case c == 'P':
 		goto yystate56
 	}
 
@@ -750,8 +761,8 @@ yystate56:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule41
-	case c == '3':
+		goto yyabort
+	case c == 'T':
 		goto yystate57
 	}
 
@@ -759,26 +770,21 @@ yystate57:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule42
-	case c == 'P':
+		goto yyabort
+	case c == 'R':
 		goto yystate58
 	}
 
 yystate58:
 	c = l.getc(c)
-	switch {
-	default:
-		goto yyabort
-	case c == 'A':
-		goto yystate59
-	}
+	goto yyrule48
 
 yystate59:
 	c = l.getc(c)
 	switch {
 	default:
 		goto yyabort
-	case c == 'R':
+	case c == 'C':
 		goto yystate60
 	}
 
@@ -786,8 +792,8 @@ yystate60:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyabort
-	case c == 'A':
+		goto yyrule49
+	case c == '3':
 		goto yystate61
 	}
 
@@ -795,58 +801,63 @@ yystate61:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyabort
-	case c == 'M':
+		goto yyrule50
+	case c == 'P':
 		goto yystate62
 	}
 
 yystate62:
 	c = l.getc(c)
-	goto yyrule43
+	switch {
+	default:
+		goto yyabort
+	case c == 'A':
+		goto yystate63
+	}
 
 yystate63:
 	c = l.getc(c)
 	switch {
 	default:
 		goto yyabort
-	case c == 'T':
+	case c == 'R':
 		goto yystate64
 	}
 
 yystate64:
 	c = l.getc(c)
-	goto yyrule44
+	switch {
+	default:
+		goto yyabort
+	case c == 'A':
+		goto yystate65
+	}
 
 yystate65:
 	c = l.getc(c)
 	switch {
 	default:
 		goto yyabort
-	case c == 'P':
+	case c == 'M':
 		goto yystate66
 	}
 
 yystate66:
 	c = l.getc(c)
-	switch {
-	default:
-		goto yyabort
-	case c == 'T':
-		goto yystate67
-	}
+	goto yyrule51
 
 yystate67:
 	c = l.getc(c)
 	switch {
 	default:
 		goto yyabort
-	case c == 'R':
+	case c == 'T':
 		goto yystate68
 	}
 
 yystate68:
 	c = l.getc(c)
-	goto yyrule38
+	goto yyrule52
 
 yystate69:
 	c = l.getc(c)
@@ -854,11 +865,7 @@ yystate69:
 	default:
 		goto yyabort
 	case c == 'P':
-		goto yystate74
-	case c == 'R':
 		goto yystate70
-	case c == 'T':
-		goto yystate75
 	}
 
 yystate70:
@@ -866,7 +873,7 @@ yystate70:
 	switch {
 	default:
 		goto yyabort
-	case c == 'S':
+	case c == 'T':
 		goto yystate71
 	}
 
@@ -875,48 +882,53 @@ yystate71:
 	switch {
 	default:
 		goto yyabort
-	case c == 'I':
+	case c == 'R':
 		goto yystate72
 	}
 
 yystate72:
 	c = l.getc(c)
-	switch {
-	default:
-		goto yyabort
-	case c == 'G':
-		goto yystate73
-	}
+	goto yyrule43
 
 yystate73:
 	c = l.getc(c)
-	goto yyrule48
+	switch {
+	default:
+		goto yyabort
+	case c == 'M':
+		goto yystate77
+	case c == 'N':
+		goto yystate74
+	}
 
 yystate74:
-	c = l.getc(c)
-	goto yyrule47
-
-yystate75:
-	c = l.getc(c)
-	goto yyrule49
-
-yystate76:
 	c = l.getc(c)
 	switch {
 	default:
 		goto yyabort
-	case c == 'N':
-		goto yystate77
-	case c == 'E':
-		goto yystate81
+	case c == 'F':
+		goto yystate75
 	}
+
+yystate75:
+	c = l.getc(c)
+	switch {
+	default:
+		goto yyabort
+	case c == 'O':
+		goto yystate76
+	}
+
+yystate76:
+	c = l.getc(c)
+	goto yyrule45
 
 yystate77:
 	c = l.getc(c)
 	switch {
 	default:
 		goto yyabort
-	case c == 'A':
+	case c == 'L':
 		goto yystate78
 	}
 
@@ -925,7 +937,7 @@ yystate78:
 	switch {
 	default:
 		goto yyabort
-	case c == 'M':
+	case c == 'O':
 		goto yystate79
 	}
 
@@ -934,19 +946,25 @@ yystate79:
 	switch {
 	default:
 		goto yyabort
-	case c == 'E':
+	case c == 'C':
 		goto yystate80
 	}
 
 yystate80:
 	c = l.getc(c)
-	goto yyrule25
+	goto yyrule44
 
 yystate81:
 	c = l.getc(c)
 	switch {
 	default:
 		goto yyabort
+	case c == 'T':
+		goto yystate90
+	case c == 'K':
+		goto yystate86
+	case c == 'P':
+		goto yystate89
 	case c == 'R':
 		goto yystate82
 	}
@@ -956,87 +974,81 @@ yystate82:
 	switch {
 	default:
 		goto yyabort
-	case c == 'T':
+	case c == 'S':
 		goto yystate83
 	}
 
 yystate83:
 	c = l.getc(c)
-	goto yyrule24
+	switch {
+	default:
+		goto yyabort
+	case c == 'I':
+		goto yystate84
+	}
 
 yystate84:
 	c = l.getc(c)
 	switch {
 	default:
 		goto yyabort
-	case c == 'P':
+	case c == 'G':
 		goto yystate85
 	}
 
 yystate85:
 	c = l.getc(c)
-	switch {
-	default:
-		goto yyabort
-	case c == 'O':
-		goto yystate86
-	}
+	goto yyrule57
 
 yystate86:
 	c = l.getc(c)
 	switch {
 	default:
 		goto yyabort
-	case c == 'S':
+	case c == 'E':
 		goto yystate87
 	}
 
 yystate87:
 	c = l.getc(c)
-	goto yyrule30
+	switch {
+	default:
+		goto yyabort
+	case c == 'Y':
+		goto yystate88
+	}
 
 yystate88:
+	c = l.getc(c)
+	goto yyrule55
+
+yystate89:
+	c = l.getc(c)
+	goto yyrule56
+
+yystate90:
+	c = l.getc(c)
+	goto yyrule58
+
+yystate91:
 	c = l.getc(c)
 	switch {
 	default:
 		goto yyabort
 	case c == 'E':
-		goto yystate90
-	case c == 'X':
-		goto yystate89
+		goto yystate98
+	case c == 'D':
+		goto yystate96
+	case c == 'N':
+		goto yystate92
 	}
-
-yystate89:
-	c = l.getc(c)
-	goto yyrule35
-
-yystate90:
-	c = l.getc(c)
-	switch {
-	default:
-		goto yyabort
-	case c == 'Y':
-		goto yystate91
-	}
-
-yystate91:
-	c = l.getc(c)
-	goto yyrule34
 
 yystate92:
 	c = l.getc(c)
 	switch {
 	default:
 		goto yyabort
-	case c == 'P':
-		goto yystate101
-	case c == 'I':
-		goto yystate103
-	case c == 'S':
-		goto yystate97
-	case c == 'O':
-		goto yystate95
-	case c == 'R':
+	case c == 'A':
 		goto yystate93
 	}
 
@@ -1045,42 +1057,42 @@ yystate93:
 	switch {
 	default:
 		goto yyabort
-	case c == 'V':
+	case c == 'M':
 		goto yystate94
 	}
 
 yystate94:
 	c = l.getc(c)
-	goto yyrule53
+	switch {
+	default:
+		goto yyabort
+	case c == 'E':
+		goto yystate95
+	}
 
 yystate95:
 	c = l.getc(c)
-	switch {
-	default:
-		goto yyabort
-	case c == 'A':
-		goto yystate96
-	}
+	goto yyrule27
 
 yystate96:
 	c = l.getc(c)
-	goto yyrule51
-
-yystate97:
-	c = l.getc(c)
 	switch {
 	default:
 		goto yyabort
-	case c == 'H':
-		goto yystate98
+	case c == 'S':
+		goto yystate97
 	}
+
+yystate97:
+	c = l.getc(c)
+	goto yyrule25
 
 yystate98:
 	c = l.getc(c)
 	switch {
 	default:
 		goto yyabort
-	case c == 'F':
+	case c == 'R':
 		goto yystate99
 	}
 
@@ -1089,102 +1101,103 @@ yystate99:
 	switch {
 	default:
 		goto yyabort
-	case c == 'P':
+	case c == 'T':
 		goto yystate100
 	}
 
 yystate100:
 	c = l.getc(c)
-	goto yyrule54
+	goto yyrule26
 
 yystate101:
 	c = l.getc(c)
 	switch {
 	default:
 		goto yyabort
-	case c == 'F':
+	case c == 'P':
 		goto yystate102
+	case c == 'I':
+		goto yystate105
 	}
 
 yystate102:
 	c = l.getc(c)
-	goto yyrule52
+	switch {
+	default:
+		goto yyabort
+	case c == 'O':
+		goto yystate103
+	}
 
 yystate103:
 	c = l.getc(c)
 	switch {
 	default:
 		goto yyabort
-	case c == 'G':
+	case c == 'S':
 		goto yystate104
 	}
 
 yystate104:
 	c = l.getc(c)
-	goto yyrule50
+	goto yyrule34
 
 yystate105:
 	c = l.getc(c)
 	switch {
 	default:
 		goto yyabort
-	case c == 'K':
+	case c == 'D':
 		goto yystate106
 	}
 
 yystate106:
 	c = l.getc(c)
-	switch {
-	default:
-		goto yyabort
-	case c == 'S':
-		goto yystate107
-	}
+	goto yyrule33
 
 yystate107:
 	c = l.getc(c)
-	goto yyrule56
-
-yystate108:
-	c = l.getc(c)
 	switch {
 	default:
 		goto yyabort
-	case c == 'N':
+	case c == 'X':
+		goto yystate108
+	case c == 'E':
 		goto yystate109
-	case c == 'S':
-		goto yystate117
-	case c == 'H':
-		goto yystate118
 	}
+
+yystate108:
+	c = l.getc(c)
+	goto yyrule40
 
 yystate109:
 	c = l.getc(c)
 	switch {
 	default:
 		goto yyabort
-	case c == 'A':
-		goto yystate114
-	case c == 'S':
+	case c == 'Y':
 		goto yystate110
 	}
 
 yystate110:
 	c = l.getc(c)
-	switch {
-	default:
-		goto yyabort
-	case c == 'K':
-		goto yystate111
-	}
+	goto yyrule39
 
 yystate111:
 	c = l.getc(c)
 	switch {
 	default:
 		goto yyabort
-	case c == 'E':
+	case c == 'R':
 		goto yystate112
+	case c == 'O':
+		goto yystate114
+	case c == 'P':
+		goto yystate120
+	case c == 'S':
+		goto yystate116
+	case c == 'I':
+		goto yystate122
 	}
 
 yystate112:
@@ -1192,95 +1205,90 @@ yystate112:
 	switch {
 	default:
 		goto yyabort
-	case c == 'Y':
+	case c == 'V':
 		goto yystate113
 	}
 
 yystate113:
 	c = l.getc(c)
-	goto yyrule28
+	goto yyrule62
 
 yystate114:
 	c = l.getc(c)
 	switch {
 	default:
 		goto yyabort
-	case c == 'M':
+	case c == 'A':
 		goto yystate115
 	}
 
 yystate115:
 	c = l.getc(c)
-	switch {
-	default:
-		goto yyabort
-	case c == 'E':
-		goto yystate116
-	}
+	goto yyrule60
 
 yystate116:
 	c = l.getc(c)
-	goto yyrule27
+	switch {
+	default:
+		goto yyabort
+	case c == 'H':
+		goto yystate117
+	}
 
 yystate117:
 	c = l.getc(c)
-	goto yyrule29
+	switch {
+	default:
+		goto yyabort
+	case c == 'F':
+		goto yystate118
+	}
 
 yystate118:
 	c = l.getc(c)
 	switch {
 	default:
 		goto yyabort
-	case c == 'C':
+	case c == 'P':
 		goto yystate119
 	}
 
 yystate119:
 	c = l.getc(c)
-	switch {
-	default:
-		goto yyabort
-	case c == 'I':
-		goto yystate120
-	}
+	goto yyrule63
 
 yystate120:
 	c = l.getc(c)
 	switch {
 	default:
 		goto yyabort
-	case c == 'D':
+	case c == 'F':
 		goto yystate121
 	}
 
 yystate121:
 	c = l.getc(c)
-	goto yyrule26
+	goto yyrule61
 
 yystate122:
 	c = l.getc(c)
 	switch {
 	default:
 		goto yyabort
-	case c == 'I':
+	case c == 'G':
 		goto yystate123
 	}
 
 yystate123:
 	c = l.getc(c)
-	switch {
-	default:
-		goto yyabort
-	case c == 'N':
-		goto yystate124
-	}
+	goto yyrule59
 
 yystate124:
 	c = l.getc(c)
 	switch {
 	default:
 		goto yyabort
-	case c == 'F':
+	case c == 'K':
 		goto yystate125
 	}
 
@@ -1289,21 +1297,25 @@ yystate125:
 	switch {
 	default:
 		goto yyabort
-	case c == 'O':
+	case c == 'S':
 		goto yystate126
 	}
 
 yystate126:
 	c = l.getc(c)
-	goto yyrule31
+	goto yyrule71
 
 yystate127:
 	c = l.getc(c)
 	switch {
 	default:
 		goto yyabort
-	case c == 'O':
+	case c == 'S':
+		goto yystate136
+	case c == 'N':
 		goto yystate128
+	case c == 'H':
+		goto yystate137
 	}
 
 yystate128:
@@ -1311,22 +1323,27 @@ yystate128:
 	switch {
 	default:
 		goto yyabort
-	case c == 'C':
+	case c == 'A':
+		goto yystate133
+	case c == 'S':
 		goto yystate129
 	}
 
 yystate129:
 	c = l.getc(c)
-	goto yyrule36
+	switch {
+	default:
+		goto yyabort
+	case c == 'K':
+		goto yystate130
+	}
 
 yystate130:
 	c = l.getc(c)
 	switch {
 	default:
 		goto yyabort
-	case c == 'X':
-		goto yystate133
-	case c == 'T':
+	case c == 'E':
 		goto yystate131
 	}
 
@@ -1335,46 +1352,46 @@ yystate131:
 	switch {
 	default:
 		goto yyabort
-	case c == 'R':
+	case c == 'Y':
 		goto yystate132
 	}
 
 yystate132:
 	c = l.getc(c)
-	goto yyrule45
+	goto yyrule30
 
 yystate133:
 	c = l.getc(c)
-	goto yyrule46
+	switch {
+	default:
+		goto yyabort
+	case c == 'M':
+		goto yystate134
+	}
 
 yystate134:
 	c = l.getc(c)
 	switch {
 	default:
 		goto yyabort
-	case c == 'X':
+	case c == 'E':
 		goto yystate135
 	}
 
 yystate135:
 	c = l.getc(c)
-	switch {
-	default:
-		goto yyabort
-	case c == 'T':
-		goto yystate136
-	}
+	goto yyrule29
 
 yystate136:
 	c = l.getc(c)
-	goto yyrule55
+	goto yyrule31
 
 yystate137:
 	c = l.getc(c)
 	switch {
 	default:
 		goto yyabort
-	case c == '2':
+	case c == 'C':
 		goto yystate138
 	}
 
@@ -1383,35 +1400,29 @@ yystate138:
 	switch {
 	default:
 		goto yyabort
-	case c == '5':
+	case c == 'I':
 		goto yystate139
 	}
 
 yystate139:
 	c = l.getc(c)
-	goto yyrule57
+	switch {
+	default:
+		goto yyabort
+	case c == 'D':
+		goto yystate140
+	}
 
 yystate140:
 	c = l.getc(c)
-	switch {
-	default:
-		goto yyrule19
-	case c == 'F':
-		goto yystate141
-	case c == '6':
-		goto yystate145
-	case c == 'P':
-		goto yystate146
-	case c == 'A':
-		goto yystate148
-	}
+	goto yyrule28
 
 yystate141:
 	c = l.getc(c)
 	switch {
 	default:
 		goto yyabort
-	case c == 'S':
+	case c == 'I':
 		goto yystate142
 	}
 
@@ -1420,8 +1431,10 @@ yystate142:
 	switch {
 	default:
 		goto yyabort
-	case c == 'D':
+	case c == 'N':
 		goto yystate143
+	case c == 'P':
+		goto yystate146
 	}
 
 yystate143:
@@ -1429,92 +1442,98 @@ yystate143:
 	switch {
 	default:
 		goto yyabort
-	case c == 'B':
+	case c == 'F':
 		goto yystate144
 	}
 
 yystate144:
 	c = l.getc(c)
-	goto yyrule22
+	switch {
+	default:
+		goto yyabort
+	case c == 'O':
+		goto yystate145
+	}
 
 yystate145:
 	c = l.getc(c)
-	goto yyrule21
+	goto yyrule35
 
 yystate146:
+	c = l.getc(c)
+	goto yyrule36
+
+yystate147:
 	c = l.getc(c)
 	switch {
 	default:
 		goto yyabort
-	case c == 'L':
-		goto yystate147
+	case c == 'O':
+		goto yystate148
 	}
-
-yystate147:
-	c = l.getc(c)
-	goto yyrule23
 
 yystate148:
 	c = l.getc(c)
 	switch {
 	default:
 		goto yyabort
-	case c == 'A':
+	case c == 'C':
 		goto yystate149
 	}
 
 yystate149:
 	c = l.getc(c)
-	switch {
-	default:
-		goto yyabort
-	case c == 'A':
-		goto yystate150
-	}
+	goto yyrule41
 
 yystate150:
 	c = l.getc(c)
-	goto yyrule20
+	switch {
+	default:
+		goto yyabort
+	case c == 'T':
+		goto yystate151
+	case c == 'X':
+		goto yystate153
+	}
 
 yystate151:
 	c = l.getc(c)
 	switch {
 	default:
 		goto yyabort
-	case c == 'S':
+	case c == 'R':
 		goto yystate152
-	case c == 'P':
-		goto yystate155
 	}
 
 yystate152:
 	c = l.getc(c)
-	switch {
-	default:
-		goto yyabort
-	case c == 'D':
-		goto yystate153
-	}
+	goto yyrule53
 
 yystate153:
 	c = l.getc(c)
-	switch {
-	default:
-		goto yyabort
-	case c == 'N':
-		goto yystate154
-	}
+	goto yyrule54
 
 yystate154:
 	c = l.getc(c)
-	goto yyrule33
+	switch {
+	default:
+		goto yyabort
+	case c == 'A':
+		goto yystate163
+	case c == 'X':
+		goto yystate161
+	case c == 'S':
+		goto yystate158
+	case c == 'K':
+		goto yystate155
+	}
 
 yystate155:
 	c = l.getc(c)
 	switch {
 	default:
 		goto yyabort
-	case c == 'S':
+	case c == 'E':
 		goto yystate156
 	}
 
@@ -1523,25 +1542,20 @@ yystate156:
 	switch {
 	default:
 		goto yyabort
-	case c == 'E':
+	case c == 'Y':
 		goto yystate157
 	}
 
 yystate157:
 	c = l.getc(c)
-	switch {
-	default:
-		goto yyabort
-	case c == 'C':
-		goto yystate158
-	}
+	goto yyrule65
 
 yystate158:
 	c = l.getc(c)
 	switch {
 	default:
 		goto yyabort
-	case c == 'K':
+	case c == 'I':
 		goto yystate159
 	}
 
@@ -1550,195 +1564,74 @@ yystate159:
 	switch {
 	default:
 		goto yyabort
-	case c == 'E':
+	case c == 'G':
 		goto yystate160
 	}
 
 yystate160:
 	c = l.getc(c)
-	switch {
-	default:
-		goto yyabort
-	case c == 'Y':
-		goto yystate161
-	}
+	goto yyrule66
 
 yystate161:
 	c = l.getc(c)
-	goto yyrule32
+	switch {
+	default:
+		goto yyabort
+	case c == 'T':
+		goto yystate162
+	}
 
 yystate162:
 	c = l.getc(c)
-	switch {
-	default:
-		goto yyabort
-	case c == 'X':
-		goto yystate163
-	}
+	goto yyrule67
 
 yystate163:
 	c = l.getc(c)
-	goto yyrule37
+	switch {
+	default:
+		goto yyabort
+	case c == 'L':
+		goto yystate164
+	}
 
-	goto yystate164 // silence unused label error
 yystate164:
 	c = l.getc(c)
-yystart164:
 	switch {
 	default:
 		goto yyabort
-	case c == ';':
-		goto yystate11
-	case c == '\t' || c == ' ':
-		goto yystate48
-	case c == ')':
-		goto yystate5
-	case c == '"':
-		goto yystate6
-	case c == '(':
-		goto yystate31
-	case c == '\n' || c == '\r':
-		goto yystate12
+	case c == 'I':
+		goto yystate165
 	}
 
-	goto yystate165 // silence unused label error
 yystate165:
 	c = l.getc(c)
-yystart165:
 	switch {
 	default:
 		goto yyabort
-	case c == ';':
-		goto yystate11
-	case c == '\t' || c == ' ':
-		goto yystate48
-	case c == ')':
-		goto yystate5
-	case c == '"':
-		goto yystate6
-	case c >= '0' && c <= '9':
-		goto yystate33
-	case c == '(':
-		goto yystate31
-	case c == '\n' || c == '\r':
-		goto yystate12
+	case c == 'N':
+		goto yystate166
 	}
 
-	goto yystate166 // silence unused label error
 yystate166:
 	c = l.getc(c)
-yystart166:
 	switch {
 	default:
 		goto yyabort
-	case c == 'W':
-		goto yystate105
-	case c == ';':
-		goto yystate11
-	case c == 'L':
-		goto yystate127
-	case c == '\t' || c == ' ':
-		goto yystate48
-	case c == 'N':
-		goto yystate51
-	case c == 'A':
-		goto yystate140
-	case c == 'M':
-		goto yystate162
 	case c == 'K':
-		goto yystate88
-	case c == 'H':
-		goto yystate122
-	case c == ')':
-		goto yystate5
-	case c == '"':
-		goto yystate6
-	case c == 'T':
-		goto yystate134
-	case c == 'C':
-		goto yystate76
-	case c == 'D':
-		goto yystate108
-	case c == 'I':
-		goto yystate151
-	case c == '(':
-		goto yystate31
-	case c == 'P':
-		goto yystate130
-	case c == 'X':
-		goto yystate137
-	case c == 'R':
-		goto yystate69
-	case c == '\n' || c == '\r':
-		goto yystate12
-	case c == 'S':
-		goto yystate92
-	case c == 'G':
-		goto yystate84
+		goto yystate167
 	}
 
-	goto yystate167 // silence unused label error
 yystate167:
 	c = l.getc(c)
-yystart167:
-	switch {
-	default:
-		goto yyabort
-	case c == 'C':
-		goto yystate169
-	case c == 'W':
-		goto yystate105
-	case c == ';':
-		goto yystate11
-	case c == 'L':
-		goto yystate127
-	case c == '\t' || c == ' ':
-		goto yystate48
-	case c == 'N':
-		goto yystate51
-	case c == 'A':
-		goto yystate140
-	case c == 'H':
-		goto yystate171
-	case c == 'M':
-		goto yystate162
-	case c == 'K':
-		goto yystate88
-	case c == 'I':
-		goto yystate173
-	case c == ')':
-		goto yystate5
-	case c == '"':
-		goto yystate6
-	case c == 'T':
-		goto yystate134
-	case c == 'D':
-		goto yystate108
-	case c == '(':
-		goto yystate31
-	case c == 'P':
-		goto yystate130
-	case c == 'X':
-		goto yystate137
-	case c == 'R':
-		goto yystate69
-	case c >= '0' && c <= '9':
-		goto yystate168
-	case c == '\n' || c == '\r':
-		goto yystate12
-	case c == 'S':
-		goto yystate92
-	case c == 'G':
-		goto yystate84
-	}
+	goto yyrule64
 
 yystate168:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule15
-	case c >= '0' && c <= '9':
-		goto yystate168
+		goto yyabort
+	case c == '2':
+		goto yystate169
 	}
 
 yystate169:
@@ -1746,114 +1639,85 @@ yystate169:
 	switch {
 	default:
 		goto yyabort
-	case c == 'N':
-		goto yystate77
-	case c == 'E':
-		goto yystate81
-	case c == 'H':
+	case c == '5':
 		goto yystate170
 	}
 
 yystate170:
 	c = l.getc(c)
-	goto yyrule17
+	goto yyrule72
 
 yystate171:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyabort
-	case c == 'S':
+		goto yyrule19
+	case c == 'T':
+		goto yystate179
+	case c == 'A':
+		goto yystate182
+	case c == 'P':
+		goto yystate177
+	case c == '6':
+		goto yystate176
+	case c == 'F':
 		goto yystate172
-	case c == 'I':
-		goto yystate123
 	}
 
 yystate172:
 	c = l.getc(c)
-	goto yyrule18
+	switch {
+	default:
+		goto yyabort
+	case c == 'S':
+		goto yystate173
+	}
 
 yystate173:
 	c = l.getc(c)
 	switch {
 	default:
 		goto yyabort
-	case c == 'N':
+	case c == 'D':
 		goto yystate174
-	case c == 'S':
-		goto yystate152
-	case c == 'P':
-		goto yystate155
 	}
 
 yystate174:
 	c = l.getc(c)
-	goto yyrule16
-
-	goto yystate175 // silence unused label error
-yystate175:
-	c = l.getc(c)
-yystart175:
 	switch {
 	default:
 		goto yyabort
-	case c == ';':
-		goto yystate11
-	case c == '\t' || c == ' ':
-		goto yystate48
-	case c == ':':
-		goto yystate187
-	case c == ')':
-		goto yystate5
-	case c == '"':
-		goto yystate6
-	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
-		goto yystate176
-	case c == '(':
-		goto yystate31
-	case c == '\n' || c == '\r':
-		goto yystate12
+	case c == 'B':
+		goto yystate175
 	}
+
+yystate175:
+	c = l.getc(c)
+	goto yyrule22
 
 yystate176:
 	c = l.getc(c)
-	switch {
-	default:
-		goto yyrule59
-	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
-		goto yystate177
-	case c == ':':
-		goto yystate180
-	}
+	goto yyrule20
 
 yystate177:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule59
-	case c == ':':
-		goto yystate180
-	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
+		goto yyabort
+	case c == 'L':
 		goto yystate178
 	}
 
 yystate178:
 	c = l.getc(c)
-	switch {
-	default:
-		goto yyrule59
-	case c == ':':
-		goto yystate180
-	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
-		goto yystate179
-	}
+	goto yyrule23
 
 yystate179:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule59
-	case c == ':':
+		goto yyabort
+	case c == 'M':
 		goto yystate180
 	}
 
@@ -1862,60 +1726,42 @@ yystate180:
 	switch {
 	default:
 		goto yyabort
-	case c == ':':
+	case c == 'A':
 		goto yystate181
-	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
-		goto yystate176
 	}
 
 yystate181:
 	c = l.getc(c)
-	switch {
-	default:
-		goto yyrule59
-	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
-		goto yystate182
-	}
+	goto yyrule24
 
 yystate182:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule59
-	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
+		goto yyabort
+	case c == 'A':
 		goto yystate183
-	case c == ':':
-		goto yystate186
 	}
 
 yystate183:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule59
-	case c == ':':
-		goto yystate186
-	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
+		goto yyabort
+	case c == 'A':
 		goto yystate184
 	}
 
 yystate184:
 	c = l.getc(c)
-	switch {
-	default:
-		goto yyrule59
-	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
-		goto yystate185
-	case c == ':':
-		goto yystate186
-	}
+	goto yyrule21
 
 yystate185:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule59
-	case c == ':':
+		goto yyabort
+	case c == 'I':
 		goto yystate186
 	}
 
@@ -1924,41 +1770,22 @@ yystate186:
 	switch {
 	default:
 		goto yyabort
-	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
-		goto yystate182
+	case c == 'D':
+		goto yystate187
 	}
 
 yystate187:
 	c = l.getc(c)
-	switch {
-	default:
-		goto yyabort
-	case c == ':':
-		goto yystate181
-	}
+	goto yyrule32
 
-	goto yystate188 // silence unused label error
 yystate188:
 	c = l.getc(c)
-yystart188:
 	switch {
 	default:
 		goto yyabort
-	case c == '-':
-		goto yystate190
-	case c == ';':
-		goto yystate11
-	case c == '\t' || c == ' ':
-		goto yystate48
-	case c == ')':
-		goto yystate5
-	case c == '"':
-		goto yystate6
-	case c == '(':
-		goto yystate31
-	case c == '\n' || c == '\r':
-		goto yystate12
-	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
+	case c == 'P':
+		goto yystate192
+	case c == 'S':
 		goto yystate189
 	}
 
@@ -1966,155 +1793,57 @@ yystate189:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule62
-	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
-		goto yystate189
+		goto yyabort
+	case c == 'D':
+		goto yystate190
 	}
 
 yystate190:
 	c = l.getc(c)
-	goto yyrule63
+	switch {
+	default:
+		goto yyabort
+	case c == 'N':
+		goto yystate191
+	}
 
-	goto yystate191 // silence unused label error
 yystate191:
 	c = l.getc(c)
-yystart191:
+	goto yyrule38
+
+yystate192:
+	c = l.getc(c)
+	switch {
+	default:
+		goto yyabort
+	case c == 'S':
+		goto yystate193
+	}
+
+yystate193:
+	c = l.getc(c)
+	switch {
+	default:
+		goto yyabort
+	case c == 'E':
+		goto yystate194
+	}
+
+yystate194:
+	c = l.getc(c)
 	switch {
 	default:
 		goto yyabort
 	case c == 'C':
-		goto yystate169
-	case c == 'W':
-		goto yystate105
-	case c == ';':
-		goto yystate11
-	case c == 'L':
-		goto yystate127
-	case c == '\t' || c == ' ':
-		goto yystate48
-	case c == 'N':
-		goto yystate51
-	case c == 'A':
-		goto yystate140
-	case c == 'H':
-		goto yystate171
-	case c == 'M':
-		goto yystate162
-	case c == 'K':
-		goto yystate88
-	case c == 'I':
-		goto yystate173
-	case c == ')':
-		goto yystate5
-	case c == '"':
-		goto yystate6
-	case c == 'T':
-		goto yystate134
-	case c == 'D':
-		goto yystate108
-	case c == '(':
-		goto yystate31
-	case c == 'P':
-		goto yystate130
-	case c == 'X':
-		goto yystate137
-	case c == 'R':
-		goto yystate69
-	case c >= '0' && c <= '9':
-		goto yystate168
-	case c == '\n' || c == '\r':
-		goto yystate12
-	case c == 'S':
-		goto yystate92
-	case c == 'G':
-		goto yystate84
-	}
-
-	goto yystate192 // silence unused label error
-yystate192:
-	c = l.getc(c)
-yystart192:
-	switch {
-	default:
-		goto yyabort
-	case c == ';':
-		goto yystate11
-	case c == '\t' || c == ' ':
-		goto yystate48
-	case c == ':':
-		goto yystate187
-	case c == ')':
-		goto yystate5
-	case c == '"':
-		goto yystate6
-	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
-		goto yystate176
-	case c == '(':
-		goto yystate31
-	case c == '\n' || c == '\r':
-		goto yystate12
-	}
-
-	goto yystate193 // silence unused label error
-yystate193:
-	c = l.getc(c)
-yystart193:
-	switch {
-	default:
-		goto yyabort
-	case c == '-':
-		goto yystate190
-	case c == ';':
-		goto yystate11
-	case c == '\t' || c == ' ':
-		goto yystate48
-	case c == ')':
-		goto yystate5
-	case c == '"':
-		goto yystate6
-	case c == '(':
-		goto yystate31
-	case c == '\n' || c == '\r':
-		goto yystate12
-	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
-		goto yystate189
-	}
-
-	goto yystate194 // silence unused label error
-yystate194:
-	c = l.getc(c)
-yystart194:
-	switch {
-	default:
-		goto yyabort
-	case c == ';':
-		goto yystate11
-	case c == '\t' || c == ' ':
-		goto yystate48
-	case c == ')':
-		goto yystate5
-	case c == '"':
-		goto yystate6
-	case c == '(':
-		goto yystate31
-	case c == '.':
-		goto yystate198
-	case c >= '0' && c <= '9' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z':
 		goto yystate195
-	case c == '\n' || c == '\r':
-		goto yystate12
 	}
 
 yystate195:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule13
-	case c == '.':
-		goto yystate197
-	case c >= '0' && c <= '9' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z':
-		goto yystate195
-	case c == '-':
+		goto yyabort
+	case c == 'K':
 		goto yystate196
 	}
 
@@ -2123,204 +1852,879 @@ yystate196:
 	switch {
 	default:
 		goto yyabort
-	case c >= '0' && c <= '9' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z':
-		goto yystate195
-	case c == '-':
-		goto yystate196
+	case c == 'E':
+		goto yystate197
 	}
 
 yystate197:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule13
-	case c >= '0' && c <= '9' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z':
-		goto yystate195
+		goto yyabort
+	case c == 'Y':
+		goto yystate198
 	}
 
 yystate198:
 	c = l.getc(c)
-	goto yyrule13
+	goto yyrule37
 
-	goto yystate199 // silence unused label error
 yystate199:
 	c = l.getc(c)
-yystart199:
 	switch {
 	default:
 		goto yyabort
-	case c == ';':
-		goto yystate11
-	case c == '\t' || c == ' ':
-		goto yystate48
-	case c == ')':
-		goto yystate5
-	case c == '"':
-		goto yystate6
-	case c == '(':
-		goto yystate31
-	case c >= '0' && c <= '9' || c == '=' || c >= 'A' && c <= 'V':
+	case c == 'X':
 		goto yystate200
-	case c == '\n' || c == '\r':
-		goto yystate12
 	}
 
 yystate200:
 	c = l.getc(c)
-	switch {
-	default:
-		goto yyrule60
-	case c >= '0' && c <= '9' || c == '=' || c >= 'A' && c <= 'V':
-		goto yystate200
-	}
+	goto yyrule42
 
-	goto yystate201 // silence unused label error
 yystate201:
 	c = l.getc(c)
-yystart201:
 	switch {
 	default:
 		goto yyabort
-	case c == ';':
-		goto yystate11
-	case c == '\t' || c == ' ':
-		goto yystate48
-	case c == ')':
-		goto yystate5
-	case c == '"':
-		goto yystate6
-	case c == '(':
-		goto yystate31
-	case c == '.':
-		goto yystate198
-	case c >= '0' && c <= '9' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z':
-		goto yystate195
-	case c == '\n' || c == '\r':
-		goto yystate12
+	case c == 'I':
+		goto yystate207
+	case c == 'N':
+		goto yystate202
 	}
 
-	goto yystate202 // silence unused label error
 yystate202:
 	c = l.getc(c)
-yystart202:
 	switch {
 	default:
 		goto yyabort
-	case c == ';':
-		goto yystate11
-	case c == '\t' || c == ' ':
-		goto yystate48
-	case c == ')':
-		goto yystate5
-	case c == '"':
-		goto yystate6
-	case c == '(':
-		goto yystate31
-	case c >= '0' && c <= '9' || c == '=' || c >= 'A' && c <= 'V':
-		goto yystate200
-	case c == '\n' || c == '\r':
-		goto yystate12
+	case c == 'S':
+		goto yystate203
 	}
 
-	goto yystate203 // silence unused label error
 yystate203:
 	c = l.getc(c)
-yystart203:
 	switch {
 	default:
 		goto yyabort
-	case c == ';':
-		goto yystate11
-	case c == '\t' || c == ' ':
-		goto yystate48
-	case c == ')':
-		goto yystate5
-	case c == '"':
-		goto yystate6
-	case c == '(':
-		goto yystate31
-	case c >= '0' && c <= '9':
-		goto yystate168
-	case c == '\n' || c == '\r':
-		goto yystate12
+	case c == 'P':
+		goto yystate204
 	}
 
-	goto yystate204 // silence unused label error
 yystate204:
 	c = l.getc(c)
-yystart204:
 	switch {
 	default:
 		goto yyabort
-	case c == ';':
-		goto yystate11
-	case c == '\t' || c == ' ':
-		goto yystate48
-	case c == ')':
-		goto yystate5
-	case c == '"':
-		goto yystate6
-	case c == '(':
-		goto yystate31
-	case c == '+' || c >= '/' && c <= '9' || c == '=' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z':
+	case c == 'E':
 		goto yystate205
-	case c == '\n' || c == '\r':
-		goto yystate12
 	}
 
 yystate205:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule61
-	case c == '+' || c >= '/' && c <= '9' || c == '=' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z':
-		goto yystate205
+		goto yyabort
+	case c == 'C':
+		goto yystate206
 	}
 
-	goto yystate206 // silence unused label error
 yystate206:
 	c = l.getc(c)
-yystart206:
-	switch {
-	default:
-		goto yyabort
-	case c == ';':
-		goto yystate11
-	case c == '\t' || c == ' ':
-		goto yystate48
-	case c == ')':
-		goto yystate5
-	case c == '"':
-		goto yystate6
-	case c == '(':
-		goto yystate31
-	case c >= '0' && c <= '9':
-		goto yystate168
-	case c == '\n' || c == '\r':
-		goto yystate12
-	}
+	goto yyrule70
 
-	goto yystate207 // silence unused label error
 yystate207:
 	c = l.getc(c)
-yystart207:
 	switch {
 	default:
 		goto yyabort
-	case c == ';':
-		goto yystate11
+	case c == 'N':
+		goto yystate208
+	case c == 'D':
+		goto yystate211
+	}
+
+yystate208:
+	c = l.getc(c)
+	switch {
+	default:
+		goto yyabort
+	case c == 'F':
+		goto yystate209
+	}
+
+yystate209:
+	c = l.getc(c)
+	switch {
+	default:
+		goto yyabort
+	case c == 'O':
+		goto yystate210
+	}
+
+yystate210:
+	c = l.getc(c)
+	goto yyrule69
+
+yystate211:
+	c = l.getc(c)
+	goto yyrule68
+
+	goto yystate212 // silence unused label error
+yystate212:
+	c = l.getc(c)
+yystart212:
+	switch {
+	default:
+		goto yyabort
 	case c == '\t' || c == ' ':
 		goto yystate48
-	case c == ')':
-		goto yystate5
 	case c == '"':
 		goto yystate6
-	case c == '(':
-		goto yystate31
-	case c == '+' || c >= '/' && c <= '9' || c == '=' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z':
-		goto yystate205
 	case c == '\n' || c == '\r':
 		goto yystate12
+	case c == ')':
+		goto yystate5
+	case c == ';':
+		goto yystate11
+	case c == '(':
+		goto yystate31
+	}
+
+	goto yystate213 // silence unused label error
+yystate213:
+	c = l.getc(c)
+yystart213:
+	switch {
+	default:
+		goto yyabort
+	case c == '\t' || c == ' ':
+		goto yystate48
+	case c == '"':
+		goto yystate6
+	case c == '\n' || c == '\r':
+		goto yystate12
+	case c == ')':
+		goto yystate5
+	case c >= '0' && c <= '9':
+		goto yystate33
+	case c == ';':
+		goto yystate11
+	case c == '(':
+		goto yystate31
+	}
+
+	goto yystate214 // silence unused label error
+yystate214:
+	c = l.getc(c)
+yystart214:
+	switch {
+	default:
+		goto yyabort
+	case c == 'C':
+		goto yystate91
+	case c == '\t' || c == ' ':
+		goto yystate48
+	case c == 'E':
+		goto yystate185
+	case c == 'N':
+		goto yystate51
+	case c == '"':
+		goto yystate6
+	case c == 'A':
+		goto yystate171
+	case c == 'S':
+		goto yystate111
+	case c == 'D':
+		goto yystate127
+	case c == 'T':
+		goto yystate154
+	case c == 'R':
+		goto yystate81
+	case c == 'I':
+		goto yystate188
+	case c == 'W':
+		goto yystate124
+	case c == 'U':
+		goto yystate201
+	case c == 'M':
+		goto yystate199
+	case c == 'H':
+		goto yystate141
+	case c == '\n' || c == '\r':
+		goto yystate12
+	case c == 'G':
+		goto yystate101
+	case c == ')':
+		goto yystate5
+	case c == 'K':
+		goto yystate107
+	case c == 'L':
+		goto yystate147
+	case c == 'P':
+		goto yystate150
+	case c == 'X':
+		goto yystate168
+	case c == ';':
+		goto yystate11
+	case c == '(':
+		goto yystate31
+	}
+
+	goto yystate215 // silence unused label error
+yystate215:
+	c = l.getc(c)
+yystart215:
+	switch {
+	default:
+		goto yyabort
+	case c == '\t' || c == ' ':
+		goto yystate48
+	case c == 'E':
+		goto yystate185
+	case c == 'N':
+		goto yystate51
+	case c == '"':
+		goto yystate6
+	case c == 'A':
+		goto yystate171
+	case c == 'S':
+		goto yystate111
+	case c == 'D':
+		goto yystate127
+	case c == 'T':
+		goto yystate154
+	case c == 'R':
+		goto yystate81
+	case c == 'W':
+		goto yystate124
+	case c == 'U':
+		goto yystate201
+	case c == 'M':
+		goto yystate199
+	case c == '\n' || c == '\r':
+		goto yystate12
+	case c == 'G':
+		goto yystate101
+	case c == ')':
+		goto yystate5
+	case c == 'K':
+		goto yystate107
+	case c == 'L':
+		goto yystate147
+	case c == 'P':
+		goto yystate150
+	case c == 'X':
+		goto yystate168
+	case c == 'I':
+		goto yystate221
+	case c >= '0' && c <= '9':
+		goto yystate216
+	case c == 'C':
+		goto yystate217
+	case c == ';':
+		goto yystate11
+	case c == '(':
+		goto yystate31
+	case c == 'H':
+		goto yystate219
+	}
+
+yystate216:
+	c = l.getc(c)
+	switch {
+	default:
+		goto yyrule15
+	case c >= '0' && c <= '9':
+		goto yystate216
+	}
+
+yystate217:
+	c = l.getc(c)
+	switch {
+	default:
+		goto yyabort
+	case c == 'E':
+		goto yystate98
+	case c == 'D':
+		goto yystate96
+	case c == 'N':
+		goto yystate92
+	case c == 'H':
+		goto yystate218
+	}
+
+yystate218:
+	c = l.getc(c)
+	goto yyrule17
+
+yystate219:
+	c = l.getc(c)
+	switch {
+	default:
+		goto yyabort
+	case c == 'I':
+		goto yystate142
+	case c == 'S':
+		goto yystate220
+	}
+
+yystate220:
+	c = l.getc(c)
+	goto yyrule18
+
+yystate221:
+	c = l.getc(c)
+	switch {
+	default:
+		goto yyabort
+	case c == 'P':
+		goto yystate192
+	case c == 'N':
+		goto yystate222
+	case c == 'S':
+		goto yystate189
+	}
+
+yystate222:
+	c = l.getc(c)
+	goto yyrule16
+
+	goto yystate223 // silence unused label error
+yystate223:
+	c = l.getc(c)
+yystart223:
+	switch {
+	default:
+		goto yyabort
+	case c == '\t' || c == ' ':
+		goto yystate48
+	case c == '"':
+		goto yystate6
+	case c == '\n' || c == '\r':
+		goto yystate12
+	case c == ')':
+		goto yystate5
+	case c == ':':
+		goto yystate235
+	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
+		goto yystate224
+	case c == ';':
+		goto yystate11
+	case c == '(':
+		goto yystate31
+	}
+
+yystate224:
+	c = l.getc(c)
+	switch {
+	default:
+		goto yyrule74
+	case c == ':':
+		goto yystate228
+	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
+		goto yystate225
+	}
+
+yystate225:
+	c = l.getc(c)
+	switch {
+	default:
+		goto yyrule74
+	case c == ':':
+		goto yystate228
+	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
+		goto yystate226
+	}
+
+yystate226:
+	c = l.getc(c)
+	switch {
+	default:
+		goto yyrule74
+	case c == ':':
+		goto yystate228
+	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
+		goto yystate227
+	}
+
+yystate227:
+	c = l.getc(c)
+	switch {
+	default:
+		goto yyrule74
+	case c == ':':
+		goto yystate228
+	}
+
+yystate228:
+	c = l.getc(c)
+	switch {
+	default:
+		goto yyabort
+	case c == ':':
+		goto yystate229
+	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
+		goto yystate224
+	}
+
+yystate229:
+	c = l.getc(c)
+	switch {
+	default:
+		goto yyrule74
+	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
+		goto yystate230
+	}
+
+yystate230:
+	c = l.getc(c)
+	switch {
+	default:
+		goto yyrule74
+	case c == ':':
+		goto yystate234
+	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
+		goto yystate231
+	}
+
+yystate231:
+	c = l.getc(c)
+	switch {
+	default:
+		goto yyrule74
+	case c == ':':
+		goto yystate234
+	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
+		goto yystate232
+	}
+
+yystate232:
+	c = l.getc(c)
+	switch {
+	default:
+		goto yyrule74
+	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
+		goto yystate233
+	case c == ':':
+		goto yystate234
+	}
+
+yystate233:
+	c = l.getc(c)
+	switch {
+	default:
+		goto yyrule74
+	case c == ':':
+		goto yystate234
+	}
+
+yystate234:
+	c = l.getc(c)
+	switch {
+	default:
+		goto yyabort
+	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
+		goto yystate230
+	}
+
+yystate235:
+	c = l.getc(c)
+	switch {
+	default:
+		goto yyabort
+	case c == ':':
+		goto yystate229
+	}
+
+	goto yystate236 // silence unused label error
+yystate236:
+	c = l.getc(c)
+yystart236:
+	switch {
+	default:
+		goto yyabort
+	case c == '\t' || c == ' ':
+		goto yystate48
+	case c == '"':
+		goto yystate6
+	case c == '\n' || c == '\r':
+		goto yystate12
+	case c == '-':
+		goto yystate238
+	case c == ')':
+		goto yystate5
+	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
+		goto yystate237
+	case c == ';':
+		goto yystate11
+	case c == '(':
+		goto yystate31
+	}
+
+yystate237:
+	c = l.getc(c)
+	switch {
+	default:
+		goto yyrule77
+	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
+		goto yystate237
+	}
+
+yystate238:
+	c = l.getc(c)
+	goto yyrule78
+
+	goto yystate239 // silence unused label error
+yystate239:
+	c = l.getc(c)
+yystart239:
+	switch {
+	default:
+		goto yyabort
+	case c == '\t' || c == ' ':
+		goto yystate48
+	case c == 'E':
+		goto yystate185
+	case c == 'N':
+		goto yystate51
+	case c == '"':
+		goto yystate6
+	case c == 'A':
+		goto yystate171
+	case c == 'S':
+		goto yystate111
+	case c == 'D':
+		goto yystate127
+	case c == 'T':
+		goto yystate154
+	case c == 'R':
+		goto yystate81
+	case c == 'W':
+		goto yystate124
+	case c == 'U':
+		goto yystate201
+	case c == 'M':
+		goto yystate199
+	case c == '\n' || c == '\r':
+		goto yystate12
+	case c == 'G':
+		goto yystate101
+	case c == ')':
+		goto yystate5
+	case c == 'K':
+		goto yystate107
+	case c == 'L':
+		goto yystate147
+	case c == 'P':
+		goto yystate150
+	case c == 'X':
+		goto yystate168
+	case c == 'I':
+		goto yystate221
+	case c >= '0' && c <= '9':
+		goto yystate216
+	case c == 'C':
+		goto yystate217
+	case c == ';':
+		goto yystate11
+	case c == '(':
+		goto yystate31
+	case c == 'H':
+		goto yystate219
+	}
+
+	goto yystate240 // silence unused label error
+yystate240:
+	c = l.getc(c)
+yystart240:
+	switch {
+	default:
+		goto yyabort
+	case c == '\t' || c == ' ':
+		goto yystate48
+	case c == '"':
+		goto yystate6
+	case c == '\n' || c == '\r':
+		goto yystate12
+	case c == ')':
+		goto yystate5
+	case c == ':':
+		goto yystate235
+	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
+		goto yystate224
+	case c == ';':
+		goto yystate11
+	case c == '(':
+		goto yystate31
+	}
+
+	goto yystate241 // silence unused label error
+yystate241:
+	c = l.getc(c)
+yystart241:
+	switch {
+	default:
+		goto yyabort
+	case c == '\t' || c == ' ':
+		goto yystate48
+	case c == '"':
+		goto yystate6
+	case c == '\n' || c == '\r':
+		goto yystate12
+	case c == '-':
+		goto yystate238
+	case c == ')':
+		goto yystate5
+	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
+		goto yystate237
+	case c == ';':
+		goto yystate11
+	case c == '(':
+		goto yystate31
+	}
+
+	goto yystate242 // silence unused label error
+yystate242:
+	c = l.getc(c)
+yystart242:
+	switch {
+	default:
+		goto yyabort
+	case c == '\t' || c == ' ':
+		goto yystate48
+	case c == '"':
+		goto yystate6
+	case c == '.':
+		goto yystate246
+	case c == '\n' || c == '\r':
+		goto yystate12
+	case c == ')':
+		goto yystate5
+	case c >= '0' && c <= '9' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z':
+		goto yystate243
+	case c == ';':
+		goto yystate11
+	case c == '(':
+		goto yystate31
+	}
+
+yystate243:
+	c = l.getc(c)
+	switch {
+	default:
+		goto yyrule13
+	case c == '.':
+		goto yystate245
+	case c >= '0' && c <= '9' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z':
+		goto yystate243
+	case c == '-':
+		goto yystate244
+	}
+
+yystate244:
+	c = l.getc(c)
+	switch {
+	default:
+		goto yyabort
+	case c >= '0' && c <= '9' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z':
+		goto yystate243
+	case c == '-':
+		goto yystate244
+	}
+
+yystate245:
+	c = l.getc(c)
+	switch {
+	default:
+		goto yyrule13
+	case c >= '0' && c <= '9' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z':
+		goto yystate243
+	}
+
+yystate246:
+	c = l.getc(c)
+	goto yyrule13
+
+	goto yystate247 // silence unused label error
+yystate247:
+	c = l.getc(c)
+yystart247:
+	switch {
+	default:
+		goto yyabort
+	case c == '\t' || c == ' ':
+		goto yystate48
+	case c == '"':
+		goto yystate6
+	case c >= '0' && c <= '9' || c == '=' || c >= 'A' && c <= 'V':
+		goto yystate248
+	case c == '\n' || c == '\r':
+		goto yystate12
+	case c == ')':
+		goto yystate5
+	case c == ';':
+		goto yystate11
+	case c == '(':
+		goto yystate31
+	}
+
+yystate248:
+	c = l.getc(c)
+	switch {
+	default:
+		goto yyrule75
+	case c >= '0' && c <= '9' || c == '=' || c >= 'A' && c <= 'V':
+		goto yystate248
+	}
+
+	goto yystate249 // silence unused label error
+yystate249:
+	c = l.getc(c)
+yystart249:
+	switch {
+	default:
+		goto yyabort
+	case c == '\t' || c == ' ':
+		goto yystate48
+	case c == '"':
+		goto yystate6
+	case c == '.':
+		goto yystate246
+	case c == '\n' || c == '\r':
+		goto yystate12
+	case c == ')':
+		goto yystate5
+	case c >= '0' && c <= '9' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z':
+		goto yystate243
+	case c == ';':
+		goto yystate11
+	case c == '(':
+		goto yystate31
+	}
+
+	goto yystate250 // silence unused label error
+yystate250:
+	c = l.getc(c)
+yystart250:
+	switch {
+	default:
+		goto yyabort
+	case c == '\t' || c == ' ':
+		goto yystate48
+	case c == '"':
+		goto yystate6
+	case c >= '0' && c <= '9' || c == '=' || c >= 'A' && c <= 'V':
+		goto yystate248
+	case c == '\n' || c == '\r':
+		goto yystate12
+	case c == ')':
+		goto yystate5
+	case c == ';':
+		goto yystate11
+	case c == '(':
+		goto yystate31
+	}
+
+	goto yystate251 // silence unused label error
+yystate251:
+	c = l.getc(c)
+yystart251:
+	switch {
+	default:
+		goto yyabort
+	case c == '\t' || c == ' ':
+		goto yystate48
+	case c == '"':
+		goto yystate6
+	case c == '\n' || c == '\r':
+		goto yystate12
+	case c == ')':
+		goto yystate5
+	case c >= '0' && c <= '9':
+		goto yystate216
+	case c == ';':
+		goto yystate11
+	case c == '(':
+		goto yystate31
+	}
+
+	goto yystate252 // silence unused label error
+yystate252:
+	c = l.getc(c)
+yystart252:
+	switch {
+	default:
+		goto yyabort
+	case c == '\t' || c == ' ':
+		goto yystate48
+	case c == '"':
+		goto yystate6
+	case c == '+' || c >= '/' && c <= '9' || c == '=' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z':
+		goto yystate253
+	case c == '\n' || c == '\r':
+		goto yystate12
+	case c == ')':
+		goto yystate5
+	case c == ';':
+		goto yystate11
+	case c == '(':
+		goto yystate31
+	}
+
+yystate253:
+	c = l.getc(c)
+	switch {
+	default:
+		goto yyrule76
+	case c == '+' || c >= '/' && c <= '9' || c == '=' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z':
+		goto yystate253
+	}
+
+	goto yystate254 // silence unused label error
+yystate254:
+	c = l.getc(c)
+yystart254:
+	switch {
+	default:
+		goto yyabort
+	case c == '\t' || c == ' ':
+		goto yystate48
+	case c == '"':
+		goto yystate6
+	case c == '\n' || c == '\r':
+		goto yystate12
+	case c == ')':
+		goto yystate5
+	case c >= '0' && c <= '9':
+		goto yystate216
+	case c == ';':
+		goto yystate11
+	case c == '(':
+		goto yystate31
+	}
+
+	goto yystate255 // silence unused label error
+yystate255:
+	c = l.getc(c)
+yystart255:
+	switch {
+	default:
+		goto yyabort
+	case c == '\t' || c == ' ':
+		goto yystate48
+	case c == '"':
+		goto yystate6
+	case c == '+' || c >= '/' && c <= '9' || c == '=' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z':
+		goto yystate253
+	case c == '\n' || c == '\r':
+		goto yystate12
+	case c == ')':
+		goto yystate5
+	case c == ';':
+		goto yystate11
+	case c == '(':
+		goto yystate31
 	}
 
 yyrule1: // ^[ \t]+$
@@ -2438,14 +2842,14 @@ yyrule19: // A
 		ret = tA
 		goto yystate0
 	}
-yyrule20: // AAAA
-	{
-		ret = tAAAA
-		goto yystate0
-	}
-yyrule21: // A6
+yyrule20: // A6
 	{
 		ret = tA6
+		goto yystate0
+	}
+yyrule21: // AAAA
+	{
+		ret = tAAAA
 		goto yystate0
 	}
 yyrule22: // AFSDB
@@ -2458,177 +2862,252 @@ yyrule23: // APL
 		ret = tAPL
 		goto yystate0
 	}
-yyrule24: // CERT
+yyrule24: // ATMA
+	{
+		ret = tATMA
+		goto yystate0
+	}
+yyrule25: // CDS
+	{
+		ret = tCDS
+		goto yystate0
+	}
+yyrule26: // CERT
 	{
 		ret = tCERT
 		goto yystate0
 	}
-yyrule25: // CNAME
+yyrule27: // CNAME
 	{
 		ret = tCNAME
 		goto yystate0
 	}
-yyrule26: // DHCID
+yyrule28: // DHCID
 	{
 		ret = tDHCID
 		goto yystate0
 	}
-yyrule27: // DNAME
+yyrule29: // DNAME
 	{
 		ret = tDNAME
 		goto yystate0
 	}
-yyrule28: // DNSKEY
+yyrule30: // DNSKEY
 	{
 		ret = tDNSKEY
 		goto yystate0
 	}
-yyrule29: // DS
+yyrule31: // DS
 	{
 		ret = tDS
 		goto yystate0
 	}
-yyrule30: // GPOS
+yyrule32: // EID
+	{
+		ret = tEID
+		goto yystate0
+	}
+yyrule33: // GID
+	{
+		ret = tGID
+		goto yystate0
+	}
+yyrule34: // GPOS
 	{
 		ret = tGPOS
 		goto yystate0
 	}
-yyrule31: // HINFO
+yyrule35: // HINFO
 	{
 		ret = tHINFO
 		goto yystate0
 	}
-yyrule32: // IPSECKEY
+yyrule36: // HIP
+	{
+		ret = tHIP
+		goto yystate0
+	}
+yyrule37: // IPSECKEY
 	{
 		ret = tIPSECKEY
 		goto yystate0
 	}
-yyrule33: // ISDN
+yyrule38: // ISDN
 	{
 		ret = tISDN
 		goto yystate0
 	}
-yyrule34: // KEY
+yyrule39: // KEY
 	{
 		ret = tKEY
 		goto yystate0
 	}
-yyrule35: // KX
+yyrule40: // KX
 	{
 		ret = tKX
 		goto yystate0
 	}
-yyrule36: // LOC
+yyrule41: // LOC
 	{
 		ret = tLOC
 		goto yystate0
 	}
-yyrule37: // MX
+yyrule42: // MX
 	{
 		ret = tMX
 		goto yystate0
 	}
-yyrule38: // NAPTR
+yyrule43: // NAPTR
 	{
 		ret = tNAPTR
 		goto yystate0
 	}
-yyrule39: // NSAP
+yyrule44: // NIMLOC
 	{
-		ret = tNSAP
+		ret = tNIMLOC
 		goto yystate0
 	}
-yyrule40: // NS
+yyrule45: // NINFO
+	{
+		ret = tNINFO
+		goto yystate0
+	}
+yyrule46: // NS
 	{
 		ret = tNS
 		goto yystate0
 	}
-yyrule41: // NSEC
+yyrule47: // NSAP
+	{
+		ret = tNSAP
+		goto yystate0
+	}
+yyrule48: // NSAP-PTR
+	{
+		ret = tNSAP_PTR
+		goto yystate0
+	}
+yyrule49: // NSEC
 	{
 		ret = tNSEC
 		goto yystate0
 	}
-yyrule42: // NSEC3
+yyrule50: // NSEC3
 	{
 		ret = tNSEC3
 		goto yystate0
 	}
-yyrule43: // NSEC3PARAM
+yyrule51: // NSEC3PARAM
 	{
 		ret = tNSEC3PARAM
 		goto yystate0
 	}
-yyrule44: // NXT
+yyrule52: // NXT
 	{
 		ret = tNXT
 		goto yystate0
 	}
-yyrule45: // PTR
+yyrule53: // PTR
 	{
 		ret = tPTR
 		goto yystate0
 	}
-yyrule46: // PX
+yyrule54: // PX
 	{
 		ret = tPX
 		goto yystate0
 	}
-yyrule47: // RP
+yyrule55: // RKEY
+	{
+		ret = tRKEY
+		goto yystate0
+	}
+yyrule56: // RP
 	{
 		ret = tRP
 		goto yystate0
 	}
-yyrule48: // RRSIG
+yyrule57: // RRSIG
 	{
 		ret = tRRSIG
 		goto yystate0
 	}
-yyrule49: // RT
+yyrule58: // RT
 	{
 		ret = tRT
 		goto yystate0
 	}
-yyrule50: // SIG
+yyrule59: // SIG
 	{
 		ret = tSIG
 		goto yystate0
 	}
-yyrule51: // SOA
+yyrule60: // SOA
 	{
 		ret = tSOA
 		goto yystate0
 	}
-yyrule52: // SPF
+yyrule61: // SPF
 	{
 		ret = tSPF
 		goto yystate0
 	}
-yyrule53: // SRV
+yyrule62: // SRV
 	{
 		ret = tSRV
 		goto yystate0
 	}
-yyrule54: // SSHFP
+yyrule63: // SSHFP
 	{
 		ret = tSSHFP
 		goto yystate0
 	}
-yyrule55: // TXT
+yyrule64: // TALINK
+	{
+		ret = tTALINK
+		goto yystate0
+	}
+yyrule65: // TKEY
+	{
+		ret = tTKEY
+		goto yystate0
+	}
+yyrule66: // TSIG
+	{
+		ret = tTSIG
+		goto yystate0
+	}
+yyrule67: // TXT
 	{
 		ret = tTXT
 		goto yystate0
 	}
-yyrule56: // WKS
+yyrule68: // UID
+	{
+		ret = tUID
+		goto yystate0
+	}
+yyrule69: // UINFO
+	{
+		ret = tUINFO
+		goto yystate0
+	}
+yyrule70: // UNSPEC
+	{
+		ret = tUNSPEC
+		goto yystate0
+	}
+yyrule71: // WKS
 	{
 		ret = tWKS
 		goto yystate0
 	}
-yyrule57: // X25
+yyrule72: // X25
 	{
 		ret = tX25
 		goto yystate0
 	}
-yyrule58: // {ipv4}
+yyrule73: // {ipv4}
 	{
 
 		ip := net.ParseIP(string(l.buf))
@@ -2638,7 +3117,7 @@ yyrule58: // {ipv4}
 		lval.ip = ip
 		return tIPV4
 	}
-yyrule59: // {ipv6}
+yyrule74: // {ipv6}
 	{
 
 		ip := net.ParseIP(string(l.buf))
@@ -2648,19 +3127,19 @@ yyrule59: // {ipv6}
 		lval.ip = ip
 		return tIPV6
 	}
-yyrule60: // [0-9A-V=]+
+yyrule75: // [0-9A-V=]+
 	{
 
 		ret = tBASE32EXT
 		goto yystate0
 	}
-yyrule61: // [A-Za-z0-9+/=]+
+yyrule76: // [A-Za-z0-9+/=]+
 	{
 
 		ret = tBASE64
 		goto yystate0
 	}
-yyrule62: // [0-9a-fA-F]+
+yyrule77: // [0-9a-fA-F]+
 	{
 
 		var err os.Error
@@ -2671,7 +3150,7 @@ yyrule62: // [0-9a-fA-F]+
 		ret = tHEX
 		goto yystate0
 	}
-yyrule63: // -
+yyrule78: // -
 	{
 
 		lval.data = nil

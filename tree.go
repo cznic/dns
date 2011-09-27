@@ -40,7 +40,7 @@ func (t *GoTree) Delete(owner string) {
 }
 
 // Enum enumerates all data in the tree starting at root
-// and all of it's childs. On every datum found the handler is invoked.
+// and all of its childs. On every datum found the handler is invoked.
 // If the handler returns false the tree traversing stops.
 func (t *GoTree) Enum(root string, handler func(path []string, data interface{}) bool) {
 	t.rwm.RLock()
@@ -113,7 +113,7 @@ func enum(path []string, node interface{}, handler func(path []string, data inte
 }
 
 // Enum enumerates all data in the tree starting at root
-// and all of it's childs. On every datum found the handler is invoked.
+// and all of its childs. On every datum found the handler is invoked.
 // If the handler returns false the tree traversing stops.
 func (t *Tree) Enum(root string, handler func(path []string, data interface{}) bool) {
 	path, node := t.getnode(root)

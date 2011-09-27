@@ -103,12 +103,12 @@ yystart1:
 	switch {
 	default:
 		goto yyabort
-	case c == '#':
-		goto yystate6
-	case c == '\t' || c == ' ':
-		goto yystate5
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z':
 		goto yystate2
+	case c == '\t' || c == ' ':
+		goto yystate5
+	case c == '#':
+		goto yystate6
 	}
 
 yystate2:
@@ -116,12 +116,12 @@ yystate2:
 	switch {
 	default:
 		goto yyrule3
+	case c == '-':
+		goto yystate3
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z':
 		goto yystate2
 	case c == '.':
 		goto yystate4
-	case c == '-':
-		goto yystate3
 	}
 
 yystate3:
@@ -129,10 +129,10 @@ yystate3:
 	switch {
 	default:
 		goto yyabort
-	case c >= '0' && c <= '9' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z':
-		goto yystate2
 	case c == '-':
 		goto yystate3
+	case c >= '0' && c <= '9' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z':
+		goto yystate2
 	}
 
 yystate4:
@@ -149,10 +149,10 @@ yystate5:
 	switch {
 	default:
 		goto yyrule4
-	case c == '#':
-		goto yystate6
 	case c == '\t' || c == ' ':
 		goto yystate5
+	case c == '#':
+		goto yystate6
 	}
 
 yystate6:
@@ -171,14 +171,14 @@ yystart7:
 	switch {
 	default:
 		goto yyabort
-	case c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
-		goto yystate13
-	case c == '#':
-		goto yystate6
-	case c >= '0' && c <= '9':
-		goto yystate8
 	case c == ':':
 		goto yystate35
+	case c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
+		goto yystate13
+	case c >= '0' && c <= '9':
+		goto yystate8
+	case c == '#':
+		goto yystate6
 	case c == '\t' || c == ' ':
 		goto yystate34
 	}
@@ -190,12 +190,12 @@ yystate8:
 		goto yyrule2
 	case c == ':':
 		goto yystate12
-	case c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
-		goto yystate14
 	case c >= '0' && c <= '9':
 		goto yystate9
 	case c == '.':
 		goto yystate22
+	case c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
+		goto yystate14
 	}
 
 yystate9:
@@ -207,10 +207,10 @@ yystate9:
 		goto yystate12
 	case c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
 		goto yystate15
-	case c == '.':
-		goto yystate22
 	case c >= '0' && c <= '9':
 		goto yystate10
+	case c == '.':
+		goto yystate22
 	}
 
 yystate10:
@@ -218,12 +218,12 @@ yystate10:
 	switch {
 	default:
 		goto yyrule2
+	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
+		goto yystate11
 	case c == ':':
 		goto yystate12
 	case c == '.':
 		goto yystate22
-	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
-		goto yystate11
 	}
 
 yystate11:
@@ -240,10 +240,10 @@ yystate12:
 	switch {
 	default:
 		goto yyabort
-	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
-		goto yystate13
 	case c == ':':
 		goto yystate16
+	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
+		goto yystate13
 	}
 
 yystate13:
@@ -273,10 +273,10 @@ yystate15:
 	switch {
 	default:
 		goto yyrule2
-	case c == ':':
-		goto yystate12
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
 		goto yystate11
+	case c == ':':
+		goto yystate12
 	}
 
 yystate16:
@@ -304,10 +304,10 @@ yystate18:
 	switch {
 	default:
 		goto yyrule2
-	case c == ':':
-		goto yystate21
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
 		goto yystate19
+	case c == ':':
+		goto yystate21
 	}
 
 yystate19:
@@ -353,10 +353,10 @@ yystate23:
 	switch {
 	default:
 		goto yyabort
-	case c >= '0' && c <= '9':
-		goto yystate24
 	case c == '.':
 		goto yystate26
+	case c >= '0' && c <= '9':
+		goto yystate24
 	}
 
 yystate24:
@@ -364,10 +364,10 @@ yystate24:
 	switch {
 	default:
 		goto yyabort
-	case c >= '0' && c <= '9':
-		goto yystate25
 	case c == '.':
 		goto yystate26
+	case c >= '0' && c <= '9':
+		goto yystate25
 	}
 
 yystate25:
@@ -393,10 +393,10 @@ yystate27:
 	switch {
 	default:
 		goto yyabort
-	case c == '.':
-		goto yystate30
 	case c >= '0' && c <= '9':
 		goto yystate28
+	case c == '.':
+		goto yystate30
 	}
 
 yystate28:
@@ -404,10 +404,10 @@ yystate28:
 	switch {
 	default:
 		goto yyabort
-	case c == '.':
-		goto yystate30
 	case c >= '0' && c <= '9':
 		goto yystate29
+	case c == '.':
+		goto yystate30
 	}
 
 yystate29:

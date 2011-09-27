@@ -114,7 +114,7 @@ type LookupResult int
 // Values of LookupResult.
 const (
 	LookupOK           LookupResult = iota // Sucess
-	LookupAliased                          // Sucess, but QNAME is an alias and the result is for it's canonical name
+	LookupAliased                          // Sucess, but QNAME is an alias and the result is for its canonical name
 	LookupNameError                        // QNAME doesn't exist
 	LookupDataNotFound                     // QNAME does exist, but no data for the combination of QTYPE and QCLASS were found
 	LookupFail                             // E.g. can't contact any DNS server (wrong conf or network communication error)
@@ -124,7 +124,7 @@ const (
 
 var LookupResultStr = map[LookupResult]string{
 	LookupOK:           "Sucess",
-	LookupAliased:      "Sucess. QNAME is an alias and the result is for it's canonical name",
+	LookupAliased:      "Sucess. QNAME is an alias and the result is for its canonical name",
 	LookupNameError:    "QNAME doesn't exist",
 	LookupDataNotFound: "QNAME does exist, but no data for the combination of QTYPE and QCLASS were found",
 	LookupFail:         "Lookup fail. Could be also wrong resolver configuration or network communication error.",

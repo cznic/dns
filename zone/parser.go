@@ -48,50 +48,65 @@ const tAAAA = 57349
 const tA6 = 57350
 const tAFSDB = 57351
 const tAPL = 57352
-const tCERT = 57353
-const tCNAME = 57354
-const tDNAME = 57355
-const tDHCID = 57356
-const tDNSKEY = 57357
-const tDS = 57358
-const tGPOS = 57359
-const tHINFO = 57360
-const tIPSECKEY = 57361
-const tISDN = 57362
-const tKEY = 57363
-const tKX = 57364
-const tLOC = 57365
-const tMX = 57366
-const tNAPTR = 57367
-const tNSAP = 57368
-const tNS = 57369
-const tNSEC = 57370
-const tNSEC3 = 57371
-const tNSEC3PARAM = 57372
-const tNXT = 57373
-const tPTR = 57374
-const tPX = 57375
-const tRP = 57376
-const tRRSIG = 57377
-const tRT = 57378
-const tSIG = 57379
-const tSOA = 57380
-const tSPF = 57381
-const tSRV = 57382
-const tSSHFP = 57383
-const tTXT = 57384
-const tWKS = 57385
-const tX25 = 57386
-const tHEX = 57387
-const tBASE32EXT = 57388
-const tBASE64 = 57389
-const tDOMAIN_NAME = 57390
-const tQSTR = 57391
-const tCLASS = 57392
-const tIPV4 = 57393
-const tIPV6 = 57394
-const tDECADIC = 57395
-const notQSTR = 57396
+const tATMA = 57353
+const tCERT = 57354
+const tCDS = 57355
+const tCNAME = 57356
+const tDNAME = 57357
+const tDHCID = 57358
+const tDNSKEY = 57359
+const tDS = 57360
+const tEID = 57361
+const tGID = 57362
+const tGPOS = 57363
+const tHINFO = 57364
+const tHIP = 57365
+const tIPSECKEY = 57366
+const tISDN = 57367
+const tKEY = 57368
+const tKX = 57369
+const tLOC = 57370
+const tMX = 57371
+const tNAPTR = 57372
+const tNIMLOC = 57373
+const tNINFO = 57374
+const tNSAP = 57375
+const tNSAP_PTR = 57376
+const tNS = 57377
+const tNSEC = 57378
+const tNSEC3 = 57379
+const tNSEC3PARAM = 57380
+const tNXT = 57381
+const tPTR = 57382
+const tPX = 57383
+const tRKEY = 57384
+const tRP = 57385
+const tRRSIG = 57386
+const tRT = 57387
+const tSIG = 57388
+const tSOA = 57389
+const tSPF = 57390
+const tSRV = 57391
+const tSSHFP = 57392
+const tTALINK = 57393
+const tTKEY = 57394
+const tTSIG = 57395
+const tTXT = 57396
+const tUID = 57397
+const tUINFO = 57398
+const tUNSPEC = 57399
+const tWKS = 57400
+const tX25 = 57401
+const tHEX = 57402
+const tBASE32EXT = 57403
+const tBASE64 = 57404
+const tDOMAIN_NAME = 57405
+const tQSTR = 57406
+const tCLASS = 57407
+const tIPV4 = 57408
+const tIPV6 = 57409
+const tDECADIC = 57410
+const notQSTR = 57411
 
 var yyToknames = []string{
 	"tDLR_TTL",
@@ -101,14 +116,19 @@ var yyToknames = []string{
 	"tA6",
 	"tAFSDB",
 	"tAPL",
+	"tATMA",
 	"tCERT",
+	"tCDS",
 	"tCNAME",
 	"tDNAME",
 	"tDHCID",
 	"tDNSKEY",
 	"tDS",
+	"tEID",
+	"tGID",
 	"tGPOS",
 	"tHINFO",
+	"tHIP",
 	"tIPSECKEY",
 	"tISDN",
 	"tKEY",
@@ -116,7 +136,10 @@ var yyToknames = []string{
 	"tLOC",
 	"tMX",
 	"tNAPTR",
+	"tNIMLOC",
+	"tNINFO",
 	"tNSAP",
+	"tNSAP_PTR",
 	"tNS",
 	"tNSEC",
 	"tNSEC3",
@@ -124,6 +147,7 @@ var yyToknames = []string{
 	"tNXT",
 	"tPTR",
 	"tPX",
+	"tRKEY",
 	"tRP",
 	"tRRSIG",
 	"tRT",
@@ -132,7 +156,13 @@ var yyToknames = []string{
 	"tSPF",
 	"tSRV",
 	"tSSHFP",
+	"tTALINK",
+	"tTKEY",
+	"tTSIG",
 	"tTXT",
+	"tUID",
+	"tUINFO",
+	"tUNSPEC",
 	"tWKS",
 	"tX25",
 	"tHEX",
@@ -156,68 +186,79 @@ var yyExca = []int{
 	-1, 1,
 	1, -1,
 	-2, 0,
-	-1, 140,
+	-1, 178,
 	1, 40,
 	4, 40,
 	5, 40,
-	48, 40,
-	55, 40,
-	56, 40,
+	63, 40,
+	70, 40,
+	71, 40,
 	-2, 68,
 }
 
-const yyNprod = 101
+const yyNprod = 139
 const yyPrivate = 57344
 
 var yyTokenNames []string
 var yyStates []string
 
-const yyLast = 150
+const yyLast = 211
 
 var yyAct = []int{
 
-	116, 124, 64, 56, 14, 132, 101, 102, 119, 4,
-	6, 127, 83, 84, 141, 125, 57, 20, 85, 126,
-	21, 86, 87, 16, 88, 134, 51, 16, 74, 70,
-	89, 69, 50, 90, 91, 92, 93, 100, 94, 68,
-	148, 95, 111, 108, 96, 99, 80, 77, 97, 98,
-	72, 71, 115, 5, 128, 137, 129, 11, 66, 65,
-	3, 7, 75, 76, 73, 13, 146, 81, 17, 78,
-	79, 36, 37, 2, 12, 8, 63, 38, 39, 62,
-	40, 41, 136, 103, 61, 60, 105, 106, 107, 42,
-	104, 59, 43, 10, 44, 45, 9, 46, 120, 58,
-	47, 109, 55, 48, 54, 118, 131, 49, 53, 112,
-	113, 110, 52, 1, 133, 114, 140, 82, 67, 123,
-	117, 121, 122, 19, 18, 35, 135, 34, 33, 32,
-	31, 30, 29, 28, 27, 26, 25, 139, 138, 142,
-	24, 144, 143, 145, 23, 22, 147, 15, 130, 149,
+	154, 162, 64, 56, 14, 170, 165, 140, 157, 4,
+	6, 179, 21, 163, 164, 16, 57, 20, 172, 16,
+	74, 70, 69, 50, 138, 68, 51, 186, 149, 146,
+	137, 80, 77, 72, 71, 166, 175, 167, 11, 2,
+	153, 8, 66, 65, 184, 81, 13, 12, 63, 17,
+	62, 174, 61, 60, 142, 59, 10, 9, 158, 58,
+	139, 147, 75, 76, 73, 55, 54, 156, 5, 78,
+	79, 169, 53, 52, 1, 3, 7, 171, 178, 82,
+	67, 155, 19, 141, 18, 35, 143, 144, 83, 85,
+	84, 86, 88, 87, 90, 89, 91, 93, 92, 94,
+	95, 96, 97, 98, 99, 100, 101, 102, 103, 104,
+	105, 106, 107, 108, 109, 111, 112, 110, 113, 114,
+	115, 116, 117, 118, 120, 121, 119, 122, 123, 124,
+	125, 126, 127, 128, 129, 130, 131, 132, 133, 134,
+	135, 136, 145, 34, 33, 32, 31, 150, 151, 148,
+	30, 29, 28, 152, 27, 26, 25, 161, 24, 159,
+	160, 23, 36, 37, 173, 22, 15, 168, 0, 0,
+	38, 39, 0, 40, 41, 177, 176, 180, 0, 182,
+	181, 183, 0, 0, 185, 42, 0, 187, 0, 0,
+	0, 43, 0, 44, 45, 0, 46, 0, 0, 0,
+	47, 0, 0, 48, 0, 0, 0, 0, 0, 0,
+	49,
 }
 var yyPact = []int{
 
-	5, 5, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -26,
-	-1000, -1000, -30, -1000, -1000, -1000, -1000, -1000, -1000, 65,
-	-18, -26, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	5, 5, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -49,
+	-1000, -1000, -53, -1000, -1000, -1000, -1000, -1000, -1000, 156,
+	-42, -49, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
 	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
-	-37, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -10,
-	-1000, -1000, -20, -23, 3, 2, -25, -1000, -37, -37,
-	-1, -25, -25, -2, -1000, 6, -3, -12, -1000, -1000,
-	-1000, -1000, -1000, -25, -1000, -25, -1000, -1000, -25, -25,
-	-1000, -25, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
-	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -5,
-	-1000, -1000, -1000, -25, -6, -37, -37, -25, -1000, -1000,
-	-1000, -1000, -1000, -1000, -26, -38, -1000, -36, 7, -1000,
-	11, -1000, -1000, -28, -38, -1000, -1000, -1000, -1000, -1000,
-	-1000, 9, -28, -1000, -1000, -38, -41, -1000, -37, -38,
-	-1000, -1000, -1000, -1000, -38, -1000, -8, -1000, -1000, -1000,
+	-52, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -39,
+	-1000, -1000, -44, -46, -29, -30, -48, -1000, -52, -52,
+	-31, -48, -48, -32, -1000, 82, -33, -40, -1000, -1000,
+	-1000, -1000, -1000, -48, -1000, -48, -1000, -1000, -48, -48,
+	-1000, -48, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, -1000, -1000, -1000, -1000, -34, -1000, -1000,
+	-1000, -48, -35, -52, -52, -48, -1000, -1000, -1000, -1000,
+	-1000, -1000, -49, -55, -1000, -56, -27, -1000, -23, -1000,
+	-1000, -50, -55, -1000, -1000, -1000, -1000, -1000, -1000, -25,
+	-50, -1000, -1000, -55, -59, -1000, -52, -55, -1000, -1000,
+	-1000, -1000, -55, -1000, -36, -1000, -1000, -1000,
 }
 var yyPgo = []int{
 
-	0, 6, 148, 0, 8, 4, 147, 145, 144, 140,
-	136, 135, 134, 133, 132, 131, 130, 129, 128, 127,
-	125, 57, 124, 123, 120, 118, 2, 117, 116, 114,
-	5, 7, 3, 1, 113, 73, 112, 108, 106, 105,
-	104, 102, 101, 99, 98, 96, 93, 91, 90, 85,
-	84, 82, 79, 76, 74, 67, 66, 59, 58, 52,
+	0, 60, 167, 0, 8, 4, 166, 165, 161, 158,
+	156, 155, 154, 152, 151, 150, 146, 145, 144, 143,
+	85, 38, 84, 82, 81, 80, 2, 79, 78, 77,
+	5, 7, 3, 1, 74, 39, 73, 72, 71, 67,
+	66, 65, 61, 59, 58, 57, 56, 55, 54, 53,
+	52, 51, 50, 48, 47, 45, 44, 43, 42, 40,
 }
 var yyR1 = []int{
 
@@ -229,9 +270,12 @@ var yyR1 = []int{
 	22, 22, 22, 22, 22, 22, 22, 22, 22, 22,
 	22, 23, 23, 23, 23, 55, 56, 18, 57, 26,
 	28, 28, 28, 27, 27, 27, 27, 27, 27, 27,
-	27, 27, 27, 27, 27, 27, 27, 27, 27, 58,
-	59, 19, 5, 20, 25, 25, 25, 31, 32, 6,
-	33,
+	27, 27, 27, 27, 27, 27, 27, 27, 27, 27,
+	27, 27, 27, 27, 27, 27, 27, 27, 27, 27,
+	27, 27, 27, 27, 27, 27, 27, 27, 27, 27,
+	27, 27, 27, 27, 27, 27, 27, 27, 27, 27,
+	27, 27, 27, 27, 27, 27, 27, 58, 59, 19,
+	5, 20, 25, 25, 25, 31, 32, 6, 33,
 }
 var yyR2 = []int{
 
@@ -243,55 +287,66 @@ var yyR2 = []int{
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
 	2, 2, 2, 1, 1, 0, 0, 12, 0, 2,
 	1, 1, 2, 1, 1, 1, 1, 1, 1, 1,
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
-	0, 10, 1, 2, 0, 1, 2, 1, 1, 1,
-	1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 0, 0, 10,
+	1, 2, 0, 1, 2, 1, 1, 1, 1,
 }
 var yyChk = []int{
 
-	-1000, -34, -35, 55, 4, 48, 5, 56, -35, -45,
-	-46, -21, -54, -21, -5, -6, 53, -21, -22, -23,
-	-5, 50, -7, -8, -9, -10, -11, -12, -13, -14,
-	-15, -16, -17, -18, -19, -20, 6, 7, 12, 13,
-	15, 16, 24, 27, 29, 30, 32, 35, 38, 42,
-	50, -5, -36, -37, -40, -41, -32, 53, -43, -47,
-	-49, -50, -52, -53, -26, -57, -58, -25, 49, 51,
-	52, 48, 48, -31, 53, -32, -32, 48, -31, -31,
-	48, -55, -27, 6, 7, 12, 15, 16, 18, 24,
-	27, 28, 29, 30, 32, 35, 38, 42, 43, 48,
-	49, -1, -31, -31, -48, -31, -31, -1, 48, -42,
-	-31, 48, -32, -32, -31, -59, -3, -24, -39, -4,
-	-44, -4, -4, -5, -33, 53, 55, 47, 47, 45,
-	-2, -38, -30, -29, 53, -33, -51, 46, -30, -33,
-	-28, 55, -26, -32, -33, -26, -56, -33, 48, -3,
+	-1000, -34, -35, 70, 4, 63, 5, 71, -35, -45,
+	-46, -21, -54, -21, -5, -6, 68, -21, -22, -23,
+	-5, 65, -7, -8, -9, -10, -11, -12, -13, -14,
+	-15, -16, -17, -18, -19, -20, 6, 7, 14, 15,
+	17, 18, 29, 35, 37, 38, 40, 44, 47, 54,
+	65, -5, -36, -37, -40, -41, -32, 68, -43, -47,
+	-49, -50, -52, -53, -26, -57, -58, -25, 64, 66,
+	67, 63, 63, -31, 68, -32, -32, 63, -31, -31,
+	63, -55, -27, 6, 8, 7, 9, 11, 10, 13,
+	12, 14, 16, 15, 17, 18, 19, 20, 21, 22,
+	23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
+	35, 33, 34, 36, 37, 38, 39, 40, 41, 44,
+	42, 43, 45, 46, 47, 48, 49, 50, 51, 52,
+	53, 54, 55, 56, 57, 58, 59, 63, 64, -1,
+	-31, -31, -48, -31, -31, -1, 63, -42, -31, 63,
+	-32, -32, -31, -59, -3, -24, -39, -4, -44, -4,
+	-4, -5, -33, 68, 70, 62, 62, 60, -2, -38,
+	-30, -29, 68, -33, -51, 61, -30, -33, -28, 70,
+	-26, -32, -33, -26, -56, -33, 63, -3,
 }
 var yyDef = []int{
 
 	0, -2, 1, 26, 27, 29, 45, 45, 2, 0,
-	45, 31, 0, 32, 28, 92, 99, 30, 46, 0,
+	45, 31, 0, 32, 28, 130, 137, 30, 46, 0,
 	63, 64, 47, 48, 49, 50, 51, 52, 53, 54,
 	55, 56, 57, 58, 59, 60, 3, 5, 14, 16,
-	0, 20, 33, 36, 38, 41, 43, 68, 89, 94,
-	61, 62, 0, 0, 0, 0, 0, 98, 0, 0,
-	0, 0, 0, 0, 65, 0, 0, 93, 95, 4,
-	6, 15, 17, 0, 97, 0, 34, 37, 0, 0,
+	0, 20, 33, 36, 38, 41, 43, 68, 127, 132,
+	61, 62, 0, 0, 0, 0, 0, 136, 0, 0,
+	0, 0, 0, 0, 65, 0, 0, 131, 133, 4,
+	6, 15, 17, 0, 135, 0, 34, 37, 0, 0,
 	44, 0, 69, 73, 74, 75, 76, 77, 78, 79,
-	80, 81, 82, 83, 84, 85, 86, 87, 88, 0,
-	96, 18, 7, 0, 0, 0, 0, 0, 90, 11,
-	24, 35, 24, 24, 0, 0, 19, 0, 0, 21,
-	0, 8, 42, 0, 0, 100, 10, 13, 12, 25,
-	39, 0, 0, 23, 22, 0, 68, 9, 0, 0,
-	-2, 70, 71, 66, 0, 72, 0, 91, 11, 67,
+	80, 81, 82, 83, 84, 85, 86, 87, 88, 89,
+	90, 91, 92, 93, 94, 95, 96, 97, 98, 99,
+	100, 101, 102, 103, 104, 105, 106, 107, 108, 109,
+	110, 111, 112, 113, 114, 115, 116, 117, 118, 119,
+	120, 121, 122, 123, 124, 125, 126, 0, 134, 18,
+	7, 0, 0, 0, 0, 0, 128, 11, 24, 35,
+	24, 24, 0, 0, 19, 0, 0, 21, 0, 8,
+	42, 0, 0, 138, 10, 13, 12, 25, 39, 0,
+	0, 23, 22, 0, 68, 9, 0, 0, -2, 70,
+	71, 66, 0, 72, 0, 129, 11, 67,
 }
 var yyTok1 = []int{
 
 	1, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	55, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	70, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 56,
+	3, 3, 3, 3, 71,
 }
 var yyTok2 = []int{
 
@@ -300,7 +355,8 @@ var yyTok2 = []int{
 	22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
 	32, 33, 34, 35, 36, 37, 38, 39, 40, 41,
 	42, 43, 44, 45, 46, 47, 48, 49, 50, 51,
-	52, 53, 54,
+	52, 53, 54, 55, 56, 57, 58, 59, 60, 61,
+	62, 63, 64, 65, 66, 67, 68, 69,
 }
 var yyTok3 = []int{
 	0,
@@ -840,95 +896,247 @@ yydefault:
 		}
 	case 74:
 		{
-			yyVAL.typ = rr.TYPE_AAAA
+			yyVAL.typ = rr.TYPE_A6
 		}
 	case 75:
 		{
-			yyVAL.typ = rr.TYPE_CNAME
+			yyVAL.typ = rr.TYPE_AAAA
 		}
 	case 76:
 		{
-			yyVAL.typ = rr.TYPE_DNSKEY
+			yyVAL.typ = rr.TYPE_AFSDB
 		}
 	case 77:
 		{
-			yyVAL.typ = rr.TYPE_DS
+			yyVAL.typ = rr.TYPE_ATMA
 		}
 	case 78:
 		{
-			yyVAL.typ = rr.TYPE_HINFO
+			yyVAL.typ = rr.TYPE_APL
 		}
 	case 79:
 		{
-			yyVAL.typ = rr.TYPE_MX
+			yyVAL.typ = rr.TYPE_CDS
 		}
 	case 80:
 		{
-			yyVAL.typ = rr.TYPE_NS
+			yyVAL.typ = rr.TYPE_CERT
 		}
 	case 81:
 		{
-			yyVAL.typ = rr.TYPE_NSEC
+			yyVAL.typ = rr.TYPE_CNAME
 		}
 	case 82:
 		{
-			yyVAL.typ = rr.TYPE_NSEC3
+			yyVAL.typ = rr.TYPE_DHCID
 		}
 	case 83:
 		{
-			yyVAL.typ = rr.TYPE_NSEC3PARAM
+			yyVAL.typ = rr.TYPE_DNAME
 		}
 	case 84:
 		{
-			yyVAL.typ = rr.TYPE_PTR
+			yyVAL.typ = rr.TYPE_DNSKEY
 		}
 	case 85:
 		{
-			yyVAL.typ = rr.TYPE_RRSIG
+			yyVAL.typ = rr.TYPE_DS
 		}
 	case 86:
 		{
-			yyVAL.typ = rr.TYPE_SOA
+			yyVAL.typ = rr.TYPE_EID
 		}
 	case 87:
 		{
-			yyVAL.typ = rr.TYPE_TXT
+			yyVAL.typ = rr.TYPE_GID
 		}
 	case 88:
 		{
-			yyVAL.typ = rr.TYPE_WKS
+			yyVAL.typ = rr.TYPE_GPOS
 		}
 	case 89:
 		{
-			yylex.begin(sc_DOMAIN)
+			yyVAL.typ = rr.TYPE_HINFO
 		}
 	case 90:
 		{
-			yylex.begin(sc_NUM)
+			yyVAL.typ = rr.TYPE_HIP
 		}
 	case 91:
 		{
-			yyVAL.rrData = &rr.SOA{yyS[yypt-7].str, yyS[yypt-6].str, uint32(yyS[yypt-4].uint), uint32(yyS[yypt-3].uint), uint32(yyS[yypt-2].uint), uint32(yyS[yypt-1].uint), uint32(yyS[yypt-0].uint)}
+			yyVAL.typ = rr.TYPE_IPSECKEY
 		}
 	case 92:
-		yyVAL.int = yyS[yypt-0].int
+		{
+			yyVAL.typ = rr.TYPE_ISDN
+		}
 	case 93:
 		{
-			yyVAL.rrData = &rr.TXT{yyS[yypt-0].str}
+			yyVAL.typ = rr.TYPE_KEY
 		}
 	case 94:
 		{
-			yyVAL.str = ""
+			yyVAL.typ = rr.TYPE_KX
 		}
 	case 95:
 		{
-			yyVAL.str = yyS[yypt-0].str
+			yyVAL.typ = rr.TYPE_LOC
 		}
 	case 96:
 		{
-			yyVAL.str += yyS[yypt-0].str
+			yyVAL.typ = rr.TYPE_MX
 		}
 	case 97:
+		{
+			yyVAL.typ = rr.TYPE_NAPTR
+		}
+	case 98:
+		{
+			yyVAL.typ = rr.TYPE_NIMLOC
+		}
+	case 99:
+		{
+			yyVAL.typ = rr.TYPE_NINFO
+		}
+	case 100:
+		{
+			yyVAL.typ = rr.TYPE_NS
+		}
+	case 101:
+		{
+			yyVAL.typ = rr.TYPE_NSAP
+		}
+	case 102:
+		{
+			yyVAL.typ = rr.TYPE_NSAP_PTR
+		}
+	case 103:
+		{
+			yyVAL.typ = rr.TYPE_NSEC
+		}
+	case 104:
+		{
+			yyVAL.typ = rr.TYPE_NSEC3
+		}
+	case 105:
+		{
+			yyVAL.typ = rr.TYPE_NSEC3PARAM
+		}
+	case 106:
+		{
+			yyVAL.typ = rr.TYPE_NXT
+		}
+	case 107:
+		{
+			yyVAL.typ = rr.TYPE_PTR
+		}
+	case 108:
+		{
+			yyVAL.typ = rr.TYPE_PX
+		}
+	case 109:
+		{
+			yyVAL.typ = rr.TYPE_RRSIG
+		}
+	case 110:
+		{
+			yyVAL.typ = rr.TYPE_RKEY
+		}
+	case 111:
+		{
+			yyVAL.typ = rr.TYPE_RP
+		}
+	case 112:
+		{
+			yyVAL.typ = rr.TYPE_RT
+		}
+	case 113:
+		{
+			yyVAL.typ = rr.TYPE_SIG
+		}
+	case 114:
+		{
+			yyVAL.typ = rr.TYPE_SOA
+		}
+	case 115:
+		{
+			yyVAL.typ = rr.TYPE_SPF
+		}
+	case 116:
+		{
+			yyVAL.typ = rr.TYPE_SRV
+		}
+	case 117:
+		{
+			yyVAL.typ = rr.TYPE_SSHFP
+		}
+	case 118:
+		{
+			yyVAL.typ = rr.TYPE_TALINK
+		}
+	case 119:
+		{
+			yyVAL.typ = rr.TYPE_TKEY
+		}
+	case 120:
+		{
+			yyVAL.typ = rr.TYPE_TSIG
+		}
+	case 121:
+		{
+			yyVAL.typ = rr.TYPE_TXT
+		}
+	case 122:
+		{
+			yyVAL.typ = rr.TYPE_UID
+		}
+	case 123:
+		{
+			yyVAL.typ = rr.TYPE_UINFO
+		}
+	case 124:
+		{
+			yyVAL.typ = rr.TYPE_UNSPEC
+		}
+	case 125:
+		{
+			yyVAL.typ = rr.TYPE_WKS
+		}
+	case 126:
+		{
+			yyVAL.typ = rr.TYPE_X25
+		}
+	case 127:
+		{
+			yylex.begin(sc_DOMAIN)
+		}
+	case 128:
+		{
+			yylex.begin(sc_NUM)
+		}
+	case 129:
+		{
+			yyVAL.rrData = &rr.SOA{yyS[yypt-7].str, yyS[yypt-6].str, uint32(yyS[yypt-4].uint), uint32(yyS[yypt-3].uint), uint32(yyS[yypt-2].uint), uint32(yyS[yypt-1].uint), uint32(yyS[yypt-0].uint)}
+		}
+	case 130:
+		yyVAL.int = yyS[yypt-0].int
+	case 131:
+		{
+			yyVAL.rrData = &rr.TXT{yyS[yypt-0].str}
+		}
+	case 132:
+		{
+			yyVAL.str = ""
+		}
+	case 133:
+		{
+			yyVAL.str = yyS[yypt-0].str
+		}
+	case 134:
+		{
+			yyVAL.str += yyS[yypt-0].str
+		}
+	case 135:
 		{
 			if yyS[yypt-0].u64 > math.MaxUint8 {
 				yylex.Error("number out of range")
@@ -937,7 +1145,7 @@ yydefault:
 				yyVAL.uint = uint(yyS[yypt-0].u64)
 			}
 		}
-	case 98:
+	case 136:
 		{
 			if yyS[yypt-0].u64 > math.MaxUint16 {
 				yylex.Error("number out of range")
@@ -946,7 +1154,7 @@ yydefault:
 				yyVAL.uint = uint(yyS[yypt-0].u64)
 			}
 		}
-	case 99:
+	case 137:
 		{
 			if yyS[yypt-0].u64 > math.MaxInt32 {
 				yylex.Error("number out of range")
@@ -955,7 +1163,7 @@ yydefault:
 				yyVAL.int = int(yyS[yypt-0].u64)
 			}
 		}
-	case 100:
+	case 138:
 		{
 			if yyS[yypt-0].u64 > math.MaxUint32 {
 				yylex.Error("number out of range")

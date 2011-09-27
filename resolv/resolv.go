@@ -89,7 +89,7 @@ func (c *Cfg) SetChanged() {
 	c.mfile.SetChanged()
 }
 
-// Conf returns a resolv.Conf from Cfg and an indicator of it's source file has been changed/modificated
+// Conf returns a resolv.Conf from Cfg and an indicator of its source file has been changed/modificated
 // compared to the last invocation of this function or an Error if any.
 func (c *Cfg) Conf() (f *Conf, changed bool, err os.Error) {
 	if _, err = c.mfile.File(); err != nil {
@@ -330,7 +330,7 @@ type GoCfg struct {
 
 // NewGoCfg returns a newly created GoCfg or an Error if any.
 // It is assumed there will be only one/few GoCfg instance(s) in an application.
-// The instance(s) and it's associated goroutine(s) will never be released.
+// The instance(s) and its associated goroutine(s) will never be released.
 // This is by design in an atempt to avoid some possibly nasty races on finalization.
 // The "impossible to release" doesn't apply when NewGoCfg returns an Error.
 func NewGoCfg(fname string, logger *dns.Logger) (c *GoCfg, err os.Error) {
@@ -353,7 +353,7 @@ func NewGoCfg(fname string, logger *dns.Logger) (c *GoCfg, err os.Error) {
 	return
 }
 
-// Conf returns a Conf from GoCfg and an indicator if it's source file has been changed/modificated
+// Conf returns a Conf from GoCfg and an indicator if its source file has been changed/modificated
 // compared to the last invocation of this function or an Error if any.
 // Invocations of Conf are concurrent safe.
 func (c *GoCfg) Conf() (f *Conf, changed bool, err os.Error) {

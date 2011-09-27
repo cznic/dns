@@ -843,7 +843,7 @@ type Options struct {
 	NotifySource       *IPAndPort  // Determines which local source address, and optionally UDP port, will be used to send NOTIFY messages.
 	NotifySourceV6     *IPAndPort  // Like notify-source, but applies to notify messages sent to IPv6 addresses.
 	NotifyToSoa        bool        // If yes do not check the nameservers in the NS RRset against the SOA MNAME. Normally a NOTIFY message is not sent to the SOA MNAME (SOA ORIGIN) as it is supposed to contain the name of the ultimate master.
-	PIDFile            string      // The pathname of the file the server writes it's process ID in.
+	PIDFile            string      // The pathname of the file the server writes its process ID in.
 	Port               IPPort      // The UDP/TCP port number the server uses for receiving and sending DNS protocol traffic.
 	PreferredGlue      *rr.Type    // If specified, the listed type (A or AAAA) will be emitted before other glue in the additional section of a query response.
 	ProvideIxfr        *bool       // etermines whether the local server, acting as master, will respond with an incremental zone transfer when the given remote server, a slave, requests it.

@@ -56,15 +56,19 @@ type rrHead struct{
 	tA6
 	tAFSDB
 	tAPL
+	tATMA
 	tCERT
+	tCDS
 	tCNAME
 	tDNAME
 	tDHCID
-	tDNAME
 	tDNSKEY
 	tDS
+	tEID
+	tGID
 	tGPOS
 	tHINFO
+	tHIP
 	tIPSECKEY
 	tISDN
 	tKEY
@@ -72,7 +76,10 @@ type rrHead struct{
 	tLOC
 	tMX
 	tNAPTR
+	tNIMLOC
+	tNINFO
 	tNSAP
+	tNSAP_PTR
 	tNS
 	tNSEC
 	tNSEC3
@@ -80,6 +87,7 @@ type rrHead struct{
 	tNXT
 	tPTR
 	tPX
+	tRKEY
 	tRP
 	tRRSIG
 	tRT
@@ -88,7 +96,13 @@ type rrHead struct{
 	tSPF
 	tSRV
 	tSSHFP
+	tTALINK
+	tTKEY
+	tTSIG
 	tTXT
+	tUID
+	tUINFO
+	tUNSPEC
 	tWKS
 	tX25
 
@@ -557,13 +571,45 @@ rrtypetok:
 	{
 		$$ = rr.TYPE_A
 	}
+|	tA6
+	{
+		$$ = rr.TYPE_A6
+	}
 |	tAAAA
 	{
 		$$ = rr.TYPE_AAAA
 	}
+|	tAFSDB
+	{
+		$$ = rr.TYPE_AFSDB
+	}
+|	tATMA
+	{
+		$$ = rr.TYPE_ATMA
+	}
+|	tAPL
+	{
+		$$ = rr.TYPE_APL
+	}
+|	tCDS
+	{
+		$$ = rr.TYPE_CDS
+	}
+|	tCERT
+	{
+		$$ = rr.TYPE_CERT
+	}
 |	tCNAME
 	{
 		$$ = rr.TYPE_CNAME
+	}
+|	tDHCID
+	{
+		$$ = rr.TYPE_DHCID
+	}
+|	tDNAME
+	{
+		$$ = rr.TYPE_DNAME
 	}
 |	tDNSKEY
 	{
@@ -573,17 +619,73 @@ rrtypetok:
 	{
 		$$ = rr.TYPE_DS
 	}
+|	tEID
+	{
+		$$ = rr.TYPE_EID
+	}
+|	tGID
+	{
+		$$ = rr.TYPE_GID
+	}
+|	tGPOS
+	{
+		$$ = rr.TYPE_GPOS
+	}
 |	tHINFO
 	{
 		$$ = rr.TYPE_HINFO
+	}
+|	tHIP
+	{
+		$$ = rr.TYPE_HIP
+	}
+|	tIPSECKEY
+	{
+		$$ = rr.TYPE_IPSECKEY
+	}
+|	tISDN
+	{
+		$$ = rr.TYPE_ISDN
+	}
+|	tKEY
+	{
+		$$ = rr.TYPE_KEY
+	}
+|	tKX
+	{
+		$$ = rr.TYPE_KX
+	}
+|	tLOC
+	{
+		$$ = rr.TYPE_LOC
 	}
 |	tMX
 	{
 		$$ = rr.TYPE_MX
 	}
+|	tNAPTR
+	{
+		$$ = rr.TYPE_NAPTR
+	}
+|	tNIMLOC
+	{
+		$$ = rr.TYPE_NIMLOC
+	}
+|	tNINFO
+	{
+		$$ = rr.TYPE_NINFO
+	}
 |	tNS
 	{
 		$$ = rr.TYPE_NS
+	}
+|	tNSAP
+	{
+		$$ = rr.TYPE_NSAP
+	}
+|	tNSAP_PTR
+	{
+		$$ = rr.TYPE_NSAP_PTR
 	}
 |	tNSEC
 	{
@@ -597,25 +699,89 @@ rrtypetok:
 	{
 		$$ = rr.TYPE_NSEC3PARAM
 	}
+|	tNXT
+	{
+		$$ = rr.TYPE_NXT
+	}
 |	tPTR
 	{
 		$$ = rr.TYPE_PTR
+	}
+|	tPX
+	{
+		$$ = rr.TYPE_PX
 	}
 |	tRRSIG
 	{
 		$$ = rr.TYPE_RRSIG
 	}
+|	tRKEY
+	{
+		$$ = rr.TYPE_RKEY
+	}
+|	tRP
+	{
+		$$ = rr.TYPE_RP
+	}
+|	tRT
+	{
+		$$ = rr.TYPE_RT
+	}
+|	tSIG
+	{
+		$$ = rr.TYPE_SIG
+	}
 |	tSOA
 	{
 		$$ = rr.TYPE_SOA
+	}
+|	tSPF
+	{
+		$$ = rr.TYPE_SPF
+	}
+|	tSRV
+	{
+		$$ = rr.TYPE_SRV
+	}
+|	tSSHFP
+	{
+		$$ = rr.TYPE_SSHFP
+	}
+|	tTALINK
+	{
+		$$ = rr.TYPE_TALINK
+	}
+|	tTKEY
+	{
+		$$ = rr.TYPE_TKEY
+	}
+|	tTSIG
+	{
+		$$ = rr.TYPE_TSIG
 	}
 |	tTXT
 	{
 		$$ = rr.TYPE_TXT
 	}
+|	tUID
+	{
+		$$ = rr.TYPE_UID
+	}
+|	tUINFO
+	{
+		$$ = rr.TYPE_UINFO
+	}
+|	tUNSPEC
+	{
+		$$ = rr.TYPE_UNSPEC
+	}
 |	tWKS
 	{
 		$$ = rr.TYPE_WKS
+	}
+|	tX25
+	{
+		$$ = rr.TYPE_X25
 	}
 
 

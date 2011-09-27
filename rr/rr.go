@@ -1262,44 +1262,143 @@ type Type uint16
 
 // Type codes
 const (
-	TYPE_A          Type = iota + 1 //   1: a host address (IPv4)
-	TYPE_NS                         //   2: an authoritative name server
-	TYPE_MD                         //   3: a mail destination (Obsolete - use MX)
-	TYPE_MF                         //   4: a mail forwarder (Obsolete - use MX)
-	TYPE_CNAME                      //   5: the canonical name for an alias
-	TYPE_SOA                        //   6: marks the start of a zone of authority
-	TYPE_MB                         //   7: a mailbox domain name (EXPERIMENTAL)
-	TYPE_MG                         //   8: a mail group member (EXPERIMENTAL)
-	TYPE_MR                         //   9: a mail rename domain name (EXPERIMENTAL)
-	TYPE_NULL                       //  10: a null RR (EXPERIMENTAL)
-	TYPE_WKS                        //  11: a well known service description
-	TYPE_PTR                        //  12: a domain name pointer
-	TYPE_HINFO                      //  13: host information
-	TYPE_MINFO                      //  14: mailbox or mail list information
-	TYPE_MX                         //  15: mail exchange
-	TYPE_TXT                        //  16: text strings
-	TYPE_AAAA       Type = 28       //  28: a host address (IPv6)
-	TYPE_DNAME      Type = 39       //  39: map an entire subtree of the DNS name space to another domain.
-	TYPE_OPT        Type = 41       //  41: OPT pseudo type (RFC2671)
-	TYPE_DS         Type = 43       //  43: delegation signer
-	TYPE_RRSIG      Type = 46       //  46: RR set signature
-	TYPE_NSEC       Type = 47       //  47: authenticated denial of existence
-	TYPE_DNSKEY     Type = 48       //  48: DNS key
-	TYPE_NSEC3      Type = 50       //  50: authenticated denial of existence
-	TYPE_NSEC3PARAM Type = 51       //  51: NSEC3 parameters
+	_ Type = iota
 
-	TYPE_NODATA   Type = 0xFF00 //      Pseudo types in the "reserved for private use" area
-	TYPE_NXDOMAIN Type = 0xFF01
+	TYPE_A          //  1 a host address                              [RFC1035]
+	TYPE_NS         //  2 an authoritative name server                [RFC1035]
+	TYPE_MD         //  3 a mail destination (Obsolete - use MX)      [RFC1035]
+	TYPE_MF         //  4 a mail forwarder (Obsolete - use MX)        [RFC1035]
+	TYPE_CNAME      //  5 the canonical name for an alias             [RFC1035]
+	TYPE_SOA        //  6 marks the start of a zone of authority      [RFC1035]
+	TYPE_MB         //  7 a mailbox domain name (EXPERIMENTAL)        [RFC1035]
+	TYPE_MG         //  8 a mail group member (EXPERIMENTAL)          [RFC1035]
+	TYPE_MR         //  9 a mail rename domain name (EXPERIMENTAL     [RFC1035]
+	TYPE_NULL       // 10 a null RR (EXPERIMENTAL)                    [RFC1035]
+	TYPE_WKS        // 11 a well known service description            [RFC1035]
+	TYPE_PTR        // 12 a domain name pointer                       [RFC1035]
+	TYPE_HINFO      // 13 host information                            [RFC1035]
+	TYPE_MINFO      // 14 mailbox or mail list information            [RFC1035]
+	TYPE_MX         // 15 mail exchange                               [RFC1035]
+	TYPE_TXT        // 16 text strings                                [RFC1035]
+	TYPE_RP         // 17 for Responsible Person                      [RFC1183]
+	TYPE_AFSDB      // 18 for AFS Data Base location                  [RFC1183][RFC5864]
+	TYPE_X25        // 19 for X.25 PSDN address                       [RFC1183]
+	TYPE_ISDN       // 20 for ISDN address                            [RFC1183]
+	TYPE_RT         // 21 for Route Through                           [RFC1183]
+	TYPE_NSAP       // 22 for NSAP address, NSAP style A record       [RFC1706]
+	TYPE_NSAP_PTR   // 23 for domain name pointer, NSAP style         [RFC1348]
+	TYPE_SIG        // 24 for security signature                      [RFC4034][RFC3755][RFC2535]
+	TYPE_KEY        // 25 for security key                            [RFC4034][RFC3755][RFC2535]
+	TYPE_PX         // 26 X.400 mail mapping information              [RFC2163]
+	TYPE_GPOS       // 27 Geographical Position                       [RFC1712]
+	TYPE_AAAA       // 28 IP6 Address                                 [RFC3596]
+	TYPE_LOC        // 29 Location Information                        [RFC1876]
+	TYPE_NXT        // 30 Next Domain - OBSOLETE                      [RFC3755][RFC2535]
+	TYPE_EID        // 31 Endpoint Identifier                         [Patton]
+	TYPE_NIMLOC     // 32 Nimrod Locator                              [Patton]
+	TYPE_SRV        // 33 Server Selection                            [RFC2782]
+	TYPE_ATMA       // 34 ATM Address                                 [ATMDOC]
+	TYPE_NAPTR      // 35 Naming Authority Pointer                    [RFC2915][RFC2168][RFC3403]
+	TYPE_KX         // 36 Key Exchanger                               [RFC2230]
+	TYPE_CERT       // 37 CERT                                        [RFC4398]
+	TYPE_A6         // 38 A6 (Experimental)                           [RFC3226][RFC2874]
+	TYPE_DNAME      // 39 DNAME                                       [RFC2672]
+	TYPE_SINK       // 40 SINK                                        [Eastlake]
+	TYPE_OPT        // 41 OPT                                         [RFC2671]
+	TYPE_APL        // 42 APL                                         [RFC3123]
+	TYPE_DS         // 43 Delegation Signer                           [RFC4034][RFC3658]
+	TYPE_SSHFP      // 44 SSH Key Fingerprint                         [RFC4255]
+	TYPE_IPSECKEY   // 45 IPSECKEY                                    [RFC4025]
+	TYPE_RRSIG      // 46 RRSIG                                       [RFC4034][RFC3755]
+	TYPE_NSEC       // 47 NSEC                                        [RFC4034][RFC3755]
+	TYPE_DNSKEY     // 48 DNSKEY                                      [RFC4034][RFC3755]
+	TYPE_DHCID      // 49 DHCID                                       [RFC4701]
+	TYPE_NSEC3      // 50 NSEC3                                       [RFC5155]
+	TYPE_NSEC3PARAM // 51 NSEC3PARAM                                  [RFC5155]
+)
+
+const (
+	_ Type = iota + 54
+
+	TYPE_HIP    // 55 Host Identity Protocol                      [RFC5205]
+	TYPE_NINFO  // 56 NINFO                                       [Reid]
+	TYPE_RKEY   // 57 RKEY                                        [Reid]
+	TYPE_TALINK // 58 Trust Anchor LINK                           [Wijngaards]
+	TYPE_CDS    // 59 Child DS                                    [Barwood]
+)
+
+const (
+	_ Type = iota + 98
+
+	TYPE_SPF    //  99                                             [RFC4408]
+	TYPE_UINFO  // 100                                             [IANA-Reserved]
+	TYPE_UID    // 101                                             [IANA-Reserved]
+	TYPE_GID    // 102                                             [IANA-Reserved]
+	TYPE_UNSPEC // 103                                             [IANA-Reserved]
+)
+
+const (
+	_ Type = iota + 248
+
+	TYPE_TKEY  // 249 Transaction Key                            [RFC2930]
+	TYPE_TSIG  // 250 Transaction Signature                      [RFC2845]
+	TYPE_IXFR  // 251 incremental transfer                       [RFC1995]
+	TYPE_AXFR  // 252 transfer of an entire zone                 [RFC1035][RFC5936]
+	TYPE_MAILB // 253 mailbox-related RRs (MB, MG or MR)         [RFC1035]
+	TYPE_MAILA // 254 mail agent RRs (Obsolete - see MX)         [RFC1035]
+)
+
+const (
+	_ Type = iota + 255
+
+	TYPE_URI // 256 URI                                        [Faltstrom]
+	TYPE_CAA // 257 Certification Authority Authorization      [Hallam-Baker]
+)
+
+const (
+	_ Type = iota + 0x7FFF
+
+	TYPE_TA  // 32768   DNSSEC Trust Authorities               [Weiler]           2005-12-13
+	TYPE_DLV // 32769   DNSSEC Lookaside Validation            [RFC4431]
+)
+
+const (
+	_ Type = iota + 0xFEFF
+
+	TYPE_NODATA //      Pseudo types in the "reserved for private use" area
+	TYPE_NXDOMAIN
 )
 
 var typeStr = map[Type]string{
+	TYPE_A6:         "A6",
 	TYPE_A:          "A",
 	TYPE_AAAA:       "AAAA",
+	TYPE_AFSDB:      "AFSDB",
+	TYPE_APL:        "APL",
+	TYPE_ATMA:       "ATMA",
+	TYPE_AXFR:       "AXFR",
+	TYPE_CAA:        "CAA",
+	TYPE_CDS:        "CDS",
+	TYPE_CERT:       "CERT",
 	TYPE_CNAME:      "CNAME",
+	TYPE_DHCID:      "DHCID",
+	TYPE_DLV:        "DLV",
 	TYPE_DNAME:      "DNAME",
 	TYPE_DNSKEY:     "DNSKEY",
 	TYPE_DS:         "DS",
+	TYPE_EID:        "EID",
+	TYPE_GID:        "GID",
+	TYPE_GPOS:       "GPOS",
 	TYPE_HINFO:      "HINFO",
+	TYPE_HIP:        "HIP",
+	TYPE_IPSECKEY:   "IPSECKEY",
+	TYPE_ISDN:       "ISDN",
+	TYPE_IXFR:       "IXFR",
+	TYPE_KEY:        "KEY",
+	TYPE_KX:         "KX",
+	TYPE_LOC:        "LOC",
+	TYPE_MAILA:      "MAILA",
+	TYPE_MAILB:      "MAILB",
 	TYPE_MB:         "MB",
 	TYPE_MD:         "MD",
 	TYPE_MF:         "MF",
@@ -1307,19 +1406,43 @@ var typeStr = map[Type]string{
 	TYPE_MINFO:      "MINFO",
 	TYPE_MR:         "MR",
 	TYPE_MX:         "MX",
+	TYPE_NAPTR:      "NAPTR",
+	TYPE_NIMLOC:     "NIMLOC",
+	TYPE_NINFO:      "NINFO",
+	TYPE_NODATA:     "NODATA",
 	TYPE_NS:         "NS",
-	TYPE_NSEC:       "NSEC",
+	TYPE_NSAP:       "NSAP",
+	TYPE_NSAP_PTR:   "NSAP-PTR",
 	TYPE_NSEC3:      "NSEC3",
 	TYPE_NSEC3PARAM: "NSEC3PARAM",
+	TYPE_NSEC:       "NSEC",
 	TYPE_NULL:       "NULL",
+	TYPE_NXDOMAIN:   "NXDOMAIN",
+	TYPE_NXT:        "NXT",
 	TYPE_OPT:        "OPT",
 	TYPE_PTR:        "PTR",
+	TYPE_PX:         "PX",
+	TYPE_RKEY:       "RKEY",
+	TYPE_RP:         "RP",
 	TYPE_RRSIG:      "RRSIG",
+	TYPE_RT:         "RT",
+	TYPE_SIG:        "SIG",
+	TYPE_SINK:       "SINK",
 	TYPE_SOA:        "SOA",
+	TYPE_SPF:        "SPF",
+	TYPE_SRV:        "SRV",
+	TYPE_SSHFP:      "SSHFP",
+	TYPE_TA:         "TA",
+	TYPE_TALINK:     "TALINK",
+	TYPE_TKEY:       "TKEY",
+	TYPE_TSIG:       "TSIG",
 	TYPE_TXT:        "TXT",
+	TYPE_UID:        "UID",
+	TYPE_UINFO:      "UINFO",
+	TYPE_UNSPEC:     "UNSPEC",
+	TYPE_URI:        "URI",
 	TYPE_WKS:        "WKS",
-	TYPE_NODATA:     "NODATA",
-	TYPE_NXDOMAIN:   "NXDOMAIN",
+	TYPE_X25:        "X25",
 }
 
 func (n Type) String() (s string) {

@@ -33,7 +33,7 @@ func (t *Tree) Delete(owner string) {
 	(*dns.Tree)(t).Delete(owner)
 }
 
-// Enum enumerates all data in the tree starting at root and all of it's childs.
+// Enum enumerates all data in the tree starting at root and all of its childs.
 // On every datum found the handler is invoked. If the handler returns false the tree traversing stops.
 func (t *Tree) Enum(root string, handler func(path []string, data RRs) bool) {
 	(*dns.Tree)(t).Enum(root, func(path []string, data interface{}) bool {

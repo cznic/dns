@@ -525,48 +525,137 @@ type QType uint16
 
 // QTYPE codes
 const (
-	QTYPE_A          QType = iota + 1 //   1: a host address
-	QTYPE_NS                          //   2: an authoritative name server
-	QTYPE_MD                          //   3: a mail destination (Obsolete - use MX)
-	QTYPE_MF                          //   4: a mail forwarder (Obsolete - use MX)
-	QTYPE_CNAME                       //   5: the canonical name for an alias
-	QTYPE_SOA                         //   6: marks the start of a zone of authority
-	QTYPE_MB                          //   7: a mailbox domain name (EXPERIMENTAL)
-	QTYPE_MG                          //   8: a mail group member (EXPERIMENTAL)
-	QTYPE_MR                          //   9: a mail rename domain name (EXPERIMENTAL)
-	QTYPE_NULL                        //  10: a null RR (EXPERIMENTAL)
-	QTYPE_WKS                         //  11: a well known service description
-	QTYPE_PTR                         //  12: a domain name pointer
-	QTYPE_HINFO                       //  13 host information
-	QTYPE_MINFO                       //  14: mailbox or mail list information
-	QTYPE_MX                          //  15: mail exchange
-	QTYPE_TXT                         //  16: text strings
-	QTYPE_AAAA       QType = 28       //  28: a host address (IPv6)
-	QTYPE_DNAME      QType = 39       //  39: map to a DNS subtree
-	QTYPE_DS         QType = 43       //  43: delegation signer
-	QTYPE_RRSIG      QType = 46       //  46: RR set signature
-	QTYPE_DNSKEY     QType = 48       //  48: DNS key
-	QTYPE_NSEC3      QType = 50       //  50: denial of existence for DNS Resource Record Sets
-	QTYPE_NSEC3PARAM QType = 51       //  51: NSEC3 parameters
+	_ QType = iota
 
-	QTYPE_AXFR  QType = 252 // 252: A request for a transfer of an entire zone
-	QTYPE_MAILB QType = 253 // 253: A request for mailbox-related records (MB, MG or MR)
-	QTYPE_MAILA QType = 254 // 254: A request for mail agent RRs (Obsolete - see MX)
-	QTYPE_STAR  QType = 255 // 255: A request for all records (*)
+	QTYPE_A          //  1 a host address                              [RFC1035]
+	QTYPE_NS         //  2 an authoritative name server                [RFC1035]
+	QTYPE_MD         //  3 a mail destination (Obsolete - use MX)      [RFC1035]
+	QTYPE_MF         //  4 a mail forwarder (Obsolete - use MX)        [RFC1035]
+	QTYPE_CNAME      //  5 the canonical name for an alias             [RFC1035]
+	QTYPE_SOA        //  6 marks the start of a zone of authority      [RFC1035]
+	QTYPE_MB         //  7 a mailbox domain name (EXPERIMENTAL)        [RFC1035]
+	QTYPE_MG         //  8 a mail group member (EXPERIMENTAL)          [RFC1035]
+	QTYPE_MR         //  9 a mail rename domain name (EXPERIMENTAL     [RFC1035]
+	QTYPE_NULL       // 10 a null RR (EXPERIMENTAL)                    [RFC1035]
+	QTYPE_WKS        // 11 a well known service description            [RFC1035]
+	QTYPE_PTR        // 12 a domain name pointer                       [RFC1035]
+	QTYPE_HINFO      // 13 host information                            [RFC1035]
+	QTYPE_MINFO      // 14 mailbox or mail list information            [RFC1035]
+	QTYPE_MX         // 15 mail exchange                               [RFC1035]
+	QTYPE_TXT        // 16 text strings                                [RFC1035]
+	QTYPE_RP         // 17 for Responsible Person                      [RFC1183]
+	QTYPE_AFSDB      // 18 for AFS Data Base location                  [RFC1183][RFC5864]
+	QTYPE_X25        // 19 for X.25 PSDN address                       [RFC1183]
+	QTYPE_ISDN       // 20 for ISDN address                            [RFC1183]
+	QTYPE_RT         // 21 for Route Through                           [RFC1183]
+	QTYPE_NSAP       // 22 for NSAP address, NSAP style A record       [RFC1706]
+	QTYPE_NSAP_PTR   // 23 for domain name pointer, NSAP style         [RFC1348]
+	QTYPE_SIG        // 24 for security signature                      [RFC4034][RFC3755][RFC2535]
+	QTYPE_KEY        // 25 for security key                            [RFC4034][RFC3755][RFC2535]
+	QTYPE_PX         // 26 X.400 mail mapping information              [RFC2163]
+	QTYPE_GPOS       // 27 Geographical Position                       [RFC1712]
+	QTYPE_AAAA       // 28 IP6 Address                                 [RFC3596]
+	QTYPE_LOC        // 29 Location Information                        [RFC1876]
+	QTYPE_NXT        // 30 Next Domain - OBSOLETE                      [RFC3755][RFC2535]
+	QTYPE_EID        // 31 Endpoint Identifier                         [Patton]
+	QTYPE_NIMLOC     // 32 Nimrod Locator                              [Patton]
+	QTYPE_SRV        // 33 Server Selection                            [RFC2782]
+	QTYPE_ATMA       // 34 ATM Address                                 [ATMDOC]
+	QTYPE_NAPTR      // 35 Naming Authority Pointer                    [RFC2915][RFC2168][RFC3403]
+	QTYPE_KX         // 36 Key Exchanger                               [RFC2230]
+	QTYPE_CERT       // 37 CERT                                        [RFC4398]
+	QTYPE_A6         // 38 A6 (Experimental)                           [RFC3226][RFC2874]
+	QTYPE_DNAME      // 39 DNAME                                       [RFC2672]
+	QTYPE_SINK       // 40 SINK                                        [Eastlake]
+	QTYPE_OPT        // 41 OPT                                         [RFC2671]
+	QTYPE_APL        // 42 APL                                         [RFC3123]
+	QTYPE_DS         // 43 Delegation Signer                           [RFC4034][RFC3658]
+	QTYPE_SSHFP      // 44 SSH Key Fingerprint                         [RFC4255]
+	QTYPE_IPSECKEY   // 45 IPSECKEY                                    [RFC4025]
+	QTYPE_RRSIG      // 46 RRSIG                                       [RFC4034][RFC3755]
+	QTYPE_NSEC       // 47 NSEC                                        [RFC4034][RFC3755]
+	QTYPE_DNSKEY     // 48 DNSKEY                                      [RFC4034][RFC3755]
+	QTYPE_DHCID      // 49 DHCID                                       [RFC4701]
+	QTYPE_NSEC3      // 50 NSEC3                                       [RFC5155]
+	QTYPE_NSEC3PARAM // 51 NSEC3PARAM                                  [RFC5155]
+)
 
-	QTYPE_NODATA   QType = 0xFF00 // A pseudo type in the "reserved for private use" area
-	QTYPE_NXDOMAIN QType = 0xFF01
+const (
+	_ QType = iota + 54
+
+	QTYPE_HIP    // 55 Host Identity Protocol                      [RFC5205]
+	QTYPE_NINFO  // 56 NINFO                                       [Reid]
+	QTYPE_RKEY   // 57 RKEY                                        [Reid]
+	QTYPE_TALINK // 58 Trust Anchor LINK                           [Wijngaards]
+	QTYPE_CDS    // 59 Child DS                                    [Barwood]
+)
+
+const (
+	_ QType = iota + 98
+
+	QTYPE_SPF    //  99                                             [RFC4408]
+	QTYPE_UINFO  // 100                                             [IANA-Reserved]
+	QTYPE_UID    // 101                                             [IANA-Reserved]
+	QTYPE_GID    // 102                                             [IANA-Reserved]
+	QTYPE_UNSPEC // 103                                             [IANA-Reserved]
+)
+
+const (
+	_ QType = iota + 248
+
+	QTYPE_TKEY  // 249 Transaction Key                            [RFC2930]
+	QTYPE_TSIG  // 250 Transaction Signature                      [RFC2845]
+	QTYPE_IXFR  // 251 incremental transfer                       [RFC1995]
+	QTYPE_AXFR  // 252 transfer of an entire zone                 [RFC1035][RFC5936]
+	QTYPE_MAILB // 253 mailbox-related RRs (MB, MG or MR)         [RFC1035]
+	QTYPE_MAILA // 254 mail agent RRs (Obsolete - see MX)         [RFC1035]
+	QTYPE_STAR  // 255 A request for all records                  [RFC1035]
+	QTYPE_URI   // 256 URI                                        [Faltstrom]
+	QTYPE_CAA   // 257 Certification Authority Authorization      [Hallam-Baker]
+)
+
+const (
+	_ QType = iota + 0x7FFF
+
+	QTYPE_TA  // 32768   DNSSEC Trust Authorities               [Weiler]           2005-12-13
+	QTYPE_DLV // 32769   DNSSEC Lookaside Validation            [RFC4431]
+)
+
+const (
+	_ QType = iota + 0xFEFF
+
+	QTYPE_NODATA // A pseudo type in the "reserved for private use" area
+	QTYPE_NXDOMAIN
 )
 
 var qtypeStr = map[QType]string{
+	QTYPE_A6:         "A6",
 	QTYPE_A:          "A",
 	QTYPE_AAAA:       "AAAA",
+	QTYPE_AFSDB:      "AFSDB",
+	QTYPE_APL:        "APL",
+	QTYPE_ATMA:       "ATMA",
 	QTYPE_AXFR:       "AXFR",
+	QTYPE_CAA:        "CAA",
+	QTYPE_CDS:        "CDS",
+	QTYPE_CERT:       "CERT",
 	QTYPE_CNAME:      "CNAME",
+	QTYPE_DHCID:      "DHCID",
+	QTYPE_DLV:        "DLV",
 	QTYPE_DNAME:      "DNAME",
 	QTYPE_DNSKEY:     "DNSKEY",
 	QTYPE_DS:         "DS",
+	QTYPE_EID:        "EID",
+	QTYPE_GID:        "GID",
+	QTYPE_GPOS:       "GPOS",
 	QTYPE_HINFO:      "HINFO",
+	QTYPE_HIP:        "HIP",
+	QTYPE_IPSECKEY:   "IPSECKEY",
+	QTYPE_ISDN:       "ISDN",
+	QTYPE_IXFR:       "IXFR",
+	QTYPE_KEY:        "KEY",
+	QTYPE_KX:         "KX",
+	QTYPE_LOC:        "LOC",
 	QTYPE_MAILA:      "MAILA",
 	QTYPE_MAILB:      "MAILB",
 	QTYPE_MB:         "MB",
@@ -576,18 +665,43 @@ var qtypeStr = map[QType]string{
 	QTYPE_MINFO:      "MINFO",
 	QTYPE_MR:         "MR",
 	QTYPE_MX:         "MX",
+	QTYPE_NAPTR:      "NAPTR",
+	QTYPE_NIMLOC:     "NIMLOC",
+	QTYPE_NINFO:      "NINFO",
+	QTYPE_NODATA:     "NODATA",
 	QTYPE_NS:         "NS",
+	QTYPE_NSAP:       "NSAP",
+	QTYPE_NSAP_PTR:   "NSAP-PTR",
 	QTYPE_NSEC3:      "NSEC3",
 	QTYPE_NSEC3PARAM: "NSEC3PARAM",
+	QTYPE_NSEC:       "NSEC",
 	QTYPE_NULL:       "NULL",
-	QTYPE_PTR:        "PTR",
-	QTYPE_RRSIG:      "RRSIG",
-	QTYPE_SOA:        "SOA",
-	QTYPE_STAR:       "*",
-	QTYPE_TXT:        "TXT",
-	QTYPE_WKS:        "WKS",
-	QTYPE_NODATA:     "NODATA",
 	QTYPE_NXDOMAIN:   "NXDOMAIN",
+	QTYPE_NXT:        "NXT",
+	QTYPE_PTR:        "PTR",
+	QTYPE_PX:         "PX",
+	QTYPE_RKEY:       "RKEY",
+	QTYPE_RP:         "RP",
+	QTYPE_RRSIG:      "RRSIG",
+	QTYPE_RT:         "RT",
+	QTYPE_SIG:        "SIG",
+	QTYPE_SINK:       "SINK",
+	QTYPE_SOA:        "SOA",
+	QTYPE_SPF:        "SPF",
+	QTYPE_SRV:        "SRV",
+	QTYPE_SSHFP:      "SSHFP",
+	QTYPE_STAR:       "*",
+	QTYPE_TA:         "TA",
+	QTYPE_TALINK:     "TALINK",
+	QTYPE_TKEY:       "TKEY",
+	QTYPE_TSIG:       "TSIG",
+	QTYPE_TXT:        "TXT",
+	QTYPE_UID:        "UID",
+	QTYPE_UINFO:      "UINFO",
+	QTYPE_UNSPEC:     "UNSPEC",
+	QTYPE_URI:        "URI",
+	QTYPE_WKS:        "WKS",
+	QTYPE_X25:        "X25",
 }
 
 func (n QType) String() (s string) {
