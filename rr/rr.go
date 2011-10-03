@@ -862,8 +862,11 @@ func (rr *RR) Decode(b []byte, pos *int) (err os.Error) {
 		rr.RData = &RDATA{}
 	}
 
-	err = rr.RData.Decode(b[:*pos+int(rdlength)], pos)
-	return
+	if *pos+int(rdlength) > len(b) {
+		return fmt.Errorf("malformed packet, len(RData) %d, len(buf) %d", rdlength, len(b)-*pos)
+	}
+
+	return rr.RData.Decode(b[:*pos+int(rdlength)], pos)
 }
 
 // Equal compares a and b as per rfc2136/1.1

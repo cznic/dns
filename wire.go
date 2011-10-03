@@ -30,13 +30,13 @@ func (s CharString) Encode(b *Wirebuf) {
 // Implementation of Wirer
 func (s *CharString) Decode(b []byte, pos *int) (err os.Error) {
 	p := *pos
-	if p+1 > len(b) {
+	if p >= len(b) {
 		return fmt.Errorf("CharString.Decode() - buffer underflow")
 	}
 
 	n := int(b[p])
 	*pos += 1
-	if p+n+1 > len(b) {
+	if p+n >= len(b) {
 		return fmt.Errorf("CharString.Decode() - buffer underflow")
 
 	}
@@ -78,7 +78,7 @@ func (s *DomainName) Decode(b []byte, pos *int) (err os.Error) {
 	labels := []string{}
 	label := CharString("")
 	for {
-		if *pos > len(b) {
+		if *pos >= len(b) {
 			return fmt.Errorf("DomainName.Decode() - buffer underflow")
 		}
 

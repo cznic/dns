@@ -707,7 +707,7 @@ var qtypeStr = map[QType]string{
 func (n QType) String() (s string) {
 	var ok bool
 	if s, ok = qtypeStr[n]; !ok {
-		panic(fmt.Errorf("unexpected QType %d", uint16(n)))
+		s = fmt.Sprintf("TYPE%d", n)
 	}
 	return
 }
