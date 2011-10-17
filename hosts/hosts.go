@@ -11,7 +11,6 @@ package hosts
 
 import (
 	"bytes"
-	"container/vector"
 	"github.com/cznic/dns"
 	"github.com/cznic/fileutil"
 	"fmt"
@@ -140,9 +139,9 @@ func (h *File) String() string {
 // An FileItem holds an item found in a hosts file,
 // e.g. '/etc/hosts'. See also hosts(5)
 type FileItem struct {
-	IP            net.IP              // Well, it's an IP address
-	CanonicalName string              // Per specs canocalized hostname
-	Aliases       vector.StringVector // Possibly empty hostname's aliases list
+	IP            net.IP   // Well, it's an IP address
+	CanonicalName string   // Per specs canocalized hostname
+	Aliases       []string // Possibly empty hostname's aliases list
 }
 
 func (i *FileItem) String() string {

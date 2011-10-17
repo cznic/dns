@@ -120,94 +120,94 @@ yystart1:
 	switch {
 	default:
 		goto yyabort
-	case c == 'v':
-		goto yystate2
-	case c == ':':
-		goto yystate879
-	case c == 'b':
-		goto yystate1615
-	case c == '#':
-		goto yystate1226
-	case c == 'n':
-		goto yystate1722
+	case c == 'i':
+		goto yystate1157
 	case c == 'z':
 		goto yystate38
-	case c == 'h':
-		goto yystate590
-	case c == 'M':
-		goto yystate1704
-	case c == 'B' || c == 'E' || c == 'F':
-		goto yystate16
-	case c == 's':
-		goto yystate245
-	case c == 'I':
-		goto yystate1636
-	case c == 'e':
-		goto yystate1096
-	case c == 'd':
-		goto yystate390
-	case c == 'T':
-		goto yystate1539
-	case c == '\t' || c == '\n' || c == '\r' || c == ' ':
-		goto yystate671
-	case c == 'w':
-		goto yystate377
-	case c == 'p':
-		goto yystate706
-	case c == 'H':
-		goto yystate1151
-	case c == 'o':
-		goto yystate216
-	case c == 'y':
-		goto yystate1608
-	case c == 'W':
-		goto yystate751
-	case c == 'N':
-		goto yystate200
-	case c >= '0' && c <= '9':
-		goto yystate9
-	case c == 'r':
-		goto yystate1766
-	case c == 'S':
-		goto yystate703
-	case c == 'k':
-		goto yystate187
-	case c == 'l':
-		goto yystate672
-	case c == 'A':
-		goto yystate1611
-	case c == 't':
-		goto yystate754
+	case c == 'b':
+		goto yystate1615
 	case c == '"':
 		goto yystate669
-	case c == 'C':
-		goto yystate381
-	case c == 'a':
-		goto yystate880
+	case c == 'j':
+		goto yystate1715
+	case c == '/':
+		goto yystate1604
+	case c == 'l':
+		goto yystate672
+	case c == 'N':
+		goto yystate200
+	case c == 'y':
+		goto yystate1608
+	case c == '\x00':
+		goto yystate186
 	case c == 'u':
 		goto yystate1542
 	case c == 'c':
 		goto yystate73
+	case c == 's':
+		goto yystate245
 	case c == 'f':
 		goto yystate1638
-	case c == 'P':
-		goto yystate1518
-	case c == 'D':
-		goto yystate1089
-	case c == '/':
-		goto yystate1604
-	case c == 'q':
-		goto yystate1521
-	case c == 'j':
-		goto yystate1715
+	case c == 'k':
+		goto yystate187
+	case c == 'A':
+		goto yystate1611
 	case c == 'R':
 		goto yystate240
-	case c == '\x00':
-		goto yystate186
+	case c == ':':
+		goto yystate879
+	case c == 'o':
+		goto yystate216
 	case c == 'm':
 		goto yystate1227
-	case c == 'i':
-		goto yystate1157
+	case c == 'M':
+		goto yystate1704
+	case c == 'a':
+		goto yystate880
+	case c == 'S':
+		goto yystate703
+	case c == 'T':
+		goto yystate1539
+	case c == 'w':
+		goto yystate377
+	case c == 'B' || c == 'E' || c == 'F':
+		goto yystate16
+	case c >= '0' && c <= '9':
+		goto yystate9
+	case c == 'r':
+		goto yystate1766
+	case c == 't':
+		goto yystate754
+	case c == 'H':
+		goto yystate1151
+	case c == 'P':
+		goto yystate1518
+	case c == 'I':
+		goto yystate1636
+	case c == 'p':
+		goto yystate706
+	case c == 'W':
+		goto yystate751
+	case c == 'D':
+		goto yystate1089
+	case c == '#':
+		goto yystate1226
+	case c == 'h':
+		goto yystate590
+	case c == 'q':
+		goto yystate1521
+	case c == '\t' || c == '\n' || c == '\r' || c == ' ':
+		goto yystate671
+	case c == 'n':
+		goto yystate1722
+	case c == 'e':
+		goto yystate1096
+	case c == 'C':
+		goto yystate381
+	case c == 'v':
+		goto yystate2
+	case c == 'd':
+		goto yystate390
 	}
 
 yystate2:
@@ -273,16 +273,16 @@ yystate9:
 	switch {
 	default:
 		goto yyrule245
-	case c == 'G' || c == 'K' || c == 'M' || c == 'g' || c == 'k' || c == 'm':
-		goto yystate14
 	case c == ':':
 		goto yystate15
-	case c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
-		goto yystate17
 	case c >= '0' && c <= '9':
 		goto yystate10
+	case c == 'G' || c == 'K' || c == 'M' || c == 'g' || c == 'k' || c == 'm':
+		goto yystate14
 	case c == '.':
 		goto yystate26
+	case c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
+		goto yystate17
 	}
 
 yystate10:
@@ -290,12 +290,12 @@ yystate10:
 	switch {
 	default:
 		goto yyrule245
+	case c == ':':
+		goto yystate15
 	case c >= '0' && c <= '9':
 		goto yystate11
 	case c == 'G' || c == 'K' || c == 'M' || c == 'g' || c == 'k' || c == 'm':
 		goto yystate14
-	case c == ':':
-		goto yystate15
 	case c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
 		goto yystate18
 	case c == '.':
@@ -307,16 +307,16 @@ yystate11:
 	switch {
 	default:
 		goto yyrule245
-	case c == 'G' || c == 'K' || c == 'M' || c == 'g' || c == 'k' || c == 'm':
-		goto yystate14
 	case c == ':':
 		goto yystate15
+	case c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
+		goto yystate19
+	case c == 'G' || c == 'K' || c == 'M' || c == 'g' || c == 'k' || c == 'm':
+		goto yystate14
 	case c >= '0' && c <= '9':
 		goto yystate12
 	case c == '.':
 		goto yystate26
-	case c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
-		goto yystate19
 	}
 
 yystate12:
@@ -324,12 +324,12 @@ yystate12:
 	switch {
 	default:
 		goto yyrule245
-	case c == 'G' || c == 'K' || c == 'M' || c == 'g' || c == 'k' || c == 'm':
-		goto yystate14
 	case c == ':':
 		goto yystate15
 	case c >= '0' && c <= '9':
 		goto yystate13
+	case c == 'G' || c == 'K' || c == 'M' || c == 'g' || c == 'k' || c == 'm':
+		goto yystate14
 	}
 
 yystate13:
@@ -337,10 +337,10 @@ yystate13:
 	switch {
 	default:
 		goto yyrule245
-	case c == 'G' || c == 'K' || c == 'M' || c == 'g' || c == 'k' || c == 'm':
-		goto yystate14
 	case c >= '0' && c <= '9':
 		goto yystate13
+	case c == 'G' || c == 'K' || c == 'M' || c == 'g' || c == 'k' || c == 'm':
+		goto yystate14
 	}
 
 yystate14:
@@ -352,10 +352,10 @@ yystate15:
 	switch {
 	default:
 		goto yyabort
-	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
-		goto yystate16
 	case c == ':':
 		goto yystate20
+	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
+		goto yystate16
 	}
 
 yystate16:
@@ -414,10 +414,10 @@ yystate21:
 	switch {
 	default:
 		goto yyrule246
-	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
-		goto yystate22
 	case c == ':':
 		goto yystate25
+	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
+		goto yystate22
 	}
 
 yystate22:
@@ -474,10 +474,10 @@ yystate27:
 	switch {
 	default:
 		goto yyabort
-	case c == '.':
-		goto yystate30
 	case c >= '0' && c <= '9':
 		goto yystate28
+	case c == '.':
+		goto yystate30
 	}
 
 yystate28:
@@ -485,10 +485,10 @@ yystate28:
 	switch {
 	default:
 		goto yyabort
-	case c == '.':
-		goto yystate30
 	case c >= '0' && c <= '9':
 		goto yystate29
+	case c == '.':
+		goto yystate30
 	}
 
 yystate29:
@@ -883,20 +883,20 @@ yystate73:
 	switch {
 	default:
 		goto yyrule246
-	case c == 'o':
-		goto yystate74
-	case c == 'h':
-		goto yystate81
-	case c == ':':
-		goto yystate15
 	case c == 'r':
 		goto yystate181
-	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
-		goto yystate17
+	case c == ':':
+		goto yystate15
+	case c == 'h':
+		goto yystate81
 	case c == 'y':
 		goto yystate176
 	case c == 'l':
 		goto yystate142
+	case c == 'o':
+		goto yystate74
+	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
+		goto yystate17
 	}
 
 yystate74:
@@ -998,18 +998,18 @@ yystate85:
 	switch {
 	default:
 		goto yyabort
-	case c == 'n':
-		goto yystate137
-	case c == 'd':
-		goto yystate109
 	case c == 'm':
 		goto yystate129
 	case c == 'w':
 		goto yystate101
-	case c == 'i':
-		goto yystate120
+	case c == 'd':
+		goto yystate109
 	case c == 's':
 		goto yystate86
+	case c == 'i':
+		goto yystate120
+	case c == 'n':
+		goto yystate137
 	}
 
 yystate86:
@@ -1017,10 +1017,10 @@ yystate86:
 	switch {
 	default:
 		goto yyabort
-	case c == 'i':
-		goto yystate87
 	case c == 'r':
 		goto yystate93
+	case c == 'i':
+		goto yystate87
 	}
 
 yystate87:
@@ -1488,10 +1488,10 @@ yystate142:
 	switch {
 	default:
 		goto yyabort
-	case c == 'e':
-		goto yystate146
 	case c == 'i':
 		goto yystate161
+	case c == 'e':
+		goto yystate146
 	case c == 'a':
 		goto yystate143
 	}
@@ -1979,12 +1979,12 @@ yystate200:
 	switch {
 	default:
 		goto yyabort
-	case c == 'U':
-		goto yystate213
 	case c == 'O':
 		goto yystate201
 	case c == 'S':
 		goto yystate204
+	case c == 'U':
+		goto yystate213
 	}
 
 yystate201:
@@ -2351,16 +2351,16 @@ yystate245:
 	switch {
 	default:
 		goto yyabort
-	case c == 't':
-		goto yystate257
-	case c == 'e':
-		goto yystate285
-	case c == 'l':
-		goto yystate253
-	case c == 'o':
-		goto yystate246
 	case c == 'i':
 		goto yystate330
+	case c == 'o':
+		goto yystate246
+	case c == 'e':
+		goto yystate285
+	case c == 't':
+		goto yystate257
+	case c == 'l':
+		goto yystate253
 	}
 
 yystate246:
@@ -2781,12 +2781,12 @@ yystate294:
 	switch {
 	default:
 		goto yyabort
-	case c == 'f':
-		goto yystate298
 	case c == 'n':
 		goto yystate302
 	case c == 'a':
 		goto yystate295
+	case c == 'f':
+		goto yystate298
 	}
 
 yystate295:
@@ -3323,12 +3323,12 @@ yystate357:
 	switch {
 	default:
 		goto yyabort
-	case c == 'n':
-		goto yystate372
 	case c == 's':
 		goto yystate358
 	case c == 't':
 		goto yystate368
+	case c == 'n':
+		goto yystate372
 	}
 
 yystate358:
@@ -3523,10 +3523,10 @@ yystate381:
 	switch {
 	default:
 		goto yyrule246
-	case c == 'H':
-		goto yystate386
 	case c == ':':
 		goto yystate15
+	case c == 'H':
+		goto yystate386
 	case c == 'N':
 		goto yystate382
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
@@ -3600,20 +3600,20 @@ yystate390:
 	switch {
 	default:
 		goto yyrule246
-	case c == 'u':
-		goto yystate475
-	case c == 'i':
-		goto yystate437
 	case c == 'e':
 		goto yystate402
 	case c == ':':
 		goto yystate15
+	case c == 'u':
+		goto yystate475
+	case c == 'a':
+		goto yystate391
+	case c == 'i':
+		goto yystate437
 	case c == 'n':
 		goto yystate499
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'b' && c <= 'd' || c == 'f':
 		goto yystate17
-	case c == 'a':
-		goto yystate391
 	}
 
 yystate391:
@@ -3643,10 +3643,10 @@ yystate393:
 	switch {
 	default:
 		goto yyabort
-	case c == 'b':
-		goto yystate398
 	case c == 's':
 		goto yystate394
+	case c == 'b':
+		goto yystate398
 	}
 
 yystate394:
@@ -3716,16 +3716,16 @@ yystate402:
 	switch {
 	default:
 		goto yyrule246
-	case c == 'l':
-		goto yystate403
 	case c == 'a':
 		goto yystate416
-	case c == 'f':
-		goto yystate432
 	case c == ':':
 		goto yystate15
+	case c == 'l':
+		goto yystate403
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'b' && c <= 'e':
 		goto yystate18
+	case c == 'f':
+		goto yystate432
 	}
 
 yystate403:
@@ -3845,12 +3845,12 @@ yystate416:
 	switch {
 	default:
 		goto yyrule246
-	case c == 'l':
-		goto yystate417
 	case c == ':':
 		goto yystate15
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
 		goto yystate19
+	case c == 'l':
+		goto yystate417
 	}
 
 yystate417:
@@ -3988,12 +3988,12 @@ yystate432:
 	switch {
 	default:
 		goto yyrule246
-	case c == 'a':
-		goto yystate433
 	case c == ':':
 		goto yystate15
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'b' && c <= 'f':
 		goto yystate19
+	case c == 'a':
+		goto yystate433
 	}
 
 yystate433:
@@ -4001,10 +4001,10 @@ yystate433:
 	switch {
 	default:
 		goto yyrule246
-	case c == 'u':
-		goto yystate434
 	case c == ':':
 		goto yystate15
+	case c == 'u':
+		goto yystate434
 	}
 
 yystate434:
@@ -4034,12 +4034,12 @@ yystate437:
 	switch {
 	default:
 		goto yyabort
-	case c == 's':
-		goto yystate438
 	case c == 'r':
 		goto yystate468
 	case c == 'a':
 		goto yystate464
+	case c == 's':
+		goto yystate438
 	}
 
 yystate438:
@@ -4362,10 +4362,10 @@ yystate475:
 	switch {
 	default:
 		goto yyabort
-	case c == 'm':
-		goto yystate492
 	case c == 'a':
 		goto yystate476
+	case c == 'm':
+		goto yystate492
 	}
 
 yystate476:
@@ -4615,20 +4615,20 @@ yystate504:
 	switch {
 	default:
 		goto yyabort
-	case c == 'm':
-		goto yystate576
-	case c == 'v':
-		goto yystate505
-	case c == 'e':
-		goto yystate570
-	case c == 's':
-		goto yystate515
-	case c == 'd':
-		goto yystate533
-	case c == 'a':
-		goto yystate556
 	case c == 'l':
 		goto yystate547
+	case c == 'e':
+		goto yystate570
+	case c == 'd':
+		goto yystate533
+	case c == 'm':
+		goto yystate576
+	case c == 'a':
+		goto yystate556
+	case c == 'v':
+		goto yystate505
+	case c == 's':
+		goto yystate515
 	}
 
 yystate505:
@@ -5366,16 +5366,16 @@ yystate590:
 	switch {
 	default:
 		goto yyabort
-	case c == 'i':
-		goto yystate644
 	case c == 'o':
 		goto yystate591
 	case c == 'e':
 		goto yystate627
-	case c == 'm':
-		goto yystate647
 	case c == 'a':
 		goto yystate613
+	case c == 'm':
+		goto yystate647
+	case c == 'i':
+		goto yystate644
 	}
 
 yystate591:
@@ -5401,10 +5401,10 @@ yystate593:
 	switch {
 	default:
 		goto yyabort
-	case c == 'n':
-		goto yystate609
 	case c == '-':
 		goto yystate594
+	case c == 'n':
+		goto yystate609
 	}
 
 yystate594:
@@ -5920,14 +5920,14 @@ yystate653:
 	switch {
 	default:
 		goto yyabort
-	case c == '2':
-		goto yystate658
 	case c == '3':
 		goto yystate663
 	case c == '1':
 		goto yystate654
 	case c == '5':
 		goto yystate655
+	case c == '2':
+		goto yystate658
 	}
 
 yystate654:
@@ -6042,10 +6042,10 @@ yystate669:
 	switch {
 	default:
 		goto yyabort
-	case c == '"':
-		goto yystate670
 	case c >= '\x01' && c <= '!' || c >= '#' && c <= 'ÿ':
 		goto yystate669
+	case c == '"':
+		goto yystate670
 	}
 
 yystate670:
@@ -6066,12 +6066,12 @@ yystate672:
 	switch {
 	default:
 		goto yyabort
+	case c == 'o':
+		goto yystate673
 	case c == 'i':
 		goto yystate692
 	case c == 'a':
 		goto yystate685
-	case c == 'o':
-		goto yystate673
 	}
 
 yystate673:
@@ -6353,16 +6353,16 @@ yystate706:
 	switch {
 	default:
 		goto yyabort
-	case c == 'u':
-		goto yystate723
-	case c == 'r':
-		goto yystate728
-	case c == 'i':
-		goto yystate716
-	case c == 'o':
-		goto yystate707
 	case c == 'a':
 		goto yystate710
+	case c == 'r':
+		goto yystate728
+	case c == 'u':
+		goto yystate723
+	case c == 'o':
+		goto yystate707
+	case c == 'i':
+		goto yystate716
 	}
 
 yystate707:
@@ -6760,18 +6760,18 @@ yystate754:
 	switch {
 	default:
 		goto yyabort
-	case c == 'r':
-		goto yystate804
-	case c == 'k':
-		goto yystate777
 	case c == 'e':
 		goto yystate798
-	case c == 'o':
-		goto yystate791
-	case c == 'c':
-		goto yystate755
 	case c == 'y':
 		goto yystate801
+	case c == 'o':
+		goto yystate791
+	case c == 'k':
+		goto yystate777
+	case c == 'c':
+		goto yystate755
+	case c == 'r':
+		goto yystate804
 	}
 
 yystate755:
@@ -7189,14 +7189,14 @@ yystate804:
 	switch {
 	default:
 		goto yyabort
-	case c == 'u':
-		goto yystate855
 	case c == 'a':
 		goto yystate805
-	case c == 'e':
-		goto yystate840
+	case c == 'u':
+		goto yystate855
 	case c == 'y':
 		goto yystate866
+	case c == 'e':
+		goto yystate840
 	}
 
 yystate805:
@@ -7269,12 +7269,12 @@ yystate812:
 	switch {
 	default:
 		goto yyabort
+	case c == 'i':
+		goto yystate822
 	case c == 'p':
 		goto yystate816
 	case c == 'o':
 		goto yystate813
-	case c == 'i':
-		goto yystate822
 	}
 
 yystate813:
@@ -7632,10 +7632,10 @@ yystate855:
 	switch {
 	default:
 		goto yyabort
-	case c == 's':
-		goto yystate856
 	case c == 'e':
 		goto yystate865
+	case c == 's':
+		goto yystate856
 	}
 
 yystate856:
@@ -7844,22 +7844,22 @@ yystate880:
 	switch {
 	default:
 		goto yyrule246
-	case c == 'v':
-		goto yystate881
-	case c == 'c':
-		goto yystate909
-	case c == 'u':
-		goto yystate1067
 	case c == 'd':
 		goto yystate938
+	case c == 'c':
+		goto yystate909
 	case c == ':':
 		goto yystate15
+	case c == 'v':
+		goto yystate881
+	case c == 'u':
+		goto yystate1067
+	case c == 'l':
+		goto yystate962
 	case c == 'n':
 		goto yystate1087
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c == 'a' || c == 'b' || c == 'e' || c == 'f':
 		goto yystate17
-	case c == 'l':
-		goto yystate962
 	}
 
 yystate881:
@@ -8111,12 +8111,12 @@ yystate909:
 	switch {
 	default:
 		goto yyrule246
-	case c == 'a':
-		goto yystate910
 	case c == ':':
 		goto yystate15
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'b' && c <= 'f':
 		goto yystate18
+	case c == 'a':
+		goto yystate910
 	}
 
 yystate910:
@@ -8124,12 +8124,12 @@ yystate910:
 	switch {
 	default:
 		goto yyrule246
-	case c == 'c':
-		goto yystate911
 	case c == ':':
 		goto yystate15
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c == 'a' || c == 'b' || c >= 'd' && c <= 'f':
 		goto yystate19
+	case c == 'c':
+		goto yystate911
 	}
 
 yystate911:
@@ -8166,10 +8166,10 @@ yystate914:
 	switch {
 	default:
 		goto yyabort
-	case c == 'e':
-		goto yystate932
 	case c == 'c':
 		goto yystate915
+	case c == 'e':
+		goto yystate932
 	}
 
 yystate915:
@@ -8387,12 +8387,12 @@ yystate939:
 	switch {
 	default:
 		goto yyrule246
-	case c == 'i':
-		goto yystate940
 	case c == ':':
 		goto yystate15
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
 		goto yystate19
+	case c == 'i':
+		goto yystate940
 	}
 
 yystate940:
@@ -8590,12 +8590,12 @@ yystate962:
 	switch {
 	default:
 		goto yyabort
+	case c == 't':
+		goto yystate1047
 	case c == 's':
 		goto yystate963
 	case c == 'l':
 		goto yystate972
-	case c == 't':
-		goto yystate1047
 	}
 
 yystate963:
@@ -8706,18 +8706,18 @@ yystate975:
 	switch {
 	default:
 		goto yyabort
-	case c == 'u':
-		goto yystate1012
-	case c == 'r':
-		goto yystate1035
-	case c == 't':
-		goto yystate988
-	case c == 'n':
-		goto yystate1029
 	case c == 'q':
 		goto yystate996
 	case c == 'v':
 		goto yystate976
+	case c == 'u':
+		goto yystate1012
+	case c == 't':
+		goto yystate988
+	case c == 'n':
+		goto yystate1029
+	case c == 'r':
+		goto yystate1035
 	}
 
 yystate976:
@@ -8940,10 +8940,10 @@ yystate1001:
 	switch {
 	default:
 		goto yyabort
-	case c == 'o':
-		goto yystate1010
 	case c == 'c':
 		goto yystate1002
+	case c == 'o':
+		goto yystate1010
 	}
 
 yystate1002:
@@ -9695,10 +9695,10 @@ yystate1089:
 		goto yystate1095
 	case c == ':':
 		goto yystate15
-	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
-		goto yystate17
 	case c == 'N':
 		goto yystate1090
+	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
+		goto yystate17
 	}
 
 yystate1090:
@@ -9754,12 +9754,12 @@ yystate1096:
 		goto yystate1121
 	case c == ':':
 		goto yystate15
+	case c == 'x':
+		goto yystate1109
 	case c == 'd':
 		goto yystate1097
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'c' || c == 'e' || c == 'f':
 		goto yystate17
-	case c == 'x':
-		goto yystate1109
 	}
 
 yystate1097:
@@ -9767,12 +9767,12 @@ yystate1097:
 	switch {
 	default:
 		goto yyrule246
-	case c == 'n':
-		goto yystate1098
 	case c == ':':
 		goto yystate15
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
 		goto yystate18
+	case c == 'n':
+		goto yystate1098
 	}
 
 yystate1098:
@@ -9874,10 +9874,10 @@ yystate1109:
 	switch {
 	default:
 		goto yyabort
-	case c == 'p':
-		goto yystate1115
 	case c == 'c':
 		goto yystate1110
+	case c == 'p':
+		goto yystate1115
 	}
 
 yystate1110:
@@ -10010,10 +10010,10 @@ yystate1125:
 	switch {
 	default:
 		goto yyabort
-	case c == 's':
-		goto yystate1145
 	case c == 'c':
 		goto yystate1138
+	case c == 's':
+		goto yystate1145
 	case c == 'z':
 		goto yystate1126
 	}
@@ -10281,10 +10281,10 @@ yystate1157:
 		goto yyabort
 	case c == 'x':
 		goto yystate1163
-	case c == 'n':
-		goto yystate1195
 	case c == 'g':
 		goto yystate1158
+	case c == 'n':
+		goto yystate1195
 	}
 
 yystate1158:
@@ -10359,10 +10359,10 @@ yystate1166:
 	switch {
 	default:
 		goto yyabort
-	case c == 't':
-		goto yystate1167
 	case c == 'b':
 		goto yystate1175
+	case c == 't':
+		goto yystate1167
 	case c == 'f':
 		goto yystate1179
 	}
@@ -10611,10 +10611,10 @@ yystate1195:
 		goto yyabort
 	case c == 'i':
 		goto yystate1217
-	case c == 't':
-		goto yystate1201
 	case c == 'c':
 		goto yystate1196
+	case c == 't':
+		goto yystate1201
 	}
 
 yystate1196:
@@ -10886,14 +10886,14 @@ yystate1227:
 	switch {
 	default:
 		goto yyabort
-	case c == 'i':
-		goto yystate1456
-	case c == 'u':
-		goto yystate1497
 	case c == 'e':
 		goto yystate1439
+	case c == 'u':
+		goto yystate1497
 	case c == 'a':
 		goto yystate1228
+	case c == 'i':
+		goto yystate1456
 	}
 
 yystate1228:
@@ -10903,12 +10903,12 @@ yystate1228:
 		goto yyabort
 	case c == 's':
 		goto yystate1229
-	case c == 'i':
-		goto yystate1404
-	case c == 't':
-		goto yystate1250
 	case c == 'n':
 		goto yystate1420
+	case c == 't':
+		goto yystate1250
+	case c == 'i':
+		goto yystate1404
 	case c == 'x':
 		goto yystate1270
 	}
@@ -11282,20 +11282,20 @@ yystate1271:
 		goto yyabort
 	case c == 'a':
 		goto yystate1330
-	case c == 'i':
-		goto yystate1341
-	case c == 'r':
-		goto yystate1384
+	case c == 'n':
+		goto yystate1374
+	case c == 'j':
+		goto yystate1362
 	case c == 'c':
 		goto yystate1272
 	case c == 'u':
 		goto yystate1354
-	case c == 'n':
-		goto yystate1374
 	case c == 't':
 		goto yystate1301
-	case c == 'j':
-		goto yystate1362
+	case c == 'i':
+		goto yystate1341
+	case c == 'r':
+		goto yystate1384
 	}
 
 yystate1272:
@@ -11672,10 +11672,10 @@ yystate1314:
 	switch {
 	default:
 		goto yyabort
-	case c == 'i':
-		goto yystate1318
 	case c == 'o':
 		goto yystate1315
+	case c == 'i':
+		goto yystate1318
 	}
 
 yystate1315:
@@ -11754,10 +11754,10 @@ yystate1324:
 	switch {
 	default:
 		goto yyabort
-	case c == 'o':
-		goto yystate1325
 	case c == 'i':
 		goto yystate1328
+	case c == 'o':
+		goto yystate1325
 	}
 
 yystate1325:
@@ -12572,10 +12572,10 @@ yystate1420:
 	switch {
 	default:
 		goto yyabort
-	case c == 'a':
-		goto yystate1421
 	case c == 'y':
 		goto yystate1430
+	case c == 'a':
+		goto yystate1421
 	}
 
 yystate1421:
@@ -12892,10 +12892,10 @@ yystate1457:
 	switch {
 	default:
 		goto yyabort
-	case c == 'i':
-		goto yystate1483
 	case c == '-':
 		goto yystate1458
+	case c == 'i':
+		goto yystate1483
 	}
 
 yystate1458:
@@ -12912,10 +12912,10 @@ yystate1459:
 	switch {
 	default:
 		goto yyabort
-	case c == 'e':
-		goto yystate1464
 	case c == 'o':
 		goto yystate1460
+	case c == 'e':
+		goto yystate1464
 	}
 
 yystate1460:
@@ -12954,10 +12954,10 @@ yystate1464:
 	switch {
 	default:
 		goto yyabort
-	case c == 'f':
-		goto yystate1473
 	case c == 't':
 		goto yystate1465
+	case c == 'f':
+		goto yystate1473
 	}
 
 yystate1465:
@@ -13477,10 +13477,10 @@ yystate1525:
 	switch {
 	default:
 		goto yyabort
-	case c == '-':
-		goto yystate1526
 	case c == 'l':
 		goto yystate1536
+	case c == '-':
+		goto yystate1526
 	}
 
 yystate1526:
@@ -13617,12 +13617,12 @@ yystate1542:
 	switch {
 	default:
 		goto yyabort
-	case c == 'n':
-		goto yystate1596
 	case c == 'p':
 		goto yystate1575
 	case c == 's':
 		goto yystate1543
+	case c == 'n':
+		goto yystate1596
 	}
 
 yystate1543:
@@ -13648,10 +13648,10 @@ yystate1545:
 	switch {
 	default:
 		goto yyabort
-	case c == 'i':
-		goto yystate1565
 	case c == 'a':
 		goto yystate1546
+	case c == 'i':
+		goto yystate1565
 	}
 
 yystate1546:
@@ -13952,10 +13952,10 @@ yystate1580:
 	switch {
 	default:
 		goto yyabort
-	case c == 'p':
-		goto yystate1590
 	case c == 'c':
 		goto yystate1581
+	case c == 'p':
+		goto yystate1590
 	}
 
 yystate1581:
@@ -14155,10 +14155,10 @@ yystate1604:
 	switch {
 	default:
 		goto yyabort
-	case c == '/':
-		goto yystate1226
 	case c == '*':
 		goto yystate1605
+	case c == '/':
+		goto yystate1226
 	}
 
 yystate1605:
@@ -14179,10 +14179,10 @@ yystate1606:
 		goto yyabort
 	case c == '*':
 		goto yystate1606
-	case c == '/':
-		goto yystate1607
 	case c >= '\x01' && c <= ')' || c >= '+' && c <= '.' || c >= '0' && c <= 'ÿ':
 		goto yystate1605
+	case c == '/':
+		goto yystate1607
 	}
 
 yystate1607:
@@ -14216,10 +14216,10 @@ yystate1611:
 	switch {
 	default:
 		goto yyrule5
-	case c == 'A':
-		goto yystate1612
 	case c == ':':
 		goto yystate15
+	case c == 'A':
+		goto yystate1612
 	case c >= '0' && c <= '9' || c >= 'B' && c <= 'F' || c >= 'a' && c <= 'f':
 		goto yystate17
 	}
@@ -14229,12 +14229,12 @@ yystate1612:
 	switch {
 	default:
 		goto yyrule246
-	case c == 'A':
-		goto yystate1613
 	case c == ':':
 		goto yystate15
 	case c >= '0' && c <= '9' || c >= 'B' && c <= 'F' || c >= 'a' && c <= 'f':
 		goto yystate18
+	case c == 'A':
+		goto yystate1613
 	}
 
 yystate1613:
@@ -14244,10 +14244,10 @@ yystate1613:
 		goto yyrule246
 	case c == ':':
 		goto yystate15
-	case c == 'A':
-		goto yystate1614
 	case c >= '0' && c <= '9' || c >= 'B' && c <= 'F' || c >= 'a' && c <= 'f':
 		goto yystate19
+	case c == 'A':
+		goto yystate1614
 	}
 
 yystate1614:
@@ -14264,14 +14264,14 @@ yystate1615:
 	switch {
 	default:
 		goto yyrule246
-	case c == ':':
-		goto yystate15
-	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
-		goto yystate17
 	case c == 'i':
 		goto yystate1624
+	case c == ':':
+		goto yystate15
 	case c == 'l':
 		goto yystate1616
+	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
+		goto yystate17
 	}
 
 yystate1616:
@@ -14462,20 +14462,20 @@ yystate1638:
 	switch {
 	default:
 		goto yyrule246
+	case c == ':':
+		goto yystate15
+	case c == 'l':
+		goto yystate1648
+	case c == 'i':
+		goto yystate1694
+	case c == 'e':
+		goto yystate1685
 	case c == 'a':
 		goto yystate1670
 	case c == 'o':
 		goto yystate1639
-	case c == 'i':
-		goto yystate1694
-	case c == ':':
-		goto yystate15
-	case c == 'e':
-		goto yystate1685
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'b' && c <= 'd' || c == 'f':
 		goto yystate17
-	case c == 'l':
-		goto yystate1648
 	}
 
 yystate1639:
@@ -14752,16 +14752,16 @@ yystate1670:
 	switch {
 	default:
 		goto yyrule246
-	case c == 'k':
-		goto yystate1671
 	case c == 'i':
 		goto yystate1683
-	case c == 'l':
-		goto yystate1680
 	case c == ':':
 		goto yystate15
+	case c == 'l':
+		goto yystate1680
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
 		goto yystate18
+	case c == 'k':
+		goto yystate1671
 	}
 
 yystate1671:
@@ -14882,10 +14882,10 @@ yystate1685:
 		goto yyrule246
 	case c == ':':
 		goto yystate15
-	case c == 't':
-		goto yystate1686
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
 		goto yystate18
+	case c == 't':
+		goto yystate1686
 	}
 
 yystate1686:
@@ -14962,10 +14962,10 @@ yystate1694:
 		goto yyabort
 	case c == 'x':
 		goto yystate1698
-	case c == 'l':
-		goto yystate1695
 	case c == 'r':
 		goto yystate1701
+	case c == 'l':
+		goto yystate1695
 	}
 
 yystate1695:
@@ -15039,20 +15039,20 @@ yystate1704:
 	switch {
 	default:
 		goto yyabort
+	case c == 'I':
+		goto yystate1711
 	case c == 'G':
 		goto yystate1708
 	case c == 'D':
 		goto yystate1709
-	case c == 'X':
-		goto yystate1710
 	case c == 'B':
 		goto yystate1705
-	case c == 'R':
-		goto yystate1707
 	case c == 'F':
 		goto yystate1706
-	case c == 'I':
-		goto yystate1711
+	case c == 'R':
+		goto yystate1707
+	case c == 'X':
+		goto yystate1710
 	}
 
 yystate1705:
@@ -15184,10 +15184,10 @@ yystate1723:
 	switch {
 	default:
 		goto yyrule164
-	case c == 'n':
-		goto yystate1756
 	case c == 't':
 		goto yystate1724
+	case c == 'n':
+		goto yystate1756
 	}
 
 yystate1724:
@@ -15231,14 +15231,14 @@ yystate1728:
 	switch {
 	default:
 		goto yyabort
-	case c == 's':
-		goto yystate1729
-	case c == 't':
-		goto yystate1750
-	case c == 'p':
-		goto yystate1743
 	case c == 'd':
 		goto yystate1738
+	case c == 'p':
+		goto yystate1743
+	case c == 't':
+		goto yystate1750
+	case c == 's':
+		goto yystate1729
 	}
 
 yystate1729:
@@ -15554,16 +15554,16 @@ yystate1766:
 	switch {
 	default:
 		goto yyabort
-	case c == 'a':
-		goto yystate1786
 	case c == 'o':
 		goto yystate1767
 	case c == 'f':
 		goto yystate1860
-	case c == 'r':
-		goto yystate1872
 	case c == 'e':
 		goto yystate1801
+	case c == 'a':
+		goto yystate1786
+	case c == 'r':
+		goto yystate1872
 	}
 
 yystate1767:
@@ -15737,10 +15737,10 @@ yystate1786:
 	switch {
 	default:
 		goto yyabort
-	case c == 'w':
-		goto yystate1787
 	case c == 'n':
 		goto yystate1788
+	case c == 'w':
+		goto yystate1787
 	}
 
 yystate1787:
@@ -15861,14 +15861,14 @@ yystate1801:
 	switch {
 	default:
 		goto yyabort
-	case c == 'q':
-		goto yystate1845
 	case c == 'f':
 		goto yystate1855
 	case c == 'c':
 		goto yystate1802
 	case c == 's':
 		goto yystate1826
+	case c == 'q':
+		goto yystate1845
 	}
 
 yystate1802:
@@ -15912,10 +15912,10 @@ yystate1806:
 	switch {
 	default:
 		goto yyabort
-	case c == 'o':
-		goto yystate1817
 	case c == 'v':
 		goto yystate1807
+	case c == 'o':
+		goto yystate1817
 	case c == 'n':
 		goto yystate1819
 	}

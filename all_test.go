@@ -8,9 +8,9 @@
 package dns
 
 import (
-	"container/vector"
 	"github.com/cznic/mathutil"
 	"net"
+	"sort"
 	"strings"
 	"testing"
 )
@@ -182,7 +182,7 @@ func TestTreePut(t *testing.T) {
 }
 
 func TestTreePut2(t *testing.T) {
-	data := &vector.StringVector{
+	data := sort.StringSlice{
 		".",
 		"1.",
 		"1.0.",
@@ -197,7 +197,7 @@ func TestTreePut2(t *testing.T) {
 	for mathutil.PermutationFirst(data); ; n++ {
 		m := map[string]bool{}
 		tr := NewTree()
-		for _, owner := range *data {
+		for _, owner := range data {
 			tr.Put(owner, owner)
 			m[owner] = true
 			for k := range m {
@@ -220,7 +220,7 @@ func TestTreePut2(t *testing.T) {
 }
 
 func TestTreeAdd(t *testing.T) {
-	data := &vector.StringVector{
+	data := sort.StringSlice{
 		".",
 		"1.",
 		"1.0.",
@@ -235,7 +235,7 @@ func TestTreeAdd(t *testing.T) {
 	for mathutil.PermutationFirst(data); ; n++ {
 		m := map[string]bool{}
 		tr := NewTree()
-		for _, owner := range *data {
+		for _, owner := range data {
 			tr.Add(owner, owner, func(interface{}) interface{} {
 				t.Fatal(10)
 				panic("unreachable")
@@ -252,7 +252,7 @@ func TestTreeAdd(t *testing.T) {
 				}
 			}
 		}
-		for _, owner := range *data {
+		for _, owner := range data {
 			tr.Add(owner, owner, func(data interface{}) interface{} {
 				return "!" + data.(string)
 			})
