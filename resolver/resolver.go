@@ -368,8 +368,8 @@ func (r *Resolver) needNSAdr(name string) {
 
 		r.Lookup(name, q, rr.CLASS_IN, true) //TODO Param? Support anything outside CLASS_IN?
 		<-time.After(retry)
-		p.lock.Lock()            // X++
-		p.m[name] = false, false // P--
+		p.lock.Lock()     // X++
+		delete(p.m, name) // P--
 	}
 
 	go f(r.pendingA, msg.QTYPE_A)

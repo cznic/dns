@@ -98,7 +98,7 @@ func tidy(dt int64, parts rr.Parts) (expired bool) {
 			}
 		}
 		if int64(min) <= dt { // expired
-			parts[typ] = nil, false
+			delete(parts, typ)
 			expired = true
 		}
 	}
@@ -128,8 +128,8 @@ func (c *Cache) get(name string) (parts rr.Parts, hit bool) {
 				}
 
 				// !P && W
-				c.pending[name] = true                            // P++
-				defer func() { c.pending[name] = false, false }() // P--
+				c.pending[name] = true                     // P++
+				defer func() { delete(c.pending, name) }() // P--
 
 				if parts, hit, expired := c.get0(name); hit && expired {
 					if len(parts) != 0 {
