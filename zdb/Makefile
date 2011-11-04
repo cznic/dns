@@ -10,7 +10,6 @@ GOFILES=\
 	hash.go\
 	map.go\
 	zdb.go\
-	zip.go\
 
 CLEANFILES += test.tmp *~
 
