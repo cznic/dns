@@ -13,6 +13,7 @@ import (
 	"bytes"
 	"github.com/cznic/dns"
 	"github.com/cznic/fileutil"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net"
@@ -34,7 +35,7 @@ type Cfg struct {
 // NewCfg returns a newly created Cfg with hosts.File initialized from file fname or an Error of any.
 // It binds the contained hosts.File to fname and on any changes to the fname file the Cfg hosts.File
 // is reloaded on access via Cfg.File().
-func NewCfg(fname string, logger *dns.Logger) (c *Cfg, err os.Error) {
+func NewCfg(fname string, logger *dns.Logger) (c *Cfg, err error) {
 	x := &Cfg{cfg: &File{}, logger: logger}
 	if x.mfile, err = fileutil.NewGoMFile(fname, os.O_RDONLY, 0444, 0); err != nil {
 		return
@@ -44,7 +45,7 @@ func NewCfg(fname string, logger *dns.Logger) (c *Cfg, err os.Error) {
 		return
 	}
 
-	x.mfile.SetHandler(func(file *os.File) (err os.Error) {
+	x.mfile.SetHandler(func(file *os.File) (err error) {
 		if _, err = file.Seek(0, 0); err != nil {
 			return
 		}
@@ -78,7 +79,7 @@ func (c *Cfg) SetChanged() {
 
 // File returns a hosts.File from Cfg and an indicator of its source file has been changed/modificated
 // compared to the last invocation of this function or an Error if any.
-func (c *Cfg) File() (f *File, changed bool, err os.Error) {
+func (c *Cfg) File() (f *File, changed bool, err error) {
 	if _, err = c.mfile.File(); err != nil {
 		return
 	}
@@ -92,11 +93,11 @@ func (c *Cfg) File() (f *File, changed bool, err os.Error) {
 type File []*FileItem
 
 // Load File from a hosts format file fname. Return an Error, if any.
-func (h *File) Load(fname string) (err os.Error) {
+func (h *File) Load(fname string) (err error) {
 	defer func() {
 		if e := recover(); e != nil {
 			*h = nil
-			err = e.(os.Error)
+			err = e.(error)
 		}
 	}()
 
@@ -109,18 +110,18 @@ func (h *File) Load(fname string) (err os.Error) {
 }
 
 // Load File from a hosts format string s. Return an Error, if any.
-func (h *File) LoadString(fname, s string) (err os.Error) {
+func (h *File) LoadString(fname, s string) (err error) {
 	lx := newLex(strings.NewReader(s))
 
 	defer func() {
 		if e := recover(); e != nil {
 			*h = nil
-			err = fmt.Errorf("%s:%d:%d - %s", fname, lx.line, lx.column, e.(os.Error))
+			err = fmt.Errorf("%s:%d:%d - %s", fname, lx.line, lx.column, e.(error))
 		}
 	}()
 
 	if yyParse(lx) != 0 {
-		panic(os.NewError("syntax error"))
+		panic(errors.New("syntax error"))
 	}
 
 	*h = lx.hosts
@@ -157,7 +158,7 @@ func (i *FileItem) String() string {
 type goCfgMsg struct {
 	f       *File
 	changed bool
-	error   os.Error
+	error   error
 }
 
 // GoCfg is a Cfg wrapped in a goroutine allowing for concurrent access.
@@ -172,7 +173,7 @@ type GoCfg struct {
 // The instance(s) and its associated goroutine(s) will never be released.
 // This is by design in an atempt to avoid some possibly nasty races on finalization.
 // The "impossible to release" doesn't apply when NewGoCfg returns an Error.
-func NewGoCfg(fname string, logger *dns.Logger) (c *GoCfg, err os.Error) {
+func NewGoCfg(fname string, logger *dns.Logger) (c *GoCfg, err error) {
 	x := &GoCfg{}
 	if x.cfg, err = NewCfg(fname, logger); err != nil {
 		return
@@ -195,7 +196,7 @@ func NewGoCfg(fname string, logger *dns.Logger) (c *GoCfg, err os.Error) {
 // File returns a File from GoCfg and an indicator if its source file has been changed/modificated
 // compared to the last invocation of this function or an Error if any.
 // Invocations of File are concurrent safe.
-func (c *GoCfg) File() (f *File, changed bool, err os.Error) {
+func (c *GoCfg) File() (f *File, changed bool, err error) {
 	c.rq <- true
 	msg := <-c.re
 	return msg.f, msg.changed, msg.error

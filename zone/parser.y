@@ -227,7 +227,7 @@ base32ext:
 	{
 		yylex.begin(sc_INITIAL)
 		if data, err := strutil.Base32ExtDecode([]byte($2)); err != nil {
-			yylex.Error(err.String())
+			yylex.Error(err.Error())
 		} else {
 			$$ = data
 		}
@@ -239,7 +239,7 @@ base64:
 	{
 		yylex.begin(sc_INITIAL)
 		if data, err := strutil.Base64Decode([]byte($1)); err != nil {
-			yylex.Error(err.String())
+			yylex.Error(err.Error())
 		} else {
 			$$ = data
 		}
@@ -314,7 +314,7 @@ dtg:
 	tDECADIC
 	{
 		if t, err := dns.String2Seconds($<str>1); err != nil {
-			yylex.Error(err.String())
+			yylex.Error(err.Error())
 		} else {
 			$$ = uint64(t)
 		}

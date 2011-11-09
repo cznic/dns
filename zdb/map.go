@@ -9,7 +9,6 @@ package zdb
 import (
 	"bytes"
 	"github.com/cznic/fileutil/falloc"
-	"os"
 )
 
 /* 
@@ -31,7 +30,7 @@ func (s *Store) getHandle(b []byte) (handle falloc.Handle) {
 	return
 }
 
-func (s *Store) setHandle(handle falloc.Handle, off int64) (err os.Error) {
+func (s *Store) setHandle(handle falloc.Handle, off int64) (err error) {
 	b := make([]byte, s.PtrBytes)
 	for i := len(b) - 1; i >= 0; i-- {
 		b[i] = byte(handle)
@@ -63,7 +62,7 @@ func (s *Store) compose(next falloc.Handle, partition uint16, key, value []byte)
 }
 
 // Set stores value under partition, key in Store and returns an os.Error if any.
-func (s *Store) Set(partition uint16, key, value []byte) (err os.Error) {
+func (s *Store) Set(partition uint16, key, value []byte) (err error) {
 	lenK := len(key)
 	var h = newFNV1a()
 	h.writeUint16(partition)
@@ -132,7 +131,7 @@ func (s *Store) Set(partition uint16, key, value []byte) (err os.Error) {
 // Get reads the value associated with partition, key in Store. It returns the
 // data, key exists in ok and an os.Error, if any. Get may return a non nil err
 // iff !ok.
-func (s *Store) Get(partition uint16, key []byte) (value []byte, ok bool, err os.Error) {
+func (s *Store) Get(partition uint16, key []byte) (value []byte, ok bool, err error) {
 	lenK := len(key)
 	var h = newFNV1a()
 	h.writeUint16(partition)

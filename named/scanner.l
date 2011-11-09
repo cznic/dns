@@ -14,10 +14,11 @@ package named
 
 
 import (
+	"errors"
 	"fmt"
+	"io"
 	"math"
 	"net"
-	"os"
 	"strconv"
 	"strings"
 	"unicode"
@@ -70,7 +71,7 @@ func (l *lex) getc(c byte) byte {
 		}
 		return b
 	} else {
-		if err == os.EOF {
+		if err == io.EOF {
 			l.peek = 0
 			return 0
 		}
@@ -93,12 +94,12 @@ func (c *Conf) newLex(name string, source *strings.Reader) (l *lex) {
 
 
 func (l *lex) Error(e string) {
-	panic(os.NewError(e))
+	panic(errors.New(e))
 }
 
 
 func (l *lex) Lex(lval *yySymType) (ret int) {
-	var err os.Error
+	var err error
 
 	/* debug helper
 	defer func() {

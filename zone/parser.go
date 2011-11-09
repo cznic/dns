@@ -11,10 +11,10 @@
 package zone
 
 import (
+	"fmt"
 	"github.com/cznic/dns"
 	"github.com/cznic/dns/rr"
 	"github.com/cznic/strutil"
-	"fmt"
 	"math"
 	"net"
 )
@@ -613,7 +613,7 @@ yydefault:
 		{
 			yylex.begin(sc_INITIAL)
 			if data, err := strutil.Base32ExtDecode([]byte(yyS[yypt-0].str)); err != nil {
-				yylex.Error(err.String())
+				yylex.Error(err.Error())
 			} else {
 				yyVAL.data = data
 			}
@@ -622,7 +622,7 @@ yydefault:
 		{
 			yylex.begin(sc_INITIAL)
 			if data, err := strutil.Base64Decode([]byte(yyS[yypt-1].str)); err != nil {
-				yylex.Error(err.String())
+				yylex.Error(err.Error())
 			} else {
 				yyVAL.data = data
 			}
@@ -680,7 +680,7 @@ yydefault:
 	case 22:
 		{
 			if t, err := dns.String2Seconds(yyS[yypt-0].str); err != nil {
-				yylex.Error(err.String())
+				yylex.Error(err.Error())
 			} else {
 				yyVAL.u64 = uint64(t)
 			}

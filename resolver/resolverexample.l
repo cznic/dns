@@ -58,7 +58,7 @@ func main() {
 
 	defer func() {
 		if e := recover(); e != nil {
-			fmt.Fprintf(stderr, "%s: %s\n", os.Args[0], e.(os.Error))
+			fmt.Fprintf(stderr, "%s: %s\n", os.Args[0], e.(error))
 			stderr.Flush()
 			os.Exit(1)
 		}

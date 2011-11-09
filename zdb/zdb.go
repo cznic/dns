@@ -48,7 +48,7 @@ type hdbAccessor struct {
 	accessor storage.Accessor
 }
 
-func (a *hdbAccessor) Close() os.Error {
+func (a *hdbAccessor) Close() error {
 	e1 := a.accessor.Sync()
 	e2 := a.accessor.Close()
 	if e1 != nil {
@@ -62,25 +62,25 @@ func (a *hdbAccessor) Name() string {
 	return a.accessor.Name()
 }
 
-func (a *hdbAccessor) ReadAt(b []byte, off int64) (n int, err os.Error) {
+func (a *hdbAccessor) ReadAt(b []byte, off int64) (n int, err error) {
 	return a.accessor.ReadAt(b, off+a.delta)
 }
 
-func (a *hdbAccessor) Stat() (fi *os.FileInfo, err os.Error) {
+func (a *hdbAccessor) Stat() (fi *os.FileInfo, err error) {
 	fi, err = a.accessor.Stat()
 	fi.Size -= a.delta
 	return
 }
 
-func (a *hdbAccessor) Sync() (err os.Error) {
+func (a *hdbAccessor) Sync() (err error) {
 	return a.accessor.Sync()
 }
 
-func (a *hdbAccessor) Truncate(size int64) os.Error {
+func (a *hdbAccessor) Truncate(size int64) error {
 	return a.accessor.Truncate(size + a.delta)
 }
 
-func (a *hdbAccessor) WriteAt(b []byte, off int64) (n int, err os.Error) {
+func (a *hdbAccessor) WriteAt(b []byte, off int64) (n int, err error) {
 	return a.accessor.WriteAt(b, off+a.delta)
 }
 
@@ -107,7 +107,7 @@ type header struct {
 	reserved  []byte
 }
 
-func (h *header) rd(b []byte) os.Error {
+func (h *header) rd(b []byte) error {
 	if len(b) != 16 {
 		return fmt.Errorf("%s: expected 16 bytes, got %d bytes", me(), len(b))
 	}
@@ -181,7 +181,7 @@ type Store struct {
 
 // Close closes the store. Further access to the store has undefined behavior
 // and may panic. It returns an os.Error, if any.
-func (s *Store) Close() os.Error {
+func (s *Store) Close() error {
 	return s.Store.Close()
 }
 
@@ -197,7 +197,7 @@ func (s *Store) delta() int64 {
 // The hashWidth and ptrBytes arguments: see the Store type docs.  If
 // successful, methods on the returned Store can be used for I/O. It returns
 // the Store and an os.Error, if any.
-func New(fn string, hashWidth, ptrBytes int) (s *Store, err os.Error) {
+func New(fn string, hashWidth, ptrBytes int) (s *Store, err error) {
 	s = &Store{
 		HashWidth: min(max(hashWidth, 8), 29),
 		PtrBytes:  min(max(ptrBytes, 4), 7),
@@ -206,7 +206,7 @@ func New(fn string, hashWidth, ptrBytes int) (s *Store, err os.Error) {
 	defer func() {
 		if e := recover(); e != nil {
 			s = nil
-			err = e.(os.Error)
+			err = e.(error)
 		}
 	}()
 
@@ -229,13 +229,13 @@ func New(fn string, hashWidth, ptrBytes int) (s *Store, err os.Error) {
 // Open opens a Store in/from named file fn. If successful, methods on the
 // returned Store can be used for data exchange.  The HashWidth and PtrBytes
 // are read from the DB.  Open returns the Store and an os.Error, if any.
-func Open(fn string) (s *Store, err os.Error) {
+func Open(fn string) (s *Store, err error) {
 	s = &Store{}
 
 	defer func() {
 		if e := recover(); e != nil {
 			s = nil
-			err = e.(os.Error)
+			err = e.(error)
 		}
 	}()
 

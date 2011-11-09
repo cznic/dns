@@ -11,7 +11,6 @@ import (
 	"fmt"
 	"math"
 	"net"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -39,7 +38,7 @@ func IsRooted(name string) bool {
 }
 
 // Labels returns a domain name labels or an Error if any.
-func Labels(name string) (labels []string, err os.Error) {
+func Labels(name string) (labels []string, err error) {
 	if name == "." || len(name) == 0 {
 		return []string{""}, nil
 	}
@@ -83,7 +82,7 @@ const (
 // MatchCount returns the number of labels that namea and nameb have in common
 // or an Error if any. The counting starts at the root label, so any two
 // valid rooted domain names have match count at least one == the root domain.
-func MatchCount(namea, nameb string) (n int, err os.Error) {
+func MatchCount(namea, nameb string) (n int, err error) {
 	var a, b []string
 	if a, err = Labels(namea); err != nil {
 		return
@@ -117,7 +116,7 @@ func Seconds2String(epochSecs int64) string {
 
 // String2Seconds converts s to epoch seconds. Input string s must be in the YYYYMMDDHHmmSS format
 // or a plain unsigned decadic number < 2^32.
-func String2Seconds(s string) (secs int64, err os.Error) {
+func String2Seconds(s string) (secs int64, err error) {
 	if len(s) > 10 { // human readable format
 		var t *time.Time
 		t, err = time.Parse(timeLayout, s)

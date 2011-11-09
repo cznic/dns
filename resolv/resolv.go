@@ -12,6 +12,7 @@ import (
 	"bytes"
 	"github.com/cznic/dns"
 	"github.com/cznic/fileutil"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net"
@@ -47,7 +48,7 @@ type Cfg struct {
 // NewCfg returns a newly created Cfg with resolv.Conf initialized from file fname of an Error of any.
 // It binds the contained resolv.Conf to fname and on any changes to the fname file the Cfg resolv.Conf
 // is reloaded on access via Cfg.Conf().
-func NewCfg(fname string, logger *dns.Logger) (c *Cfg, err os.Error) {
+func NewCfg(fname string, logger *dns.Logger) (c *Cfg, err error) {
 	x := &Cfg{cfg: &Conf{}, logger: logger}
 	if x.mfile, err = fileutil.NewGoMFile(fname, os.O_RDONLY, 0444, 0); err != nil {
 		return
@@ -57,7 +58,7 @@ func NewCfg(fname string, logger *dns.Logger) (c *Cfg, err os.Error) {
 		return
 	}
 
-	x.mfile.SetHandler(func(file *os.File) (err os.Error) {
+	x.mfile.SetHandler(func(file *os.File) (err error) {
 		if _, err = file.Seek(0, 0); err != nil {
 			return
 		}
@@ -91,7 +92,7 @@ func (c *Cfg) SetChanged() {
 
 // Conf returns a resolv.Conf from Cfg and an indicator of its source file has been changed/modificated
 // compared to the last invocation of this function or an Error if any.
-func (c *Cfg) Conf() (f *Conf, changed bool, err os.Error) {
+func (c *Cfg) Conf() (f *Conf, changed bool, err error) {
 	if _, err = c.mfile.File(); err != nil {
 		return
 	}
@@ -154,16 +155,16 @@ func NewConf() (c *Conf) {
 func (c *Conf) appendNameserver(ip net.IP) {
 	n := len(c.Nameserver)
 	if n == resolvMaxNS {
-		panic(os.NewError("Maximum number of nameservers reached"))
+		panic(errors.New("Maximum number of nameservers reached"))
 	}
 	c.Nameserver = c.Nameserver[:n+1]
 	c.Nameserver[n] = ip
 }
 
-func (c *Conf) AppendNameserver(ip net.IP) (err os.Error) {
+func (c *Conf) AppendNameserver(ip net.IP) (err error) {
 	defer func() {
 		if e := recover(); e != nil {
-			err = e.(os.Error)
+			err = e.(error)
 		}
 	}()
 
@@ -174,16 +175,16 @@ func (c *Conf) AppendNameserver(ip net.IP) (err os.Error) {
 func (c *Conf) appendSearch(s string) {
 	n := len(c.Search)
 	if n == resolvMaxSearch {
-		panic(os.NewError("maximum length of the searchliost reached"))
+		panic(errors.New("maximum length of the searchliost reached"))
 	}
 	c.Search = c.Search[:n+1]
 	c.Search[n] = s
 }
 
-func (c *Conf) AppendSearch(s string) (err os.Error) {
+func (c *Conf) AppendSearch(s string) (err error) {
 	defer func() {
 		if e := recover(); e != nil {
-			err = e.(os.Error)
+			err = e.(error)
 		}
 	}()
 
@@ -194,16 +195,16 @@ func (c *Conf) AppendSearch(s string) (err os.Error) {
 func (c *Conf) appendSortlist(addr, mask net.IP) {
 	n := len(c.Sortlist)
 	if n == resolvMaxSortlistPairs {
-		panic(os.NewError("Maximum length of the sortlist reached"))
+		panic(errors.New("Maximum length of the sortlist reached"))
 	}
 	c.Sortlist = c.Sortlist[:n+1]
 	c.Sortlist[n] = SortlistItem{addr, mask}
 }
 
-func (c *Conf) AppendSortlist(addr, mask net.IP) (err os.Error) {
+func (c *Conf) AppendSortlist(addr, mask net.IP) (err error) {
 	defer func() {
 		if e := recover(); e != nil {
-			err = e.(os.Error)
+			err = e.(error)
 		}
 	}()
 
@@ -212,10 +213,10 @@ func (c *Conf) AppendSortlist(addr, mask net.IP) (err os.Error) {
 }
 
 // Load Conf c from a resolv.conf format file fname. Return an Error, if any.
-func (c *Conf) Load(fname string) (err os.Error) {
+func (c *Conf) Load(fname string) (err error) {
 	defer func() {
 		if e := recover(); e != nil {
-			err = e.(os.Error)
+			err = e.(error)
 		}
 	}()
 
@@ -234,17 +235,17 @@ func min(a *uint, b uint) {
 }
 
 // Load Conf c with from a resolv.conf format string s. Return an Error, if any.
-func (c *Conf) LoadString(fname, s string) (err os.Error) {
+func (c *Conf) LoadString(fname, s string) (err error) {
 	lx := newLex(fname, strings.NewReader(s))
 
 	defer func() {
 		if e := recover(); e != nil {
-			err = fmt.Errorf("%s:%d:%d - %s", fname, lx.line, lx.column, e.(os.Error))
+			err = fmt.Errorf("%s:%d:%d - %s", fname, lx.line, lx.column, e.(error))
 		}
 	}()
 
 	if yyParse(lx) != 0 {
-		panic(os.NewError("syntax error"))
+		panic(errors.New("syntax error"))
 	}
 
 	min(&lx.resolv.Opt.Ndots, resolvNDotsCap)
@@ -318,7 +319,7 @@ func (c *Conf) String() string {
 type goCfgMsg struct {
 	f       *Conf
 	changed bool
-	error   os.Error
+	error   error
 }
 
 // GoCfg is a Cfg wrapped in a goroutine allowing for concurrent access.
@@ -333,7 +334,7 @@ type GoCfg struct {
 // The instance(s) and its associated goroutine(s) will never be released.
 // This is by design in an atempt to avoid some possibly nasty races on finalization.
 // The "impossible to release" doesn't apply when NewGoCfg returns an Error.
-func NewGoCfg(fname string, logger *dns.Logger) (c *GoCfg, err os.Error) {
+func NewGoCfg(fname string, logger *dns.Logger) (c *GoCfg, err error) {
 	x := &GoCfg{}
 	if x.cfg, err = NewCfg(fname, logger); err != nil {
 		return
@@ -356,7 +357,7 @@ func NewGoCfg(fname string, logger *dns.Logger) (c *GoCfg, err os.Error) {
 // Conf returns a Conf from GoCfg and an indicator if its source file has been changed/modificated
 // compared to the last invocation of this function or an Error if any.
 // Invocations of Conf are concurrent safe.
-func (c *GoCfg) Conf() (f *Conf, changed bool, err os.Error) {
+func (c *GoCfg) Conf() (f *Conf, changed bool, err error) {
 	c.rq <- true
 	msg := <-c.re
 	return msg.f, msg.changed, msg.error

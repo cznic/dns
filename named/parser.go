@@ -11,9 +11,9 @@
 package named
 
 import (
+	"fmt"
 	"github.com/cznic/dns/rr"
 	"github.com/cznic/strutil"
-	"fmt"
 	"io/ioutil"
 	"math"
 	"net"

@@ -14,10 +14,10 @@ import (
 	"bytes"
 	"github.com/cznic/dns/rr"
 	"github.com/cznic/strutil"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net"
-	"os"
 	"strings"
 )
 
@@ -133,7 +133,7 @@ type Conf struct {
 
 // NewConf create an empty Conf ready to use or an Error if any.
 // The Options.Version field is filled from the version parameter.
-func NewConf(version string) (c *Conf, err os.Error) {
+func NewConf(version string) (c *Conf, err error) {
 	c = &Conf{}
 	c.Options, err = NewOptions(version)
 	return
@@ -153,17 +153,17 @@ func (x *Conf) String() string {
 }
 
 // Load Conf from a named.conf format string s. Return an Error, if any.
-func (c *Conf) LoadString(fname, s string) (err os.Error) {
+func (c *Conf) LoadString(fname, s string) (err error) {
 	lx := c.newLex(fname, strings.NewReader(s))
 
 	defer func() {
 		if e := recover(); e != nil {
-			err = fmt.Errorf("%s:%d:%d - %s", lx.name, lx.line, lx.column, e.(os.Error))
+			err = fmt.Errorf("%s:%d:%d - %s", lx.name, lx.line, lx.column, e.(error))
 		}
 	}()
 
 	if yyParse(lx) != 0 {
-		panic(os.NewError("syntax error"))
+		panic(errors.New("syntax error"))
 	}
 
 	*c = *lx.conf
@@ -171,10 +171,10 @@ func (c *Conf) LoadString(fname, s string) (err os.Error) {
 }
 
 // Load Conf from a configuration file fname. Return an Error, if any.
-func (c *Conf) Load(fname string) (err os.Error) {
+func (c *Conf) Load(fname string) (err error) {
 	defer func() {
 		if e := recover(); e != nil {
-			err = e.(os.Error)
+			err = e.(error)
 		}
 	}()
 
@@ -905,7 +905,7 @@ type Options struct {
 
 // NewOptions returns a newly created Options with sane defaults set or an Error if any.
 // The Version field is filled from the version parameter.
-func NewOptions(version string) (o *Options, err os.Error) {
+func NewOptions(version string) (o *Options, err error) {
 	return defaultOptions(version)
 }
 

@@ -18,9 +18,10 @@ import(
 	"bytes"
 	"github.com/cznic/dns/rr"
 	"encoding/hex"
+	"errors"
 	"fmt"
+	"io"
 	"net"
-	"os"
 	"strconv"
 	"unicode"
 )
@@ -75,7 +76,7 @@ func (l *lex) getc(c byte) byte {
 		l.peek = b
 		return b
 	} else {
-		if err == os.EOF {
+		if err == io.EOF {
 			l.peek = 0
 			return 0
 		}
@@ -105,7 +106,7 @@ func (l *lex) Error(e string) {
 			return
 		}
 	}
-	panic(os.NewError(e))
+	panic(errors.New(e))
 }
 
 
@@ -130,7 +131,7 @@ const (
 
 
 func (l *lex) Lex(lval *yySymType) (ret int) {
-	var err os.Error
+	var err error
 
 	/* debug helper
 	defer func(sc0 int) {
@@ -321,7 +322,7 @@ label          {let-or-digit}(({let-or-digit}|"-")*{let-or-digit})?
 	ret = tBASE64
 
 <hex>[0-9a-fA-F]+
-	var err os.Error
+	var err error
 	lval.data, err = hex.DecodeString(string(l.buf))
 	if err != nil {
 		l.Error("expected hex string")

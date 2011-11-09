@@ -98,7 +98,7 @@ func TestDelta(t *testing.T) {
 	t.Logf("delta(20, 4): %d(0x%x)", delta, delta)
 }
 
-func testNewOpen(t *testing.T, pth string, hashWidth, ptrBytes int) (e os.Error) {
+func testNewOpen(t *testing.T, pth string, hashWidth, ptrBytes int) (e error) {
 	fn := fmt.Sprintf("%s/zdb-%d-%d", pth, hashWidth, ptrBytes)
 
 	if !*optKeep {
@@ -169,7 +169,7 @@ func TestNewOpen(t *testing.T) {
 	}
 }
 
-func testSetGet(hashWidth, ptrBytes, n int) (err os.Error) {
+func testSetGet(hashWidth, ptrBytes, n int) (err error) {
 	var pth string
 	pth, err = ioutil.TempDir("", "zdb-gotest")
 	if err != nil {
@@ -269,7 +269,7 @@ func TestSetGet(t *testing.T) {
 	}
 }
 
-func testBenchGet(hashWidth, ptrBytes, n int) (ns, sz int64, err os.Error) {
+func testBenchGet(hashWidth, ptrBytes, n int) (ns, sz int64, err error) {
 	var pth string
 	pth, err = ioutil.TempDir("", "zdb-gotest")
 	if err != nil {
@@ -320,7 +320,7 @@ func testBenchGet(hashWidth, ptrBytes, n int) (ns, sz int64, err os.Error) {
 
 	fi, _ := s.accessor.Stat()
 	sz = fi.Size
-	ch := make(chan os.Error, *optCores+1)
+	ch := make(chan error, *optCores+1)
 	chunk := n / *optCores
 	if chunk == 0 {
 		chunk++
@@ -332,7 +332,7 @@ func testBenchGet(hashWidth, ptrBytes, n int) (ns, sz int64, err os.Error) {
 		goroutines++
 		go func(lo, hi int) {
 			var ok bool
-			var err os.Error
+			var err error
 			var buf []byte
 			for i := lo; i < hi; i++ {
 				partition := uint16(i & 15)

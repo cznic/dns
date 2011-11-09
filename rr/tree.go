@@ -37,7 +37,7 @@ func (t *Tree) Delete(owner string) {
 // On every datum found the handler is invoked. If the handler returns false the tree traversing stops.
 func (t *Tree) Enum(root string, handler func(path []string, data RRs) bool) {
 	(*dns.Tree)(t).Enum(root, func(path []string, data interface{}) bool {
-		switch x := data.(type) {
+		switch data.(type) {
 		case nil:
 			return handler(path, nil)
 		default:

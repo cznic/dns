@@ -136,7 +136,7 @@ var DefaultEnv = map[string]string{
 	"GODNS": "godns",
 }
 
-func defaultOptions(version string) (o *Options, err os.Error) {
+func defaultOptions(version string) (o *Options, err error) {
 	src := DefaultOptions
 	for key, val := range DefaultEnv {
 		if env := os.Getenv(key); env != "" {

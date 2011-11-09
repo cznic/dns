@@ -31,7 +31,7 @@ type queryConf struct {
 	*Resolver
 }
 
-func (q *queryConf) hostsChanged(f *hosts.File) (err os.Error) {
+func (q *queryConf) hostsChanged(f *hosts.File) (err error) {
 	q.hosts = map[string][]net.IP{}
 	q.ips = map[string][]string{}
 
@@ -141,13 +141,13 @@ type Resolver struct {
 	pendingA, pendingAAAA *goStrMapBool // paralel NS addr requests recursion protector
 }
 
-func New(hostsFName, resolvFName string, logger *dns.Logger) (r *Resolver, err os.Error) {
+func New(hostsFName, resolvFName string, logger *dns.Logger) (r *Resolver, err error) {
 	r = &Resolver{cache: cache.New(), log: logger, pendingA: newGoStrMapBool(), pendingAAAA: newGoStrMapBool()}
 
 	defer func() {
 		if e := recover(); e != nil {
 			if r.log.Level >= dns.LOG_ERRORS {
-				r.log.Log("FAIL New: %s", e.(os.Error))
+				r.log.Log("FAIL New: %s", e.(error))
 			}
 			r = nil
 		}
@@ -223,7 +223,7 @@ func (r *Resolver) Logger() *dns.Logger {
 	return r.log
 }
 
-func (r *Resolver) getHostByName(name string, qtype msg.QType) (ipList []net.IP, redirects rr.RRs, err os.Error) {
+func (r *Resolver) getHostByName(name string, qtype msg.QType) (ipList []net.IP, redirects rr.RRs, err error) {
 	qc := r.getQueryConf()
 	// query trylist
 	qlist := qc.hostqlist(strings.ToLower(strings.TrimSpace(name)))
@@ -273,13 +273,13 @@ func (r *Resolver) getHostByName(name string, qtype msg.QType) (ipList []net.IP,
 
 // GetHostByNameIPv4 will try to Lookup an IN A address (i.e. IPv4) list for name.
 // Used CNAMEs chain, if any, is returned in redirects.
-func (r *Resolver) GetHostByNameIPv4(name string) (ipList []net.IP, redirects rr.RRs, err os.Error) {
+func (r *Resolver) GetHostByNameIPv4(name string) (ipList []net.IP, redirects rr.RRs, err error) {
 	return r.getHostByName(name, msg.QTYPE_A)
 }
 
 // GetHostByNameIPv6 will try to Lookup an IN AAAA address (i.e. IPv6) list for name.
 // Used CNAMEs chain, if any, is returned in redirects.
-func (r *Resolver) GetHostByNameIPv6(name string) (ipList []net.IP, redirects rr.RRs, err os.Error) {
+func (r *Resolver) GetHostByNameIPv6(name string) (ipList []net.IP, redirects rr.RRs, err error) {
 	return r.getHostByName(name, msg.QTYPE_AAAA)
 }
 
@@ -287,7 +287,7 @@ func (r *Resolver) GetHostByNameIPv6(name string) (ipList []net.IP, redirects rr
 // Used CNAMEs chain, if any, is returned in redirects. Initially an attempt for IPv4 addresses
 // is performed. Query for the IPv6 addresses is afterwards invoked iff no IPv4 addresses were
 // returned by the initial attempt. If preferIPv6 == true then the above query order is reversed.
-func (r *Resolver) GetHostByName(name string, preferIPv6 bool) (ipList []net.IP, redirects rr.RRs, err os.Error) {
+func (r *Resolver) GetHostByName(name string, preferIPv6 bool) (ipList []net.IP, redirects rr.RRs, err error) {
 	a, b := (*Resolver).GetHostByNameIPv4, (*Resolver).GetHostByNameIPv6
 	if preferIPv6 {
 		a, b = b, a
@@ -301,7 +301,7 @@ func (r *Resolver) GetHostByName(name string, preferIPv6 bool) (ipList []net.IP,
 }
 
 // GetHostByAddr will try to resolve an IPv4 or IPv6 address to host name(s).
-func (r *Resolver) GetHostByAddr(ip net.IP) (hosts []string, err os.Error) {
+func (r *Resolver) GetHostByAddr(ip net.IP) (hosts []string, err error) {
 	qc := r.getQueryConf()
 	if hosts, _ = qc.qips(ip); hosts != nil {
 		return // resolved from hosts
@@ -381,12 +381,12 @@ func (r *Resolver) needNSAdr(name string) {
 // matching RRs. Lookup should normally report "DNS lookup error" results via the return result variable.
 // A non-nil Error is returned for any non-lookup error event. The rd parameter is the msg.Messsage.Header
 // "Recursion Desired" flag. Lookup CNAMEs chain walked, if any, is returned in redirects.
-func (r *Resolver) Lookup(sname string, stype msg.QType, sclass rr.Class, rd bool) (answer, redirects rr.RRs, result LookupResult, err os.Error) {
+func (r *Resolver) Lookup(sname string, stype msg.QType, sclass rr.Class, rd bool) (answer, redirects rr.RRs, result LookupResult, err error) {
 
 	defer func() {
 		if e := recover(); e != nil {
 			if r.log.Level >= dns.LOG_ERRORS {
-				r.log.Log("FAIL Lookup error: %s", e.(os.Error))
+				r.log.Log("FAIL Lookup error: %s", e.(error))
 			}
 		}
 	}()

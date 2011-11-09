@@ -9,7 +9,6 @@ package rr
 
 import (
 	"fmt"
-	"os"
 	"sort"
 	"strings"
 )
@@ -67,7 +66,7 @@ func TypesEncode(types []Type) (bits []byte) {
 }
 
 // TypesDecode decodes RR Type bitmap bits (RFC 4034/4.1.2).
-func TypesDecode(bits []byte) (types []Type, err os.Error) {
+func TypesDecode(bits []byte) (types []Type, err error) {
 	p := 0
 	for p < len(bits) {
 		window := int(bits[p]) << 8

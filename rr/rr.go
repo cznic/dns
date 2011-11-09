@@ -15,7 +15,6 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"os"
 	"strings"
 	"time"
 )
@@ -41,7 +40,7 @@ func (d *A) Encode(b *dns.Wirebuf) {
 }
 
 // Implementation of dns.Wirer
-func (d *A) Decode(b []byte, pos *int) (err os.Error) {
+func (d *A) Decode(b []byte, pos *int) (err error) {
 	return (*ip4)(&d.Address).Decode(b, pos)
 }
 
@@ -60,7 +59,7 @@ func (d *AAAA) Encode(b *dns.Wirebuf) {
 }
 
 // Implementation of dns.Wirer
-func (d *AAAA) Decode(b []byte, pos *int) (err os.Error) {
+func (d *AAAA) Decode(b []byte, pos *int) (err error) {
 	return (*ip6)(&d.Address).Decode(b, pos)
 }
 
@@ -79,7 +78,7 @@ func (c CNAME) Encode(b *dns.Wirebuf) {
 }
 
 // Implementation of dns.Wirer
-func (c *CNAME) Decode(b []byte, pos *int) (err os.Error) {
+func (c *CNAME) Decode(b []byte, pos *int) (err error) {
 	err = (*dns.DomainName)(&c.Name).Decode(b, pos)
 	return
 }
@@ -99,7 +98,7 @@ func (c DNAME) Encode(b *dns.Wirebuf) {
 }
 
 // Implementation of dns.Wirer
-func (c *DNAME) Decode(b []byte, pos *int) (err os.Error) {
+func (c *DNAME) Decode(b []byte, pos *int) (err error) {
 	err = (*dns.DomainName)(&c.Name).Decode(b, pos)
 	return
 }
@@ -185,7 +184,7 @@ func (n Class) Encode(b *dns.Wirebuf) {
 }
 
 // Implementation of dns.Wirer
-func (n *Class) Decode(b []byte, pos *int) (err os.Error) {
+func (n *Class) Decode(b []byte, pos *int) (err error) {
 	return (*dns.Octets2)(n).Decode(b, pos)
 }
 
@@ -239,7 +238,7 @@ func (d *DNSKEY) Encode(b *dns.Wirebuf) {
 }
 
 // Implementation of dns.Wirer
-func (d *DNSKEY) Decode(b []byte, pos *int) (err os.Error) {
+func (d *DNSKEY) Decode(b []byte, pos *int) (err error) {
 	if err = (*dns.Octets2)(&d.Flags).Decode(b, pos); err != nil {
 		return
 	}
@@ -289,7 +288,7 @@ func (d *DS) Encode(b *dns.Wirebuf) {
 }
 
 // Implementation of dns.Wirer
-func (d *DS) Decode(b []byte, pos *int) (err os.Error) {
+func (d *DS) Decode(b []byte, pos *int) (err error) {
 	if err = (*dns.Octets2)(&d.KeyTag).Decode(b, pos); err != nil {
 		return
 	}
@@ -338,7 +337,7 @@ func (d ip4) Encode(b *dns.Wirebuf) {
 }
 
 // Implementation of dns.Wirer
-func (d *ip4) Decode(b []byte, pos *int) (err os.Error) {
+func (d *ip4) Decode(b []byte, pos *int) (err error) {
 	p := *pos
 	if p+4 > len(b) {
 		return fmt.Errorf("ip4.Decode() - buffer underflow")
@@ -363,7 +362,7 @@ func (d ip6) Encode(b *dns.Wirebuf) {
 }
 
 // Implementation of dns.Wirer
-func (d *ip6) Decode(b []byte, pos *int) (err os.Error) {
+func (d *ip6) Decode(b []byte, pos *int) (err error) {
 	p := *pos
 	if p+16 > len(b) {
 		return fmt.Errorf("ip6.Decode() - buffer underflow")
@@ -393,7 +392,7 @@ func (d *MX) Encode(b *dns.Wirebuf) {
 }
 
 // Implementation of dns.Wirer
-func (d *MX) Decode(b []byte, pos *int) (err os.Error) {
+func (d *MX) Decode(b []byte, pos *int) (err error) {
 	if err = (*dns.Octets2)(&d.Preference).Decode(b, pos); err != nil {
 		return
 	}
@@ -416,7 +415,7 @@ func (d *NODATA) Encode(b *dns.Wirebuf) {
 }
 
 // Implementation of dns.Wirer
-func (d *NODATA) Decode(b []byte, pos *int) (err os.Error) {
+func (d *NODATA) Decode(b []byte, pos *int) (err error) {
 	return d.Type.Decode(b, pos)
 }
 
@@ -433,7 +432,7 @@ func (d *NXDOMAIN) Encode(b *dns.Wirebuf) {
 }
 
 // Implementation of dns.Wirer
-func (d *NXDOMAIN) Decode(b []byte, pos *int) (err os.Error) {
+func (d *NXDOMAIN) Decode(b []byte, pos *int) (err error) {
 	return
 }
 
@@ -454,7 +453,7 @@ func (d *NS) Encode(b *dns.Wirebuf) {
 }
 
 // Implementation of dns.Wirer
-func (d *NS) Decode(b []byte, pos *int) (err os.Error) {
+func (d *NS) Decode(b []byte, pos *int) (err error) {
 	return (*dns.DomainName)(&d.NSDName).Decode(b, pos)
 }
 
@@ -494,7 +493,7 @@ func (d *NSEC3) Encode(b *dns.Wirebuf) {
 }
 
 // Implementation of dns.Wirer
-func (d *NSEC3) Decode(b []byte, pos *int) (err os.Error) {
+func (d *NSEC3) Decode(b []byte, pos *int) (err error) {
 	if err = d.NSEC3PARAM.Decode(b, pos); err != nil {
 		return
 	}
@@ -562,7 +561,7 @@ func (d *NSEC3PARAM) Encode(b *dns.Wirebuf) {
 }
 
 // Implementation of dns.Wirer
-func (d *NSEC3PARAM) Decode(b []byte, pos *int) (err os.Error) {
+func (d *NSEC3PARAM) Decode(b []byte, pos *int) (err error) {
 	if err = (*dns.Octet)(&d.HashAlgorithm).Decode(b, pos); err != nil {
 		return
 	}
@@ -608,7 +607,7 @@ func (d *OPT_DATA) Encode(b *dns.Wirebuf) {
 }
 
 // Implementation of dns.Wirer
-func (d *OPT_DATA) Decode(b []byte, pos *int) (err os.Error) {
+func (d *OPT_DATA) Decode(b []byte, pos *int) (err error) {
 	if err = (*dns.Octets2)(&d.Code).Decode(b, pos); err != nil {
 		return
 	}
@@ -643,7 +642,7 @@ func (d *OPT) Encode(b *dns.Wirebuf) {
 }
 
 // Implementation of dns.Wirer
-func (d *OPT) Decode(b []byte, pos *int) (err os.Error) {
+func (d *OPT) Decode(b []byte, pos *int) (err error) {
 	for *pos < len(b) {
 		v := OPT_DATA{}
 		if err = v.Decode(b, pos); err != nil {
@@ -689,7 +688,7 @@ func (d *EXT_RCODE) Encode(b *dns.Wirebuf) {
 }
 
 // Implementation of dns.Wirer
-func (d *EXT_RCODE) Decode(b []byte, pos *int) (err os.Error) {
+func (d *EXT_RCODE) Decode(b []byte, pos *int) (err error) {
 	var n dns.Octets4
 	if err = n.Decode(b, pos); err != nil {
 		return
@@ -715,7 +714,7 @@ func (d *PTR) Encode(b *dns.Wirebuf) {
 }
 
 // Implementation of dns.Wirer
-func (d *PTR) Decode(b []byte, pos *int) (err os.Error) {
+func (d *PTR) Decode(b []byte, pos *int) (err error) {
 	return (*dns.DomainName)(&d.PTRDName).Decode(b, pos)
 }
 
@@ -732,7 +731,7 @@ func (d *RDATA) Encode(b *dns.Wirebuf) {
 }
 
 // Implementation of dns.Wirer
-func (d *RDATA) Decode(b []byte, pos *int) (err os.Error) {
+func (d *RDATA) Decode(b []byte, pos *int) (err error) {
 	n := len(b) - *pos
 	*d = b[*pos:]
 	*pos += n
@@ -798,7 +797,7 @@ func (rr *RR) Encode(b *dns.Wirebuf) {
 }
 
 // Implementation of dns.Wirer
-func (rr *RR) Decode(b []byte, pos *int) (err os.Error) {
+func (rr *RR) Decode(b []byte, pos *int) (err error) {
 	if err = (*dns.DomainName)(&rr.Name).Decode(b, pos); err != nil {
 		return
 	}
@@ -1103,7 +1102,7 @@ func (r *RRSIG) Encode(b *dns.Wirebuf) {
 }
 
 // Implementation of dns.Wirer
-func (r *RRSIG) Decode(b []byte, pos *int) (err os.Error) {
+func (r *RRSIG) Decode(b []byte, pos *int) (err error) {
 	if err = (*dns.Octets2)(&r.Type).Decode(b, pos); err != nil {
 		return
 	}
@@ -1204,7 +1203,7 @@ func (d *SOA) Encode(b *dns.Wirebuf) {
 }
 
 // Implementation of dns.Wirer
-func (d *SOA) Decode(b []byte, pos *int) (err os.Error) {
+func (d *SOA) Decode(b []byte, pos *int) (err error) {
 	if err = (*dns.DomainName)(&d.MName).Decode(b, pos); err != nil {
 		return
 	}
@@ -1241,7 +1240,7 @@ func (t *TXT) Encode(b *dns.Wirebuf) {
 }
 
 // Implementation of dns.Wirer
-func (t *TXT) Decode(b []byte, pos *int) (err os.Error) {
+func (t *TXT) Decode(b []byte, pos *int) (err error) {
 	s := ""
 	for *pos < len(b) {
 		var part dns.CharString
@@ -1462,6 +1461,6 @@ func (n Type) Encode(b *dns.Wirebuf) {
 }
 
 // Implementation of dns.Wirer
-func (n *Type) Decode(b []byte, pos *int) (err os.Error) {
+func (n *Type) Decode(b []byte, pos *int) (err error) {
 	return (*dns.Octets2)(n).Decode(b, pos)
 }

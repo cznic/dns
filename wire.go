@@ -9,7 +9,6 @@ package dns
 
 import (
 	"fmt"
-	"os"
 	"strings"
 )
 
@@ -28,7 +27,7 @@ func (s CharString) Encode(b *Wirebuf) {
 }
 
 // Implementation of Wirer
-func (s *CharString) Decode(b []byte, pos *int) (err os.Error) {
+func (s *CharString) Decode(b []byte, pos *int) (err error) {
 	p := *pos
 	if p >= len(b) {
 		return fmt.Errorf("CharString.Decode() - buffer underflow")
@@ -74,7 +73,7 @@ func (s DomainName) Encode(b *Wirebuf) {
 }
 
 // Implementation of Wirer
-func (s *DomainName) Decode(b []byte, pos *int) (err os.Error) {
+func (s *DomainName) Decode(b []byte, pos *int) (err error) {
 	labels := []string{}
 	label := CharString("")
 	for {
@@ -126,7 +125,7 @@ func (o Octet) Encode(b *Wirebuf) {
 }
 
 // Implementation of Wirer
-func (o *Octet) Decode(b []byte, pos *int) (err os.Error) {
+func (o *Octet) Decode(b []byte, pos *int) (err error) {
 	p := *pos
 	if p+1 > len(b) {
 		return fmt.Errorf("Octet.Decode() - buffer underflow")
@@ -145,7 +144,7 @@ func (n Octets2) Encode(b *Wirebuf) {
 }
 
 // Implementation of Wirer
-func (n *Octets2) Decode(b []byte, pos *int) (err os.Error) {
+func (n *Octets2) Decode(b []byte, pos *int) (err error) {
 	p := *pos
 	if p+2 > len(b) {
 		return fmt.Errorf("Octets2.Decode() - buffer underflow")
@@ -164,7 +163,7 @@ func (n Octets4) Encode(b *Wirebuf) {
 }
 
 // Implementation of Wirer
-func (n *Octets4) Decode(b []byte, pos *int) (err os.Error) {
+func (n *Octets4) Decode(b []byte, pos *int) (err error) {
 	p := *pos
 	if p+4 > len(b) {
 		return fmt.Errorf("Octets4.Decode() - buffer underflow")
@@ -205,5 +204,5 @@ type Wirer interface {
 	// Decode decodes data from a DNS wire format in b, starting at p.
 	// Decode may return a non nil Error if b is not in the correct format.
 	// After Decode, p is adjusted to reflect the amount of data consumed from b.
-	Decode(b []byte, p *int) os.Error
+	Decode(b []byte, p *int) error
 }

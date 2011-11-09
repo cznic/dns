@@ -12,14 +12,13 @@ import (
 	"github.com/cznic/dns/rr"
 	"fmt"
 	"net"
-	"os"
 )
 
 // RxMsgHandler is the type of a xfer received message handler.
 type RxMsgHandler func(serial int, m *msg.Message) bool
 
 // ErrHandler is the type of a xfer error handler.
-type ErrHandler func(serial int, err os.Error) bool
+type ErrHandler func(serial int, err error) bool
 
 // Error is the type returned for some xfer errors.
 type Error struct {
@@ -27,7 +26,7 @@ type Error struct {
 	Msg    *msg.Message
 }
 
-func (e *Error) String() string {
+func (e *Error) Error() string {
 	return e.Reason
 }
 
@@ -45,11 +44,11 @@ func (e *Error) String() string {
 // If the error is from sending the initial query then the serial parameter is < 0.
 //
 // This function *never* closes the conn.
-func RxAll(conn *net.TCPConn, zone string, msgHandler RxMsgHandler, errHandler ErrHandler) (err os.Error) {
+func RxAll(conn *net.TCPConn, zone string, msgHandler RxMsgHandler, errHandler ErrHandler) (err error) {
 	serial := 0
 	defer func() {
 		if e := recover(); e != nil {
-			err = e.(os.Error)
+			err = e.(error)
 			if errHandler == nil || !errHandler(serial, err) {
 				return
 			}

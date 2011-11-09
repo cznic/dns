@@ -13,7 +13,6 @@ import (
 	"github.com/cznic/mathutil"
 	"math"
 	"net"
-	"os"
 	"testing"
 	"time"
 )
@@ -21,7 +20,7 @@ import (
 var rng *mathutil.FC32
 
 func init() {
-	var err os.Error
+	var err error
 	rng, err = mathutil.NewFC32(math.MinInt32, math.MaxInt32, true)
 	if err != nil {
 		panic(err)
@@ -161,11 +160,11 @@ func TestExchange1(t *testing.T) {
 
 	c.SetTimeout(1e6)
 	re := <-m.GoExchange(c, 2000, ch)
-	if re.Error == nil {
+	if re.error == nil {
 		t.Fatal(20)
 	}
 
-	t.Log(20, re.Error)
+	t.Log(20, re.error)
 }
 
 func TestExchange2(t *testing.T) {
@@ -182,8 +181,8 @@ func TestExchange2(t *testing.T) {
 
 	c.SetTimeout(5e9)
 	re := <-m.GoExchange(c, 2000, ch)
-	if re.Error != nil {
-		t.Fatal(20, re.Error)
+	if re.error != nil {
+		t.Fatal(20, re.error)
 	}
 
 	t.Log(re.Message)
@@ -215,15 +214,15 @@ func TestExchange3(t *testing.T) {
 	ch := m.GoExchange(c, 2000, m2.GoExchange(c2, 2000, nil))
 
 	re := <-ch
-	if re.Error != nil {
-		t.Fatal(30, re.Error)
+	if re.error != nil {
+		t.Fatal(30, re.error)
 	}
 
 	t.Log(re.Message)
 
 	re = <-ch
-	if re.Error != nil {
-		t.Fatal(40, re.Error)
+	if re.error != nil {
+		t.Fatal(40, re.error)
 	}
 
 	t.Log(re.Message)

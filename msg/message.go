@@ -15,7 +15,6 @@ import (
 	"io"
 	"math"
 	"net"
-	"os"
 	"strings"
 	"sync"
 	"time"
@@ -27,7 +26,7 @@ var idgen struct {
 }
 
 func init() {
-	var err os.Error
+	var err error
 	if idgen.rng, err = mathutil.NewFC32(math.MinInt32, math.MaxInt32, true); err != nil {
 		panic(err)
 	}
@@ -182,7 +181,7 @@ func (m *Header) Encode(b *dns.Wirebuf) {
 }
 
 // Implementation of dns.Wirer
-func (m *Header) Decode(b []byte, pos *int) (err os.Error) {
+func (m *Header) Decode(b []byte, pos *int) (err error) {
 	if err = (*dns.Octets2)(&m.ID).Decode(b, pos); err != nil {
 		return
 	}
@@ -279,7 +278,7 @@ func (m *Message) Encode(b *dns.Wirebuf) {
 }
 
 // Implementation of dns.Wirer
-func (m *Message) Decode(b []byte, pos *int) (err os.Error) {
+func (m *Message) Decode(b []byte, pos *int) (err error) {
 	if err = m.Header.Decode(b, pos); err != nil {
 		return
 	}
@@ -351,7 +350,7 @@ func (m *Message) additionalString() string {
 
 // Send sends m through conn and returns an Error of any.
 // If the conn is a *net.TCPConn then the 2 byte msg len is prepended.
-func (m *Message) Send(conn net.Conn) (err os.Error) {
+func (m *Message) Send(conn net.Conn) (err error) {
 	//TODO use this from Exchange and friends
 	w := dns.NewWirebuf()
 	m.Encode(w)
@@ -385,7 +384,7 @@ func (m *Message) Send(conn net.Conn) (err os.Error) {
 // Returned n reflects the number of bytes revecied to rxbuf.
 // The 2 byte msg len prefix is expected firstly.
 // The two prefix bytes are not reflected in the returned size 'n'.
-func (m *Message) ReceiveTCP(conn *net.TCPConn, rxbuf []byte) (n int, err os.Error) {
+func (m *Message) ReceiveTCP(conn *net.TCPConn, rxbuf []byte) (n int, err error) {
 	b := make([]byte, 2)
 	if n, err = io.ReadFull(conn, b); err != nil {
 		return
@@ -407,7 +406,7 @@ func (m *Message) ReceiveTCP(conn *net.TCPConn, rxbuf []byte) (n int, err os.Err
 // It returns the number of bytes copied into b and the address that was on the packet.
 // ReceiveUDP can hang forever if the conn doesn't have appropriate read timeout already set.
 // Returned n reflects the number of bytes revecied to rxbuf.
-func (m *Message) ReceiveUDP(conn *net.UDPConn, rxbuf []byte) (n int, addr *net.UDPAddr, err os.Error) {
+func (m *Message) ReceiveUDP(conn *net.UDPConn, rxbuf []byte) (n int, addr *net.UDPAddr, err error) {
 	if n, addr, err = conn.ReadFromUDP(rxbuf); err != nil {
 		return
 	}
@@ -421,7 +420,7 @@ func (m *Message) ReceiveUDP(conn *net.UDPConn, rxbuf []byte) (n int, addr *net.
 // ExchangeBuf uses rxbuf for receiving the reply. ExchangeWire can hang forever if the
 // conn doesn't have appropriate read and/or write timeouts already set.
 // Returned n reflects the number of bytes revecied to rxbuf.
-func ExchangeWire(conn net.Conn, w, rxbuf []byte) (n int, reply *Message, err os.Error) {
+func ExchangeWire(conn net.Conn, w, rxbuf []byte) (n int, reply *Message, err error) {
 	var nw int
 	if nw, err = conn.Write(w); err != nil {
 		return
@@ -447,14 +446,14 @@ func ExchangeWire(conn net.Conn, w, rxbuf []byte) (n int, reply *Message, err os
 // ExchangeBuf uses rxbuf for receiving the reply. ExchangeBuf can hang forever if the
 // conn doesn't have appropriate read and/or write timeouts already set.
 // Returned n reflects the number of bytes revecied to rxbuf.
-func (m *Message) ExchangeBuf(conn net.Conn, rxbuf []byte) (n int, reply *Message, err os.Error) {
+func (m *Message) ExchangeBuf(conn net.Conn, rxbuf []byte) (n int, reply *Message, err error) {
 	w := dns.NewWirebuf()
 	m.Encode(w)
 	return ExchangeWire(conn, w.Buf, rxbuf)
 }
 
 // Exchange invokes ExchangeBuf with a private rxbuf of rxbufsize bytes.
-func (m *Message) Exchange(conn net.Conn, rxbufsize int) (reply *Message, err os.Error) {
+func (m *Message) Exchange(conn net.Conn, rxbufsize int) (reply *Message, err error) {
 	_, reply, err = m.ExchangeBuf(conn, make([]byte, rxbufsize))
 	return
 }
@@ -462,7 +461,7 @@ func (m *Message) Exchange(conn net.Conn, rxbufsize int) (reply *Message, err os
 // ExchangeReply is the type of the ExchangeChan.
 type ExchangeReply struct {
 	*Message
-	os.Error
+	error
 }
 
 // ExchangeChan is the type of the channel used to report ExchangeReply from GoExchangeBuf and GoExchange.
@@ -716,7 +715,7 @@ func (n QType) String() (s string) {
 type Question []*QuestionItem
 
 // Implementation of dns.Wirer
-func (q Question) Decode(b []byte, pos *int) (err os.Error) {
+func (q Question) Decode(b []byte, pos *int) (err error) {
 	for i := range q {
 		qi := &QuestionItem{}
 		if err = qi.Decode(b, pos); err != nil {
@@ -795,7 +794,7 @@ func (m *QuestionItem) Encode(b *dns.Wirebuf) {
 }
 
 // Implementation of dns.Wirer
-func (m *QuestionItem) Decode(b []byte, pos *int) (err os.Error) {
+func (m *QuestionItem) Decode(b []byte, pos *int) (err error) {
 	if err = (*dns.DomainName)(&m.QNAME).Decode(b, pos); err != nil {
 		return
 	}
@@ -865,7 +864,7 @@ func (r RCODE) String() string {
 	return fmt.Sprint("%d!", r)
 }
 
-func decodeRRs(rrs *rr.RRs, n uint16, b []byte, pos *int) (err os.Error) {
+func decodeRRs(rrs *rr.RRs, n uint16, b []byte, pos *int) (err error) {
 	if n == 0 {
 		return
 	}

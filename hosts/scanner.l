@@ -14,9 +14,10 @@ package hosts
 
 
 import (
+	"errors"
 	"fmt"
+	"io"
 	"net"
-	"os"
 	"strings"
 	"unicode"
 )
@@ -48,7 +49,7 @@ func (l *lex) getc(c byte) byte {
 		}
 		return b
 	} else {
-		if err == os.EOF {
+		if err == io.EOF {
 			l.peek = 0
 			return 0
 		}
@@ -70,7 +71,7 @@ func newLex(source *strings.Reader) (l *lex) {
 
 
 func (l *lex) Error(e string) {
-	panic(os.NewError(e))
+	panic(errors.New(e))
 }
 
 

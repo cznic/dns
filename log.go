@@ -49,7 +49,7 @@ func NewLogger(logger *log.Logger, level LogLevel) *Logger {
 
 // If l.Logger != nil then Output invokes l.Logger.Output.
 // If s contains newlines it is splitted to multiple Outputs.
-func (l *Logger) Output(calldepth int, s string) (err os.Error) {
+func (l *Logger) Output(calldepth int, s string) (err error) {
 	if l.Logger != nil {
 		err = l.Logger.Output(calldepth, s)
 	}

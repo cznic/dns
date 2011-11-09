@@ -37,7 +37,7 @@ func NewCompiler(w io.Writer) (c *Compiler) {
 	return
 }
 
-func (c *Compiler) flush() (err os.Error) {
+func (c *Compiler) flush() (err error) {
 	if len(c.rrs) == 0 {
 		return
 	}
@@ -54,7 +54,7 @@ func (c *Compiler) flush() (err os.Error) {
 	return c.write(b)
 }
 
-func (c *Compiler) write(b []byte) (err os.Error) {
+func (c *Compiler) write(b []byte) (err error) {
 	//fmt.Printf(".write %04x: % x\n", len(b), b)
 	n, m := len(b), 0
 	if m, err = c.w.Write(b); err != nil {
@@ -79,7 +79,7 @@ var eof = []byte{0, 0}
 //
 // Warning: Failure to invoke Done as a last task of a compilation causes loss and/or
 // corruption of the produced binary data.
-func (c *Compiler) Done() (err os.Error) {
+func (c *Compiler) Done() (err error) {
 	defer func() { c.w = nil }()
 	if err = c.flush(); err != nil {
 		return
@@ -89,7 +89,7 @@ func (c *Compiler) Done() (err os.Error) {
 }
 
 // Write appends r to the "compilation".
-func (c *Compiler) Write(r *rr.RR) (err os.Error) {
+func (c *Compiler) Write(r *rr.RR) (err error) {
 	owner := strings.ToLower(r.Name)
 	if owner != c.owner {
 		if err = c.flush(); err != nil {
@@ -110,11 +110,11 @@ func (c *Compiler) Write(r *rr.RR) (err os.Error) {
 // and Error returned.
 // rrHandler is invoked for every resource record found in the zone file.
 // If rrHandler returns false the loading is aborted and returns nil Error.
-func Load(fname string, errHandler func(e string) bool, rrHandler func(rr *rr.RR) bool) (err os.Error) {
+func Load(fname string, errHandler func(e string) bool, rrHandler func(rr *rr.RR) bool) (err error) {
 
 	defer func() {
 		if e := recover(); e != nil {
-			err = e.(os.Error)
+			err = e.(error)
 		}
 	}()
 
@@ -136,7 +136,7 @@ func Load(fname string, errHandler func(e string) bool, rrHandler func(rr *rr.RR
 // Load attempts to load compiled RRs from r.
 // rrHandler is invoked for every RRs pack found in the data.
 // If rrHandler returns false the loading is aborted without error.
-func LoadBinary(r io.Reader, rrHandler func(rr.Bytes) bool) (err os.Error) {
+func LoadBinary(r io.Reader, rrHandler func(rr.Bytes) bool) (err error) {
 	lbuf := []byte{0, 0}
 	for {
 		if err = fileutil.Read(r, lbuf); err != nil {
