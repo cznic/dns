@@ -61,7 +61,7 @@ func (s *Store) compose(next falloc.Handle, partition uint16, key, value []byte)
 	return
 }
 
-// Set stores value under partition, key in Store and returns an os.Error if any.
+// Set stores value under partition, key in Store and returns an error if any.
 func (s *Store) Set(partition uint16, key, value []byte) (err error) {
 	lenK := len(key)
 	var h = newFNV1a()
@@ -129,7 +129,7 @@ func (s *Store) Set(partition uint16, key, value []byte) (err error) {
 }
 
 // Get reads the value associated with partition, key in Store. It returns the
-// data, key exists in ok and an os.Error, if any. Get may return a non nil err
+// data, key exists in ok and an error, if any. Get may return a non nil err
 // iff !ok.
 func (s *Store) Get(partition uint16, key []byte) (value []byte, ok bool, err error) {
 	lenK := len(key)

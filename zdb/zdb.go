@@ -180,7 +180,7 @@ type Store struct {
 }
 
 // Close closes the store. Further access to the store has undefined behavior
-// and may panic. It returns an os.Error, if any.
+// and may panic. It returns an error, if any.
 func (s *Store) Close() error {
 	return s.Store.Close()
 }
@@ -196,7 +196,7 @@ func (s *Store) delta() int64 {
 // New creates the Store in named file fn, truncating it if it already exists.
 // The hashWidth and ptrBytes arguments: see the Store type docs.  If
 // successful, methods on the returned Store can be used for I/O. It returns
-// the Store and an os.Error, if any.
+// the Store and an error, if any.
 func New(fn string, hashWidth, ptrBytes int) (s *Store, err error) {
 	s = &Store{
 		HashWidth: min(max(hashWidth, 8), 29),
@@ -228,7 +228,7 @@ func New(fn string, hashWidth, ptrBytes int) (s *Store, err error) {
 
 // Open opens a Store in/from named file fn. If successful, methods on the
 // returned Store can be used for data exchange.  The HashWidth and PtrBytes
-// are read from the DB.  Open returns the Store and an os.Error, if any.
+// are read from the DB.  Open returns the Store and an error, if any.
 func Open(fn string) (s *Store, err error) {
 	s = &Store{}
 
