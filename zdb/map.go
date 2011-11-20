@@ -16,7 +16,7 @@ import (
 Chunk layout:
 
 PtrBytes: next pointer (collision chain)
-       2: partition
+       4: partition
        2: key length
        2: value length
     lenK: key
@@ -47,12 +47,12 @@ func (s *Store) putHandle(handle falloc.Handle, b []byte) {
 	}
 }
 
-func (s *Store) compose(next falloc.Handle, partition uint16, key, value []byte) (b []byte) {
+func (s *Store) compose(next falloc.Handle, partition uint32, key, value []byte) (b []byte) {
 	lenK, lenV := len(key), len(value)
 	b = make([]byte, s.PtrBytes)
 	s.putHandle(next, b)
 	b = append(b,
-		byte(partition>>8), byte(partition),
+		byte(partition>>24), byte(partition>>16), byte(partition>>8), byte(partition),
 		byte(lenK>>8), byte(lenK),
 		byte(lenV>>8), byte(lenV),
 	)
@@ -62,10 +62,10 @@ func (s *Store) compose(next falloc.Handle, partition uint16, key, value []byte)
 }
 
 // Set stores value under partition, key in Store and returns an error if any.
-func (s *Store) Set(partition uint16, key, value []byte) (err error) {
+func (s *Store) Set(partition uint32, key, value []byte) (err error) {
 	lenK := len(key)
 	var h = newFNV1a()
-	h.writeUint16(partition)
+	h.writeUint32(partition)
 	h.write(key)
 	var ptrbuf = make([]byte, s.PtrBytes)
 	hdelta := s.hdelta(h.hash(s.HashWidth))
@@ -89,13 +89,13 @@ func (s *Store) Set(partition uint16, key, value []byte) (err error) {
 			return
 		}
 
-		if len(chunk) < s.PtrBytes+6 {
+		if len(chunk) < s.PtrBytes+8 {
 			return &falloc.ECorrupted{s.accessor.Name(), int64(handle) << 4}
 		}
 
 		rdoff := s.PtrBytes
-		rdpartition := uint16(chunk[rdoff])<<8 | uint16(chunk[rdoff+1])
-		rdoff += 2
+		rdpartition := uint32(chunk[rdoff])<<24 | uint32(chunk[rdoff+1])<<16 | uint32(chunk[rdoff+2])<<8 | uint32(chunk[rdoff+3])
+		rdoff += 4
 		if rdpartition == partition {
 			rdLenK := int(chunk[rdoff])<<8 | int(chunk[rdoff+1])
 			rdoff += 4
@@ -131,10 +131,10 @@ func (s *Store) Set(partition uint16, key, value []byte) (err error) {
 // Get reads the value associated with partition, key in Store. It returns the
 // data, key exists in ok and an error, if any. Get may return a non nil err
 // iff !ok.
-func (s *Store) Get(partition uint16, key []byte) (value []byte, ok bool, err error) {
+func (s *Store) Get(partition uint32, key []byte) (value []byte, ok bool, err error) {
 	lenK := len(key)
 	var h = newFNV1a()
-	h.writeUint16(partition)
+	h.writeUint32(partition)
 	h.write(key)
 	var ptrbuf = make([]byte, s.PtrBytes)
 	hdelta := s.hdelta(h.hash(s.HashWidth))
@@ -154,13 +154,13 @@ func (s *Store) Get(partition uint16, key []byte) (value []byte, ok bool, err er
 			return
 		}
 
-		if len(chunk) < s.PtrBytes+6 {
+		if len(chunk) < s.PtrBytes+8 {
 			return nil, false, &falloc.ECorrupted{s.accessor.Name(), int64(handle) << 4}
 		}
 
 		rdoff := s.PtrBytes
-		rdpartition := uint16(chunk[rdoff])<<8 | uint16(chunk[rdoff+1])
-		rdoff += 2
+		rdpartition := uint32(chunk[rdoff])<<24 | uint32(chunk[rdoff+1])<<16 | uint32(chunk[rdoff+2])<<8 | uint32(chunk[rdoff+3])
+		rdoff += 4
 		if rdpartition == partition { // chunk partition OK
 			rdLenK := int(chunk[rdoff])<<8 | int(chunk[rdoff+1])
 			rdoff += 2

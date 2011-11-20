@@ -195,7 +195,7 @@ func testSetGet(hashWidth, ptrBytes, n int) (err error) {
 	buf := []byte{}
 	// value less pass
 	for i := 0; i < n; i++ {
-		partition := uint16(i & 15)
+		partition := uint32(i & 15)
 		ikey := i >> 4
 		key := fmt.Sprintf("i%d.example.org", ikey)
 		buf = append(buf[:0], key...)
@@ -205,7 +205,7 @@ func testSetGet(hashWidth, ptrBytes, n int) (err error) {
 	}
 	// overwrite values
 	for i := 0; i < n; i++ {
-		partition := uint16(i & 15)
+		partition := uint32(i & 15)
 		ikey := i >> 4
 		key := fmt.Sprintf("i%d.example.org", ikey)
 		buf = append(buf[:0], key...)
@@ -233,7 +233,7 @@ func testSetGet(hashWidth, ptrBytes, n int) (err error) {
 	var value []byte
 	var ok bool
 	for i := 0; i < n; i++ {
-		partition := uint16(i & 15)
+		partition := uint32(i & 15)
 		ikey := i >> 4
 		key := fmt.Sprintf("i%d.example.org", ikey)
 		buf = append(buf[:0], key...)
@@ -293,7 +293,7 @@ func testBenchGet(hashWidth, ptrBytes, n int) (ns, sz int64, err error) {
 
 	buf := []byte{}
 	for i := 0; i < n; i++ {
-		partition := uint16(i & 15)
+		partition := uint32(i & 15)
 		ikey := i >> 4
 		key := fmt.Sprintf("i%d.example.org", ikey)
 		buf = append(buf[:0], key...)
@@ -335,7 +335,7 @@ func testBenchGet(hashWidth, ptrBytes, n int) (ns, sz int64, err error) {
 			var err error
 			var buf []byte
 			for i := lo; i < hi; i++ {
-				partition := uint16(i & 15)
+				partition := uint32(i & 15)
 				ikey := i >> 4
 				key := fmt.Sprintf("i%d.example.org", ikey)
 				buf = append(buf[:0], key...)

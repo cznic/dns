@@ -31,10 +31,12 @@ func (s *sum32) writeByte(b byte) {
 	*s = (*s ^ sum32(b)) * prime32a
 }
 
-func (s *sum32) writeUint16(b uint16) {
+func (s *sum32) writeUint32(b uint32) {
 	h := *s
-	h = (h ^ sum32(b>>8)) * prime32a
-	h = (h ^ sum32(b&255)) * prime32a
+	h = (h ^ sum32((b>>24)&0xff)) * prime32a
+	h = (h ^ sum32((b>>16)&0xff)) * prime32a
+	h = (h ^ sum32((b>>8)&0xff)) * prime32a
+	h = (h ^ sum32(b&0xff)) * prime32a
 	*s = h
 }
 
