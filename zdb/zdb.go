@@ -136,7 +136,7 @@ func (h *header) rd(b []byte) error {
 // Any object ([]byte) can be used as the (hdb) DB root.
 //
 // The zdb model extends the hdb model with a hashmap of []byte keys to []byte
-// values, (sub)partitioned with a table/zone/partition numeric IDs (16 bit).
+// values, (sub)partitioned with a table/zone/partition numeric IDs (uint32).
 // The hashmap has a huge (hundreds of MB) fixed index prepended to the "real"
 // hdb data. This overhead is a tradeoff between disk space and hashmap access
 // speed, cf.  the specialization of this package as described in the package
