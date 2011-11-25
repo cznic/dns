@@ -18,6 +18,9 @@ Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns/msg
 Install: $ goinstall github.com/cznic/dns/named
 Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns/named
 
+Install: $ goinstall github.com/cznic/dns/pcat
+Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns/pcat
+
 Install: $ goinstall github.com/cznic/dns/resolv
 Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns/resolv
 
