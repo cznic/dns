@@ -106,10 +106,10 @@ yystart1:
 		goto yyabort
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z':
 		goto yystate2
-	case c == '\t' || c == ' ':
-		goto yystate5
 	case c == '#':
 		goto yystate6
+	case c == '\t' || c == ' ':
+		goto yystate5
 	}
 
 yystate2:
@@ -150,10 +150,10 @@ yystate5:
 	switch {
 	default:
 		goto yyrule4
-	case c == '\t' || c == ' ':
-		goto yystate5
 	case c == '#':
 		goto yystate6
+	case c == '\t' || c == ' ':
+		goto yystate5
 	}
 
 yystate6:
@@ -178,10 +178,10 @@ yystart7:
 		goto yystate8
 	case c == '#':
 		goto yystate6
-	case c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
-		goto yystate13
 	case c == ':':
 		goto yystate34
+	case c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
+		goto yystate13
 	}
 
 yystate8:
@@ -189,14 +189,14 @@ yystate8:
 	switch {
 	default:
 		goto yyrule2
-	case c >= '0' && c <= '9':
-		goto yystate9
-	case c == ':':
-		goto yystate12
 	case c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
 		goto yystate14
 	case c == '.':
 		goto yystate22
+	case c >= '0' && c <= '9':
+		goto yystate9
+	case c == ':':
+		goto yystate12
 	}
 
 yystate9:
@@ -204,12 +204,12 @@ yystate9:
 	switch {
 	default:
 		goto yyrule2
-	case c == ':':
-		goto yystate12
-	case c >= '0' && c <= '9':
-		goto yystate10
 	case c == '.':
 		goto yystate22
+	case c >= '0' && c <= '9':
+		goto yystate10
+	case c == ':':
+		goto yystate12
 	case c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
 		goto yystate15
 	}
@@ -241,10 +241,10 @@ yystate12:
 	switch {
 	default:
 		goto yyabort
-	case c == ':':
-		goto yystate16
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
 		goto yystate13
+	case c == ':':
+		goto yystate16
 	}
 
 yystate13:
@@ -316,10 +316,10 @@ yystate19:
 	switch {
 	default:
 		goto yyrule2
-	case c == ':':
-		goto yystate21
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
 		goto yystate20
+	case c == ':':
+		goto yystate21
 	}
 
 yystate20:
@@ -465,10 +465,10 @@ yystate35:
 	switch {
 	default:
 		goto yyrule1
-	case c == '\t' || c == ' ':
-		goto yystate35
 	case c == '#':
 		goto yystate6
+	case c == '\t' || c == ' ':
+		goto yystate35
 	}
 
 yyrule1: // [ \t]+

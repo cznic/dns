@@ -89,10 +89,10 @@ yystart4:
 	switch {
 	default:
 		goto yyrule2
-	case c == '\x00':
-		goto yystate6
 	case c == '\n':
 		goto yystate5
+	case c == '\x00':
+		goto yystate6
 	}
 
 yystate5:
@@ -102,10 +102,10 @@ yystate5:
 	switch {
 	default:
 		goto yyrule2
-	case c == '\x00':
-		goto yystate6
 	case c == '\n':
 		goto yystate5
+	case c == '\x00':
+		goto yystate6
 	}
 
 yystate6:

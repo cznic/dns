@@ -121,7 +121,7 @@ func testNewOpen(t *testing.T, pth string, hashWidth, ptrBytes int) (e error) {
 		return err
 	}
 
-	t.Logf("%s: %s, HashWidth %d, PtrBytes %d, file size %d(0x%x), s.delta() %d(0x%x)", me(), fn, s.HashWidth, s.PtrBytes, fi.Size, fi.Size, s.delta(), s.delta())
+	t.Logf("%s: %s, HashWidth %d, PtrBytes %d, file size %d(0x%x), s.delta() %d(0x%x)", me(), fn, s.HashWidth, s.PtrBytes, fi.Size(), fi.Size(), s.delta(), s.delta())
 
 	if s, err = Open(fn); err != nil {
 		return err
@@ -319,13 +319,13 @@ func testBenchGet(hashWidth, ptrBytes, n int) (ns, sz int64, err error) {
 	}()
 
 	fi, _ := s.accessor.Stat()
-	sz = fi.Size
+	sz = fi.Size()
 	ch := make(chan error, *optCores+1)
 	chunk := n / *optCores
 	if chunk == 0 {
 		chunk++
 	}
-	ns = time.Nanoseconds()
+	ns = time.Now().UnixNano()
 	goroutines := 0
 	for from := 0; from < n; from += chunk {
 		to := min(from+chunk, n) - 1
@@ -360,7 +360,7 @@ func testBenchGet(hashWidth, ptrBytes, n int) (ns, sz int64, err error) {
 		}
 	}
 
-	ns = time.Nanoseconds() - ns
+	ns = time.Now().UnixNano() - ns
 	return
 }
 

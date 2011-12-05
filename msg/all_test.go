@@ -26,7 +26,7 @@ func init() {
 		panic(err)
 	}
 
-	rng.Seed(time.Nanoseconds())
+	rng.Seed(time.Now().UnixNano())
 }
 
 func test0b(t *testing.T, domain string, addr net.IP, all bool) {

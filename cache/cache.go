@@ -16,7 +16,7 @@ import (
 	"time"
 )
 
-var secs0 = time.Seconds()
+var secs0 = time.Now().Unix()
 
 // Secs0 returns the app start time in epoch seconds.
 func Secs0() int64 {
@@ -73,7 +73,7 @@ func (c *Cache) add(name string, rrs rr.RRs) {
 		return
 	}
 
-	now := time.Seconds()
+	now := time.Now().Unix()
 	for _, part := range newparts {
 		for _, rec := range part {
 			rec.TTL = int32(now - secs0 + int64(rec.TTL))
@@ -109,7 +109,7 @@ func (c *Cache) get0(name string) (parts rr.Parts, hit, expired bool) {
 	var item rr.Bytes
 	if item, hit = c.tree.Get(name).(rr.Bytes); hit {
 		parts = item.Unpack().Partition(false)
-		expired = tidy(time.Seconds()-secs0, parts)
+		expired = tidy(time.Now().Unix()-secs0, parts)
 		hit = len(parts) != 0
 	}
 	return
@@ -153,7 +153,7 @@ func (c *Cache) Get(name string) (rrs rr.RRs, hit bool) {
 	defer c.rwm.RUnlock() // R--
 
 	var parts rr.Parts
-	now := time.Seconds()
+	now := time.Now().Unix()
 	if parts, hit = c.get(name); hit {
 		rrs = parts.Join()
 		for _, v := range rrs {

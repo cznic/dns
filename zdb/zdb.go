@@ -66,10 +66,13 @@ func (a *hdbAccessor) ReadAt(b []byte, off int64) (n int, err error) {
 	return a.accessor.ReadAt(b, off+a.delta)
 }
 
-func (a *hdbAccessor) Stat() (fi *os.FileInfo, err error) {
-	fi, err = a.accessor.Stat()
-	fi.Size -= a.delta
-	return
+func (a *hdbAccessor) Stat() (fi os.FileInfo, err error) {
+	if fi, err = a.accessor.Stat(); err != nil {
+		return
+	}
+	i := storage.NewFileInfo(fi)
+	i.FSize -= a.delta
+	return i, nil
 }
 
 func (a *hdbAccessor) Sync() (err error) {

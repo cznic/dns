@@ -111,17 +111,17 @@ func RootedName(name string) string {
 
 // Seconds2String converts epoch seconds to a string with the YYYYMMDDHHmmSS format.
 func Seconds2String(epochSecs int64) string {
-	return time.SecondsToUTC(int64(epochSecs)).Format(timeLayout)
+	return time.Unix(int64(epochSecs), 0).UTC().Format(timeLayout)
 }
 
 // String2Seconds converts s to epoch seconds. Input string s must be in the YYYYMMDDHHmmSS format
 // or a plain unsigned decadic number < 2^32.
 func String2Seconds(s string) (secs int64, err error) {
 	if len(s) > 10 { // human readable format
-		var t *time.Time
+		var t time.Time
 		t, err = time.Parse(timeLayout, s)
 		if err == nil {
-			secs = t.Seconds()
+			secs = t.Unix()
 		}
 		return
 	}

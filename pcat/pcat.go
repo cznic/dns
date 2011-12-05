@@ -4,8 +4,8 @@
 
 // blame: jnml, labs.nic.cz
 
-// Package pcat supports reading files produce by the pcat utility which is a
-// part of the NLnetLabs' ldns project.
+// Package pcat supports reading files produced by the pcat utility which is a
+// part of the NLnet Labs' ldns project.
 //
 // See also: http://nlnetlabs.nl/projects/ldns/
 package pcat

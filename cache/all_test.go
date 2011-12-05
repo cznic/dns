@@ -24,7 +24,7 @@ func init() {
 }
 
 func TestSecs0(t *testing.T) {
-	if delta := Secs0() - time.Seconds(); delta < 0 || delta > 1 {
+	if delta := Secs0() - time.Now().Unix(); delta < 0 || delta > 1 {
 		t.Fatal(delta)
 	}
 }

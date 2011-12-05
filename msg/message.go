@@ -34,9 +34,9 @@ func init() {
 		for {
 			idgen.mtx.Lock() // X++
 			x := int64(idgen.rng.Next())
-			idgen.rng.Seed(x + time.Nanoseconds())
+			idgen.rng.Seed(x + time.Now().UnixNano())
 			idgen.mtx.Unlock() // X--
-			<-time.After((600 + x&0xFF) * 1e9)
+			<-time.After(time.Duration((600 + x&0xFF) * 1e9))
 		}
 	}()
 }
