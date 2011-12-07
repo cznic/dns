@@ -16,6 +16,7 @@ import (
 )
 
 type lex struct {
+	ofs     int64
 	buf     []byte
 	column  int
 	current byte
@@ -50,11 +51,12 @@ func (l *lex) getc() (b byte, err error) {
 		}
 		err = nil
 	}
+	l.ofs++
 	l.current = b
 	return
 }
 
-// Record captures data form one record in the pcat produced text file.
+// Record captures data from one record in the pcat produced text file.
 type Record struct {
 	Id    int    // Sequential number
 	Query []byte // What was sent to server in wire format

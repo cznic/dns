@@ -127,7 +127,7 @@ func String2Seconds(s string) (secs int64, err error) {
 	}
 
 	// plain
-	secs, err = strconv.Atoi64(s)
+	secs, err = strconv.ParseInt(s, 10, 64)
 	if err == nil && (secs < 0 || secs >= math.MaxUint32) {
 		err = fmt.Errorf("invalid time %q", s)
 	}

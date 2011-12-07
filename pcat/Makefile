@@ -7,10 +7,11 @@ include $(GOROOT)/src/Make.inc
 TARG=github.com/cznic/dns/pcat
 
 GOFILES=\
+	db.go\
 	pcat.go\
 	scanner.go\
 
-CLEANFILES += lex.yy.go *~
+CLEANFILES += lex.yy.go temp_db *~
 
 include $(GOROOT)/src/Make.pkg
 

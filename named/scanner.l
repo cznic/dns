@@ -408,7 +408,7 @@ zone-statistics             ret = tZONE_STATS
 		k = 1<<30
 		w--
 	}
-	lval.u64, err = strconv.Atoui64(string(l.buf[:w]))
+	lval.u64, err = strconv.ParseUint(string(l.buf[:w]), 10, 64)
 	if err != nil || lval.u64 > uint64(math.MaxInt64) / k {
 		panic(fmt.Errorf("invalid numeric value %q", l.buf))
 	}

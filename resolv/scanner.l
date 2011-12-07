@@ -160,7 +160,10 @@ name           {let_or_digit}(({let_or_digit}|"-")*{let_or_digit})?
 
 <opts>[0-9]+
 	var err error
-	if lval.num, err = strconv.Atoui(string(l.buf)); err == nil {
+	var n64 uint64
+	n64, err = strconv.ParseUint(string(l.buf), 10, 0)
+	lval.num = uint(n64)
+	if err == nil {
 		return tDECADIC
 	}
 

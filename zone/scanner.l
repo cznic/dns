@@ -224,7 +224,7 @@ label          {let-or-digit}(({let-or-digit}|"-")*{let-or-digit})?
 	/* RR TTL */
 <rrHead,num>[0-9]+
 	lval.str = string(l.buf)
-	lval.u64, err = strconv.Atoui64(lval.str)
+	lval.u64, err = strconv.ParseUint(lval.str, 10, 64)
 	if err != nil {
 		panic(fmt.Errorf("invalid number %q", l.buf))
 	}

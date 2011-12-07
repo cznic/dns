@@ -8,6 +8,7 @@ package pcat
 
 import (
 	"fmt"
+	"os"
 	"regexp"
 	"strings"
 	"testing"
@@ -109,4 +110,116 @@ func TestScannerB(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+}
+
+func mkrec(id, part int) (r Record) {
+	r.Id = id
+	r.Query = make([]byte, 16+id&0x1f)
+	for i := range r.Query {
+		r.Query[i] = byte(id + i + part)
+	}
+	r.Reply = make([]byte, 16+id&0x1f)
+	for i := range r.Reply {
+		r.Reply[i] = byte(id - i - part)
+	}
+	return
+}
+
+func TestDB(t *testing.T) {
+	const (
+		recs  = 400
+		parts = 10
+	)
+
+	fn := "temp_db"
+	db, err := NewDB(fn)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer func() {
+		var err error
+		if db != nil {
+			err = db.Close()
+		}
+		os.Remove(fn)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}()
+
+	t.Log("DB created")
+	for recn := 0; recn < recs; recn++ {
+		for part := 0; part < parts; part++ {
+			r := mkrec(recn, part)
+			if err := db.RSet(uint32(part), &r); err != nil {
+				db.Close()
+				t.Fatal(err)
+			}
+		}
+	}
+	t.Log("DB written")
+	for recn := 0; recn < recs; recn++ {
+		for part := 0; part < parts; part++ {
+			g, ok, err := db.RGet(uint32(part), recn)
+			if err != nil {
+				db.Close()
+				db = nil
+				t.Fatal(err)
+			}
+
+			if !ok {
+				db.Close()
+				db = nil
+				t.Fatal(recn, part, " record not found")
+			}
+
+			e := mkrec(recn, part)
+			if gs, es := g.String(), e.String(); gs != es {
+				db.Close()
+				db = nil
+				t.Errorf("rec: %d, part: %d\nexp:\n%s\ngot:\n%s", recn, part, gs, es)
+			}
+
+		}
+	}
+	t.Log("DB checked")
+
+	err = db.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Log("DB closed")
+	db, err = OpenDB(fn)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Log("DB opened")
+	for recn := 0; recn < recs; recn++ {
+		for part := 0; part < parts; part++ {
+			g, ok, err := db.RGet(uint32(part), recn)
+			if err != nil {
+				db.Close()
+				db = nil
+				t.Fatal(err)
+			}
+
+			if !ok {
+				db.Close()
+				db = nil
+				t.Fatal(recn, part, " record not found")
+			}
+
+			e := mkrec(recn, part)
+			if gs, es := g.String(), e.String(); gs != es {
+				db.Close()
+				db = nil
+				t.Errorf("rec: %d, part: %d\nexp:\n%s\ngot:\n%s", recn, part, gs, es)
+			}
+
+		}
+	}
+	t.Log("DB checked")
 }
