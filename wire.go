@@ -27,12 +27,13 @@ func (s CharString) Encode(b *Wirebuf) {
 }
 
 // Implementation of Wirer
-func (s *CharString) Decode(b []byte, pos *int) (err error) {
+func (s *CharString) Decode(b []byte, pos *int, sniffer WireDecodeSniffer) (err error) {
 	p := *pos
 	if p >= len(b) {
 		return fmt.Errorf("CharString.Decode() - buffer underflow")
 	}
 
+	p0 := &b[*pos]
 	n := int(b[p])
 	*pos += 1
 	if p+n >= len(b) {
@@ -41,6 +42,9 @@ func (s *CharString) Decode(b []byte, pos *int) (err error) {
 	}
 	*s = CharString(b[p+1 : p+n+1])
 	*pos += n
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], SniffCharString, *s)
+	}
 	return
 }
 
@@ -72,8 +76,7 @@ func (s DomainName) Encode(b *Wirebuf) {
 	}
 }
 
-// Implementation of Wirer
-func (s *DomainName) Decode(b []byte, pos *int) (err error) {
+func (s *DomainName) decode(b []byte, pos *int) (err error) {
 	labels := []string{}
 	label := CharString("")
 	for {
@@ -83,13 +86,13 @@ func (s *DomainName) Decode(b []byte, pos *int) (err error) {
 
 		if b[*pos]&0xC0 == 0xC0 { // compressed
 			var ptr Octets2
-			if err = ptr.Decode(b, pos); err != nil {
+			if err = ptr.Decode(b, pos, nil); err != nil {
 				return
 			}
 
 			p := int(ptr) ^ 0xC000
 			var name DomainName
-			if err = name.Decode(b, &p); err != nil {
+			if err = name.decode(b, &p); err != nil {
 				return
 			}
 
@@ -98,7 +101,7 @@ func (s *DomainName) Decode(b []byte, pos *int) (err error) {
 			return
 		}
 
-		if err = label.Decode(b, pos); err != nil {
+		if err = label.Decode(b, pos, nil); err != nil {
 			return
 		}
 
@@ -116,6 +119,19 @@ func (s *DomainName) Decode(b []byte, pos *int) (err error) {
 	panic("unreachable")
 }
 
+// Implementation of Wirer
+func (s *DomainName) Decode(b []byte, pos *int, sniffer WireDecodeSniffer) (err error) {
+	ip0 := *pos
+	if err = s.decode(b, pos); err != nil {
+		return
+	}
+
+	if sniffer != nil {
+		sniffer(&b[ip0], &b[*pos-1], SniffDomainName, *s)
+	}
+	return
+}
+
 // Octet is a byte implementing Wirer.
 type Octet byte
 
@@ -125,13 +141,17 @@ func (o Octet) Encode(b *Wirebuf) {
 }
 
 // Implementation of Wirer
-func (o *Octet) Decode(b []byte, pos *int) (err error) {
+func (o *Octet) Decode(b []byte, pos *int, sniffer WireDecodeSniffer) (err error) {
 	p := *pos
 	if p+1 > len(b) {
 		return fmt.Errorf("Octet.Decode() - buffer underflow")
 	}
+	p0 := &b[*pos]
 	*o = Octet(b[p])
 	*pos += 1
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], SniffOctet, *o)
+	}
 	return
 }
 
@@ -144,13 +164,17 @@ func (n Octets2) Encode(b *Wirebuf) {
 }
 
 // Implementation of Wirer
-func (n *Octets2) Decode(b []byte, pos *int) (err error) {
+func (n *Octets2) Decode(b []byte, pos *int, sniffer WireDecodeSniffer) (err error) {
 	p := *pos
 	if p+2 > len(b) {
 		return fmt.Errorf("Octets2.Decode() - buffer underflow")
 	}
+	p0 := &b[*pos]
 	*n = Octets2(b[p])<<8 + Octets2(b[p+1])
 	*pos = p + 2
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], SniffOctets2, *n)
+	}
 	return
 }
 
@@ -163,13 +187,17 @@ func (n Octets4) Encode(b *Wirebuf) {
 }
 
 // Implementation of Wirer
-func (n *Octets4) Decode(b []byte, pos *int) (err error) {
+func (n *Octets4) Decode(b []byte, pos *int, sniffer WireDecodeSniffer) (err error) {
 	p := *pos
 	if p+4 > len(b) {
 		return fmt.Errorf("Octets4.Decode() - buffer underflow")
 	}
+	p0 := &b[*pos]
 	*n = Octets4(b[p])<<24 + Octets4(b[p+1])<<16 + Octets4(b[p+2])<<8 + Octets4(b[p+3])
 	*pos = p + 4
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], SniffOctets4, *n)
+	}
 	return
 }
 
@@ -196,6 +224,54 @@ func (w *Wirebuf) DisableCompression() {
 	w.zip--
 }
 
+// WireDecodeSniffed tags data passed to WireDecodeSniffer
+type WireDecodeSniffed int
+
+// Values of WireDecodeSniffed
+const (
+	_                    WireDecodeSniffed = iota
+	SniffCharString                        // A domain name label
+	SniffClass                             // A CLASS
+	SniffDomainName                        // A domain name
+	SniffEXT_RCODE                         // An EXT_RCODE
+	SniffHeader                            // A DNS message header
+	SniffIPV4                              // An IP V4 address
+	SniffIPV6                              // An IP V6 address
+	SniffMessage                           // A DNS message
+	SniffOPT_DATA                          // OPT resource record attr/value pair
+	SniffOctet                             // An octet
+	SniffOctets2                           // Two octets
+	SniffOctets4                           // Four octets
+	SniffQuestion                          // A DNS message question
+	SniffQuestionItem                      // A DNS message question item
+	SniffRData                             // Resource record data
+	SniffRDataA                            // A resource record data
+	SniffRDataAAAA                         // AAAA resource record data
+	SniffRDataCNAME                        // CNAME resource record data
+	SniffRDataDNAME                        // DNAME resource record data
+	SniffRDataDNSKEY                       // DNSKEY resource record data
+	SniffRDataDS                           // DS resource record data
+	SniffRDataMX                           // MX resource record data
+	SniffRDataNODATA                       // NODATA pseudo resource record data
+	SniffRDataNS                           // NS resource record data
+	SniffRDataNSEC3                        // NSEC3 resource record data
+	SniffRDataNSEC3PARAM                   // NSEC3PARAM resource record data
+	SniffRDataOPT                          // OPT resource record data
+	SniffRDataPTR                          // PTR resource record data
+	SniffRDataRRSIG                        // RRSIG resource record data
+	SniffRDataSOA                          // SOA resource record data
+	SniffRDataTXT                          // TXT resource record data
+	SniffRR                                // Any or unknown/unsupported type resource record
+	SniffType                              // A TYPE
+)
+
+// WireDecodeSniffer is the type of the hook called by Wirer.Decode.  p0 points
+// to a wire buffer on entry to Decode, p to the last byte of the buffer used
+// on leaving the same.  tag describes what was pulled from the wire buffer and
+// info may optionally carry the just decoded entity (or a pointer to the same
+// when more ćonvenient).
+type WireDecodeSniffer func(p0, p *byte, tag WireDecodeSniffed, info interface{})
+
 // Wirer is a DNS wire format encoder/decoder.
 type Wirer interface {
 	// Encode appends data in DNS wire format to Wirebuf.Buf.
@@ -204,5 +280,6 @@ type Wirer interface {
 	// Decode decodes data from a DNS wire format in b, starting at p.
 	// Decode may return a non nil Error if b is not in the correct format.
 	// After Decode, p is adjusted to reflect the amount of data consumed from b.
-	Decode(b []byte, p *int) error
+	// If sniffer is not nil it is invoked with a description of the decoded stuff.
+	Decode(b []byte, p *int, sniffer WireDecodeSniffer) error
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/cznic/dns"
 	"github.com/cznic/dns/rr"
 	"github.com/cznic/mathutil"
+	"errors"
 	"fmt"
 	"io"
 	"math"
@@ -180,14 +181,26 @@ func (m *Header) Encode(b *dns.Wirebuf) {
 	dns.Octets2(m.ARCOUNT).Encode(b)
 }
 
+func bufp0(b []byte, pos *int) (p *byte, err error) {
+	if *pos >= len(b) {
+		return nil, errors.New(fmt.Sprintf("Can't decode, wire buffer has not enough data (ofs 0x%x)", *pos))
+	}
+
+	return &b[*pos], nil
+}
+
 // Implementation of dns.Wirer
-func (m *Header) Decode(b []byte, pos *int) (err error) {
-	if err = (*dns.Octets2)(&m.ID).Decode(b, pos); err != nil {
+func (m *Header) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	var p0 *byte
+	if p0, err = bufp0(b, pos); err != nil {
+		return
+	}
+	if err = (*dns.Octets2)(&m.ID).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
 	var w dns.Octets2
-	if err = w.Decode(b, pos); err != nil {
+	if err = w.Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
@@ -211,25 +224,25 @@ func (m *Header) Decode(b []byte, pos *int) (err error) {
 	w >>= 4
 	m.QR = w&1 != 0
 
-	if w.Decode(b, pos); err != nil {
+	if w.Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
 	m.QDCOUNT = uint16(w)
 
-	if w.Decode(b, pos); err != nil {
+	if w.Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
 	m.ANCOUNT = uint16(w)
 
-	if w.Decode(b, pos); err != nil {
+	if w.Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
 	m.NSCOUNT = uint16(w)
 
-	if w.Decode(b, pos); err != nil {
+	if w.Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
@@ -237,6 +250,9 @@ func (m *Header) Decode(b []byte, pos *int) (err error) {
 
 	if m.Z {
 		err = fmt.Errorf("invalid DNS message header Z:%t", m.Z)
+	}
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffHeader, m)
 	}
 	return
 }
@@ -278,32 +294,47 @@ func (m *Message) Encode(b *dns.Wirebuf) {
 }
 
 // Implementation of dns.Wirer
-func (m *Message) Decode(b []byte, pos *int) (err error) {
-	if err = m.Header.Decode(b, pos); err != nil {
+func (m *Message) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	var p0 *byte
+	if p0, err = bufp0(b, pos); err != nil {
+		return
+	}
+	if err = m.Header.Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
 	m.Question = make([]*QuestionItem, m.QDCOUNT)
-	if err = m.Question.Decode(b, pos); err != nil {
-		return
+	if m.QDCOUNT != 0 {
+		if err = m.Question.Decode(b, pos, sniffer); err != nil {
+			return
+		}
 	}
 
-	if err = decodeRRs(&m.Answer, m.ANCOUNT, b, pos); err != nil {
-		return
+	if m.ANCOUNT != 0 {
+		if err = decodeRRs(&m.Answer, m.ANCOUNT, b, pos, sniffer); err != nil {
+			return
+		}
 	}
 
-	if err = decodeRRs(&m.Authority, m.NSCOUNT, b, pos); err != nil {
-		return
+	if m.NSCOUNT != 0 {
+		if err = decodeRRs(&m.Authority, m.NSCOUNT, b, pos, sniffer); err != nil {
+			return
+		}
 	}
 
-	if err = decodeRRs(&m.Additional, m.ARCOUNT, b, pos); err != nil {
-		return
+	if m.ARCOUNT != 0 {
+		if err = decodeRRs(&m.Additional, m.ARCOUNT, b, pos, sniffer); err != nil {
+			return
+		}
 	}
 
 	if *pos != len(b) {
 		return fmt.Errorf("Message.Decode() - %d extra bytes", *pos-len(b))
 	}
 
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffMessage, m)
+	}
 	return
 }
 
@@ -398,7 +429,7 @@ func (m *Message) ReceiveTCP(conn *net.TCPConn, rxbuf []byte) (n int, err error)
 	}
 
 	p := 0
-	err = m.Decode(rxbuf, &p)
+	err = m.Decode(rxbuf, &p, nil)
 	return
 }
 
@@ -412,7 +443,7 @@ func (m *Message) ReceiveUDP(conn *net.UDPConn, rxbuf []byte) (n int, addr *net.
 	}
 
 	p := 0
-	err = m.Decode(rxbuf[:n], &p)
+	err = m.Decode(rxbuf[:n], &p, nil)
 	return
 }
 
@@ -436,7 +467,7 @@ func ExchangeWire(conn net.Conn, w, rxbuf []byte) (n int, reply *Message, err er
 
 	reply = &Message{}
 	p := 0
-	if err = reply.Decode(rxbuf[:n], &p); err != nil {
+	if err = reply.Decode(rxbuf[:n], &p, nil); err != nil {
 		reply = nil
 	}
 	return
@@ -715,14 +746,21 @@ func (n QType) String() (s string) {
 type Question []*QuestionItem
 
 // Implementation of dns.Wirer
-func (q Question) Decode(b []byte, pos *int) (err error) {
+func (q Question) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	var p0 *byte
+	if p0, err = bufp0(b, pos); err != nil {
+		return
+	}
 	for i := range q {
 		qi := &QuestionItem{}
-		if err = qi.Decode(b, pos); err != nil {
+		if err = qi.Decode(b, pos, sniffer); err != nil {
 			return
 		}
 
 		q[i] = qi
+	}
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffQuestion, q)
 	}
 	return
 }
@@ -794,19 +832,26 @@ func (m *QuestionItem) Encode(b *dns.Wirebuf) {
 }
 
 // Implementation of dns.Wirer
-func (m *QuestionItem) Decode(b []byte, pos *int) (err error) {
-	if err = (*dns.DomainName)(&m.QNAME).Decode(b, pos); err != nil {
+func (m *QuestionItem) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	var p0 *byte
+	if p0, err = bufp0(b, pos); err != nil {
+		return
+	}
+	if err = (*dns.DomainName)(&m.QNAME).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if err = (*dns.Octets2)(&m.QTYPE).Decode(b, pos); err != nil {
+	if err = (*dns.Octets2)(&m.QTYPE).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if err = m.QCLASS.Decode(b, pos); err != nil {
+	if err = m.QCLASS.Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffQuestionItem, m)
+	}
 	return
 }
 
@@ -864,7 +909,7 @@ func (r RCODE) String() string {
 	return fmt.Sprint("%d!", r)
 }
 
-func decodeRRs(rrs *rr.RRs, n uint16, b []byte, pos *int) (err error) {
+func decodeRRs(rrs *rr.RRs, n uint16, b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	if n == 0 {
 		return
 	}
@@ -872,7 +917,7 @@ func decodeRRs(rrs *rr.RRs, n uint16, b []byte, pos *int) (err error) {
 	*rrs = make(rr.RRs, n)
 	for i := range *rrs {
 		r := &rr.RR{}
-		if err = r.Decode(b, pos); err != nil {
+		if err = r.Decode(b, pos, sniffer); err != nil {
 			return
 		}
 

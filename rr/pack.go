@@ -43,7 +43,7 @@ func (b Bytes) Unpack() (y RRs) {
 	pos := 0
 	for pos < len(b) {
 		rec := &RR{}
-		if err := rec.Decode(b, &pos); err != nil {
+		if err := rec.Decode(b, &pos, nil); err != nil {
 			panic(fmt.Errorf("dns.Unpack\n% x\n at %04x %q", b, pos, err))
 		}
 

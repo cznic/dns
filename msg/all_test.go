@@ -74,7 +74,7 @@ func test0b(t *testing.T, domain string, addr net.IP, all bool) {
 
 	rxm := &Message{}
 	p := 0
-	if err = rxm.Decode(rbuf, &p); err != nil {
+	if err = rxm.Decode(rbuf, &p, nil); err != nil {
 		t.Fatal(err)
 	}
 
@@ -93,7 +93,7 @@ func test0b(t *testing.T, domain string, addr net.IP, all bool) {
 
 	compr := &Message{}
 	p = 0
-	if err = compr.Decode(buf2.Buf, &p); err != nil {
+	if err = compr.Decode(buf2.Buf, &p, nil); err != nil {
 		t.Fatal(err)
 	}
 

@@ -7,7 +7,7 @@
 // Package pcat supports reading files produced by the pcat utility which is a
 // part of the NLnet Labs' ldns project.
 //
-// See also: http://nlnetlabs.nl/projects/ldns/
+// See also: http://www.nlnetlabs.nl/svn/ldns/trunk/pcat/README.pcat
 package pcat
 
 import (
