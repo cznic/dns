@@ -58,14 +58,17 @@ func (a *hdbAccessor) Close() error {
 	return e2
 }
 
+// Implementation of storage.Accessor
 func (a *hdbAccessor) Name() string {
 	return a.accessor.Name()
 }
 
+// Implementation of storage.Accessor
 func (a *hdbAccessor) ReadAt(b []byte, off int64) (n int, err error) {
 	return a.accessor.ReadAt(b, off+a.delta)
 }
 
+// Implementation of storage.Accessor
 func (a *hdbAccessor) Stat() (fi os.FileInfo, err error) {
 	if fi, err = a.accessor.Stat(); err != nil {
 		return
@@ -75,16 +78,29 @@ func (a *hdbAccessor) Stat() (fi os.FileInfo, err error) {
 	return i, nil
 }
 
+// Implementation of storage.Accessor
 func (a *hdbAccessor) Sync() (err error) {
 	return a.accessor.Sync()
 }
 
+// Implementation of storage.Accessor
 func (a *hdbAccessor) Truncate(size int64) error {
 	return a.accessor.Truncate(size + a.delta)
 }
 
+// Implementation of storage.Accessor
 func (a *hdbAccessor) WriteAt(b []byte, off int64) (n int, err error) {
 	return a.accessor.WriteAt(b, off+a.delta)
+}
+
+// Implementation of storage.Accessor
+func (a *hdbAccessor) BeginUpdate() error {
+	return a.accessor.BeginUpdate()
+}
+
+// Implementation of storage.Accessor
+func (a *hdbAccessor) EndUpdate() error {
+	return a.accessor.EndUpdate()
 }
 
 func min(a, b int) int {
