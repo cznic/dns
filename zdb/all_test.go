@@ -121,7 +121,10 @@ func testNewOpen(t *testing.T, pth string, hashWidth, ptrBytes int) (e error) {
 		return err
 	}
 
-	t.Logf("%s: %s, HashWidth %d, PtrBytes %d, file size %d(0x%x), s.delta() %d(0x%x)", me(), fn, s.HashWidth, s.PtrBytes, fi.Size(), fi.Size(), s.delta(), s.delta())
+	t.Logf(
+		"%s: %s, HashWidth %d, PtrBytes %d, file size %d(0x%x), s.delta() %d(0x%x)",
+		me(), fn, s.HashWidth, s.PtrBytes, fi.Size(), fi.Size(), s.delta(), s.delta(),
+	)
 
 	if s, err = Open(fn); err != nil {
 		return err
@@ -246,7 +249,10 @@ func testSetGet(hashWidth, ptrBytes, n int) (err error) {
 		}
 
 		if bytes.Compare(value, buf) != 0 {
-			return fmt.Errorf("%s: partition %d, key %q, got value %q, expected %q", me(), partition, key, value, key)
+			return fmt.Errorf(
+				"%s: partition %d, key %q, got value %q, expected %q",
+				me(), partition, key, value, key,
+			)
 		}
 	}
 
@@ -346,7 +352,10 @@ func testBenchGet(hashWidth, ptrBytes, n int) (ns, sz int64, err error) {
 				}
 
 				if !ok {
-					ch <- fmt.Errorf("%s: partition %d, key %q not found", me(), partition, key)
+					ch <- fmt.Errorf(
+						"%s: partition %d, key %q not found",
+						me(), partition, key,
+					)
 				}
 
 			}

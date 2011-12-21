@@ -128,23 +128,33 @@ type header struct {
 
 func (h *header) rd(b []byte) error {
 	if len(b) != 16 {
-		return fmt.Errorf("%s: expected 16 bytes, got %d bytes", me(), len(b))
+		return fmt.Errorf(
+			"%s: expected 16 bytes, got %d bytes", me(), len(b),
+		)
 	}
 
 	if h.magic = b[:6]; bytes.Compare(h.magic, []byte("ZONEDB")) != 0 {
-		return fmt.Errorf("%s: expected magic \"ZONEDB\", got %q", me, h.magic)
+		return fmt.Errorf(
+			"%s: expected magic \"ZONEDB\", got %q", me, h.magic,
+		)
 	}
 
 	if h.hashWidth = b[6]; h.hashWidth < 8 || h.hashWidth > 30 {
-		return fmt.Errorf("%s: expected hashWidth in 8...30, got %d", me, h.hashWidth)
+		return fmt.Errorf(
+			"%s: expected hashWidth in 8...30, got %d", me, h.hashWidth,
+		)
 	}
 
 	if h.ptrBytes = b[7]; h.ptrBytes < 4 || h.ptrBytes > 7 {
-		return fmt.Errorf("%s: expected ptrBytes in 4...7, got %d", me, h.ptrBytes)
+		return fmt.Errorf(
+			"%s: expected ptrBytes in 4...7, got %d", me, h.ptrBytes,
+		)
 	}
 
 	if h.reserved = b[8:]; bytes.Compare(h.reserved, []byte{0, 0, 0, 0, 0, 0, 0, 0}) != 0 {
-		return fmt.Errorf("%s: expected reserved all zeros, got \"% x\"", me, h.reserved)
+		return fmt.Errorf(
+			"%s: expected reserved all zeros, got \"% x\"", me, h.reserved,
+		)
 	}
 
 	return nil
@@ -233,7 +243,12 @@ func New(fn string, hashWidth, ptrBytes int) (s *Store, err error) {
 		return nil, fmt.Errorf("%s: %s", me(), err)
 	}
 
-	b := []byte{'Z', 'O', 'N', 'E', 'D', 'B', byte(s.HashWidth), byte(s.PtrBytes), 0, 0, 0, 0, 0, 0, 0, 0}
+	b := []byte{
+		'Z', 'O', 'N', 'E', 'D', 'B',
+		byte(s.HashWidth),
+		byte(s.PtrBytes),
+		0, 0, 0, 0, 0, 0, 0, 0,
+	}
 	if n, err := s.accessor.WriteAt(b, 0); n != len(b) || err != nil {
 		return nil, fmt.Errorf("%s: %s", me(), err)
 	}

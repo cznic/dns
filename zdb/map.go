@@ -9,6 +9,7 @@ package zdb
 import (
 	"bytes"
 	"github.com/cznic/fileutil/falloc"
+	"github.com/cznic/fileutil/storage"
 )
 
 /* 
@@ -63,69 +64,80 @@ func (s *Store) compose(next falloc.Handle, partition uint32, key, value []byte)
 
 // Set stores value under partition, key in Store and returns an error if any.
 func (s *Store) Set(partition uint32, key, value []byte) (err error) {
-	lenK := len(key)
-	var h = newFNV1a()
-	h.writeUint32(partition)
-	h.write(key)
-	var ptrbuf = make([]byte, s.PtrBytes)
-	hdelta := s.hdelta(h.hash(s.HashWidth))
-	if _, err = s.accessor.ReadAt(ptrbuf, hdelta); err != nil {
-		return
-	}
-
-	handle := s.getHandle(ptrbuf)
-	if handle == 0 { // no collision, not set before
-		if handle, err = s.Store.New(s.compose(0, partition, key, value)); err != nil {
+	return storage.Mutate(s.accessor, func() (err error) {
+		lenK := len(key)
+		var h = newFNV1a()
+		h.writeUint32(partition)
+		h.write(key)
+		var ptrbuf = make([]byte, s.PtrBytes)
+		hdelta := s.hdelta(h.hash(s.HashWidth))
+		if _, err = s.accessor.ReadAt(ptrbuf, hdelta); err != nil {
 			return
 		}
 
-		return s.setHandle(handle, hdelta)
-	}
-
-	// collision or overwrite existing
-	var chunk []byte
-	for {
-		if chunk, err = s.Store.Get(handle); err != nil {
-			return
-		}
-
-		if len(chunk) < s.PtrBytes+8 {
-			return &falloc.ECorrupted{s.accessor.Name(), int64(handle) << 4}
-		}
-
-		rdoff := s.PtrBytes
-		rdpartition := uint32(chunk[rdoff])<<24 | uint32(chunk[rdoff+1])<<16 | uint32(chunk[rdoff+2])<<8 | uint32(chunk[rdoff+3])
-		rdoff += 4
-		if rdpartition == partition {
-			rdLenK := int(chunk[rdoff])<<8 | int(chunk[rdoff+1])
-			rdoff += 4
-			if rdLenK == lenK { // chunk key length OK
-				if rdoff+lenK > len(chunk) {
-					return &falloc.ECorrupted{s.accessor.Name(), int64(handle) << 4}
-				}
-
-				if bytes.Compare(key, chunk[rdoff:rdoff+lenK]) == 0 { // hit, overwrite
-					rdoff += lenK
-					next := s.getHandle(chunk)
-					return s.Store.Set(handle, s.compose(next, partition, key, value))
-				}
-			}
-		}
-
-		next := s.getHandle(chunk)
-		if next == 0 { // collision, not set before
-			if next, err = s.Store.New(s.compose(0, partition, key, value)); err != nil {
+		handle := s.getHandle(ptrbuf)
+		if handle == 0 { // no collision, not set before
+			if handle, err = s.Store.New(s.compose(0, partition, key, value)); err != nil {
 				return
 			}
 
-			s.putHandle(next, chunk)          // link
-			return s.Store.Set(handle, chunk) // write back updated chunk
+			return s.setHandle(handle, hdelta)
 		}
 
-		handle = next
-	}
+		// collision or overwrite existing
+		var chunk []byte
+		for {
+			if chunk, err = s.Store.Get(handle); err != nil {
+				return
+			}
 
-	panic("unreachable")
+			if len(chunk) < s.PtrBytes+8 {
+				return &falloc.ECorrupted{s.accessor.Name(), int64(handle) << 4}
+			}
+
+			rdoff := s.PtrBytes
+			rdpartition := uint32(chunk[rdoff])<<24 |
+				uint32(chunk[rdoff+1])<<16 |
+				uint32(chunk[rdoff+2])<<8 |
+				uint32(chunk[rdoff+3])
+			rdoff += 4
+			if rdpartition == partition {
+				rdLenK := int(chunk[rdoff])<<8 | int(chunk[rdoff+1])
+				rdoff += 4
+				if rdLenK == lenK { // chunk key length OK
+					if rdoff+lenK > len(chunk) {
+						return &falloc.ECorrupted{
+							s.accessor.Name(),
+							int64(handle) << 4,
+						}
+					}
+
+					if bytes.Compare(key, chunk[rdoff:rdoff+lenK]) == 0 { // hit, overwrite
+						rdoff += lenK
+						next := s.getHandle(chunk)
+						return s.Store.Set(
+							handle,
+							s.compose(next, partition, key, value),
+						)
+					}
+				}
+			}
+
+			next := s.getHandle(chunk)
+			if next == 0 { // collision, not set before
+				if next, err = s.Store.New(s.compose(0, partition, key, value)); err != nil {
+					return
+				}
+
+				s.putHandle(next, chunk)          // link
+				return s.Store.Set(handle, chunk) // write back updated chunk
+			}
+
+			handle = next
+		}
+
+		panic("unreachable")
+	})
 }
 
 // Get reads the value associated with partition, key in Store. It returns the
@@ -159,7 +171,10 @@ func (s *Store) Get(partition uint32, key []byte) (value []byte, ok bool, err er
 		}
 
 		rdoff := s.PtrBytes
-		rdpartition := uint32(chunk[rdoff])<<24 | uint32(chunk[rdoff+1])<<16 | uint32(chunk[rdoff+2])<<8 | uint32(chunk[rdoff+3])
+		rdpartition := uint32(chunk[rdoff])<<24 |
+			uint32(chunk[rdoff+1])<<16 |
+			uint32(chunk[rdoff+2])<<8 |
+			uint32(chunk[rdoff+3])
 		rdoff += 4
 		if rdpartition == partition { // chunk partition OK
 			rdLenK := int(chunk[rdoff])<<8 | int(chunk[rdoff+1])
@@ -168,13 +183,19 @@ func (s *Store) Get(partition uint32, key []byte) (value []byte, ok bool, err er
 			rdoff += 2
 			if rdLenK == lenK { // chunk key length OK
 				if rdoff+lenK > len(chunk) {
-					return nil, false, &falloc.ECorrupted{s.accessor.Name(), int64(handle) << 4}
+					return nil, false, &falloc.ECorrupted{
+						s.accessor.Name(),
+						int64(handle) << 4,
+					}
 				}
 
 				if bytes.Compare(key, chunk[rdoff:rdoff+lenK]) == 0 { // hit
 					rdoff += lenK
 					if rdoff+rdLenV != len(chunk) {
-						return nil, false, &falloc.ECorrupted{s.accessor.Name(), int64(handle) << 4}
+						return nil, false, &falloc.ECorrupted{
+							s.accessor.Name(),
+							int64(handle) << 4,
+						}
 					}
 
 					// Success
