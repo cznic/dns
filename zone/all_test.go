@@ -4,13 +4,17 @@
 
 // blame: jnml, labs.nic.cz
 
-
 package zone
 
 import (
 	"github.com/cznic/dns/rr"
+	"flag"
+	"os"
 	"testing"
+	"time"
 )
+
+var optZone = flag.String("zone", "", "text zone file for the parser benchmark")
 
 func TestLoad(t *testing.T) {
 	if err := Load(
@@ -31,4 +35,42 @@ func TestCompiler(t *testing.T) {
 
 func TestLoadBinary(t *testing.T) {
 	t.Log("TODO") //TODO
+}
+
+func BenchmarkParser(b *testing.B) {
+	b.StopTimer()
+	fn := *optZone
+	if fn == "" {
+		b.Fatal("use -zone to specify the source file")
+	}
+
+	fi, err := os.Stat(fn)
+	if err != nil {
+		b.Fatal(err)
+	}
+	b.SetBytes(fi.Size())
+	n := 0
+	t0 := time.Now()
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		if err := Load(
+			fn,
+			func(e string) bool {
+				b.Fatal(e)
+				panic("unreachable")
+			},
+			func(*rr.RR) bool {
+				n++
+				return true
+			},
+		); err != nil {
+			b.Fatal(err)
+		}
+	}
+	t1 := time.Now()
+	b.StopTimer()
+	d := t1.Sub(t0)
+	T := d.Seconds()
+	b.Logf("Parsed %d RRs in %v, %.0f RRs/sec", n, d, float64(n)/T)
 }

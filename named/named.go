@@ -24,7 +24,6 @@ import (
 // System named.conf name
 var Sys = "/etc/bind/named.conf" //TODO:LSB only
 
-
 type formatter interface {
 	str(f strutil.Formatter)
 }
