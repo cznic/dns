@@ -50,7 +50,7 @@ func test0b(t *testing.T, domain string, addr net.IP, all bool) {
 	}
 	defer c.Close()
 
-	c.SetTimeout(5e9)
+	c.SetDeadline(time.Now().Add(5 * time.Second))
 
 	t.Logf("remote %s, local %s", raddr, c.LocalAddr())
 	n, err := c.Write(buf.Buf)
@@ -140,7 +140,7 @@ func TestExchange0(t *testing.T) {
 
 	defer c.Close()
 
-	c.SetTimeout(1e6)
+	c.SetDeadline(time.Now().Add(time.Millisecond))
 	close(m.GoExchange(c, 2000, ch))
 	<-time.Tick(1e9)
 }
@@ -157,7 +157,7 @@ func TestExchange1(t *testing.T) {
 
 	defer c.Close()
 
-	c.SetTimeout(1e6)
+	c.SetDeadline(time.Now().Add(time.Millisecond))
 	re := <-m.GoExchange(c, 2000, ch)
 	if re.error == nil {
 		t.Fatal(20)
@@ -178,7 +178,7 @@ func TestExchange2(t *testing.T) {
 
 	defer c.Close()
 
-	c.SetTimeout(5e9)
+	c.SetDeadline(time.Now().Add(5 * time.Second))
 	re := <-m.GoExchange(c, 2000, ch)
 	if re.error != nil {
 		t.Fatal(20, re.error)
@@ -202,14 +202,14 @@ func TestExchange3(t *testing.T) {
 	}
 
 	defer c.Close()
-	c.SetTimeout(5e9)
+	c.SetDeadline(time.Now().Add(5 * time.Second))
 	c2, err := net.DialUDP("udp", nil, &net.UDPAddr{net.ParseIP("8.8.4.4"), 53})
 	if err != nil {
 		t.Fatal(20, err)
 	}
 
 	defer c2.Close()
-	c2.SetTimeout(5e9)
+	c2.SetDeadline(time.Now().Add(5 * time.Second))
 	ch := m.GoExchange(c, 2000, m2.GoExchange(c2, 2000, nil))
 
 	re := <-ch

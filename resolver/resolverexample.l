@@ -188,23 +188,23 @@ cmd        c|g|t
 {ip_address}
 	go func(s string) {
 		ip := net.ParseIP(s)
-		t0 := time.Nanoseconds()
+		t0 := time.Now()
 		hosts, err := r.GetHostByAddr(ip)
-		t1 := time.Nanoseconds()
+		t1 := time.Now()
 		var y string
 		if err != nil {
 			y = fmt.Sprintf("!!! GetHostByAddr(%q): %s", s, err)
 		} else {
 			y = fmt.Sprintf(">>> %q %s", s, hosts)
 		}
-		fmt.Printf("%s t = %.3g s\n", y, float64(t1-t0)/1e9)
+		fmt.Printf("%s t = %.3g s\n", y, float64(t1.Sub(t0))/1e9)
 	}(string(buf))
 
 {hex4}|{hostname}
 	go func(name string) {
-		t0 := time.Nanoseconds()
+		t0 := time.Now()
 		ipList, cnames, err := r.GetHostByName(name, preferIPv6)
-		t1 := time.Nanoseconds()
+		t1 := time.Now()
 		var y string
 		if err != nil {
 			y = fmt.Sprintf("!!! GetHostByName(%q): %s", name, err)
@@ -215,7 +215,7 @@ cmd        c|g|t
 			}
 			y += fmt.Sprintf(" %s", ipList)
 		}
-		fmt.Printf("%s t = %.3g s\n", y, float64(t1-t0)/1e9)
+		fmt.Printf("%s t = %.3g s\n", y, float64(t1.Sub(t0))/1e9)
 	}(string(buf))
 
 

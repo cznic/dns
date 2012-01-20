@@ -642,7 +642,7 @@ asking:
 
 				defer c.Close()
 
-				c.SetTimeout(int64(slist.conf.Conf.Opt.TimeoutSecs) * 1e9)
+				c.SetDeadline(time.Now().Add(time.Duration(slist.conf.Conf.Opt.TimeoutSecs) * time.Second))
 				if _, reply, err = m.ExchangeBuf(c, rxbuf); err != nil {
 					if r.log.Level >= dns.LOG_ERRORS {
 						r.log.Log("FAIL ExchangeBuf: %s", err)
