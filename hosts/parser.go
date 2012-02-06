@@ -267,10 +267,9 @@ yydefault:
 					}
 				}
 
-				/* the current p has no shift onn "error", pop stack */
+				/* the current p has no shift on "error", pop stack */
 				if yyDebug >= 2 {
-					fmt.Printf("error recovery pops state %d, uncovers %d\n",
-						yyS[yyp].yys, yyS[yyp-1].yys)
+					fmt.Printf("error recovery pops state %d\n", yyS[yyp].yys)
 				}
 				yyp--
 			}

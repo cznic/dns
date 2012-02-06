@@ -10,9 +10,9 @@ package zone
 
 import (
 	"bufio"
+	"fmt"
 	"github.com/cznic/dns/rr"
 	"github.com/cznic/fileutil"
-	"fmt"
 	"io"
 	"os"
 	"strings"

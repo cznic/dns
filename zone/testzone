@@ -17,6 +17,7 @@ nHINFO.example.com. IN HINFO "x86_\"64" "Linux"
 nISDN.example.com. IN ISDN "\"phone"
 nISDN.example.com. IN ISDN "\"phone" "\"home"
 nKEY.example.com. IN KEY 2 3 4 CwwNDg8QERIT
+nKX.example.com. IN KX 4660 exchanger.example.com.
 
 ;nLOC.example.com.	IN	10	LOC  0 0.000 N   0 0.000 W          1m 10000m 10m
 ;----------------------------------------------------------------------------------------
@@ -35,6 +36,12 @@ nMG.example.com. IN MG exchange.example.com.
 nMINFO.example.com. IN MINFO a.example.com. b.example.com.
 nMR.example.com. IN MR exchange.example.com.
 nMX.example.com. IN MX 4660 exchange.example.com.
+
+nNAPTR.example.com IN NAPTR 100 10 "U" "E2U+sip" "!^.*$!sip:customer-service@example.com!" .
+nNAPTR.example.com IN NAPTR 102 10 "U" "E2U+email" "!^.*$!mailto:information@example.com!" .
+nNAPTR.example.com IN NAPTR 100 10 "S" "SIP+D2U" "!^.*$!sip:customer-service@example.com!" _sip._udp.example.com.
+nNAPTR.example.com IN NAPTR 102 10 "S" "SIP+D2T" "!^.*$!sip:customer-service@example.com!" _sip._tcp.example.com.
+
 nNS.example.com. IN NS ns.example.com
 nNSAP.example.com. IN NSAP 0x01
 nNSAP.example.com. IN NSAP 0x.12
@@ -62,6 +69,12 @@ nRRSIG.example.com. IN RRSIG A 3 2 3 20101231205012 20001231235959 4660 signer.e
 nRT.example.com. IN RT 12345 x.example.com.
 nSIG.example.com. IN SIG A 3 2 3 20101231205012 20001231235959 4660 signer.example.com. AAZAAQAAAAM=
 nSOA.example.com. IN SOA mname.example.com. rname.example.com. 305419896 1193046 624485 4913 38930
+_sip._tcp.nSRV.example.com. 86400 IN SRV 10 60 5060 bigbox.example.com.
+_sip._tcp.nSRV.example.com. 86400 IN SRV 10 20 5060 smallbox1.example.com.
+_sip._tcp.nSRV.example.com. 86400 IN SRV 10 10 5060 smallbox2.example.com.
+_sip._tcp.nSRV.example.com. 86400 IN SRV 10 10 5066 smallbox2.example.com.
+_sip._tcp.nSRV.example.com. 86400 IN SRV 20 0 5060 backupbox.example.com.
+nMX.example.com. IN MX 4660 exchange.example.com.
 nDNSKEY.example.com. 86400 IN DNSKEY 256 3 5 ( AQPSKmynfzW4kyBv015MUG2DeIQ3
                                        Cbl+BBZH4b/0PY1kxkmvHjcZc8no
                                        kfzj31GajIQKY+5CptLr3buXA10h

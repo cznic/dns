@@ -8,13 +8,13 @@
 package resolver
 
 import (
+	"fmt"
 	"github.com/cznic/dns"
 	"github.com/cznic/dns/cache"
 	"github.com/cznic/dns/hosts"
 	"github.com/cznic/dns/msg"
 	"github.com/cznic/dns/resolv"
 	"github.com/cznic/dns/rr"
-	"fmt"
 	"log"
 	"net"
 	"os"

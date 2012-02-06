@@ -11,10 +11,10 @@ package hosts
 
 import (
 	"bytes"
-	"github.com/cznic/dns"
-	"github.com/cznic/fileutil"
 	"errors"
 	"fmt"
+	"github.com/cznic/dns"
+	"github.com/cznic/fileutil"
 	"io/ioutil"
 	"net"
 	"os"

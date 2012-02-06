@@ -7,8 +7,8 @@
 package dns
 
 import (
-	"github.com/cznic/mathutil"
 	"fmt"
+	"github.com/cznic/mathutil"
 	"net"
 	"sort"
 	"strings"

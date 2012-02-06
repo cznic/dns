@@ -8,9 +8,9 @@
 package xfr
 
 import (
+	"fmt"
 	"github.com/cznic/dns/msg"
 	"github.com/cznic/dns/rr"
-	"fmt"
 	"net"
 )
 

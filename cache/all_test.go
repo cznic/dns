@@ -7,9 +7,9 @@
 package cache
 
 import (
-	"github.com/cznic/dns/rr"
 	"flag"
 	"fmt"
+	"github.com/cznic/dns/rr"
 	"net"
 	"runtime"
 	"testing"

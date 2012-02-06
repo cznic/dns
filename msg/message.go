@@ -8,11 +8,11 @@
 package msg
 
 import (
+	"errors"
+	"fmt"
 	"github.com/cznic/dns"
 	"github.com/cznic/dns/rr"
 	"github.com/cznic/mathutil"
-	"errors"
-	"fmt"
 	"io"
 	"math"
 	"net"

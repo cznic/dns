@@ -12,10 +12,10 @@ package named
 
 import (
 	"bytes"
-	"github.com/cznic/dns/rr"
-	"github.com/cznic/strutil"
 	"errors"
 	"fmt"
+	"github.com/cznic/dns/rr"
+	"github.com/cznic/strutil"
 	"io/ioutil"
 	"net"
 	"strings"

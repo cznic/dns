@@ -47,6 +47,11 @@ func (s *CharString) Decode(b []byte, pos *int, sniffer WireDecodeSniffer) (err 
 	return
 }
 
+// Quoted returns s with `"` escaped as `\"`
+func (s CharString) Quoted() string {
+	return strings.Replace(string(s), `"`, `\"`, -1)
+}
+
 // DomainName is a DNS <domain-name> (RFC 1035) implementing Wirer.
 type DomainName string
 
@@ -255,6 +260,7 @@ const (
 	SniffRDataHINFO                        // HINFO resource record data
 	SniffRDataISDN                         // ISDN resource record data
 	SniffRDataKEY                          // KEY resource record data
+	SniffRDataKX                           // KX resource record data
 	SniffRDataLOC                          // LOC resource record data
 	SniffRDataMB                           // MB resource record data
 	SniffRDataMD                           // MD resource record data
@@ -263,6 +269,7 @@ const (
 	SniffRDataMINFO                        // MINFO resource record data
 	SniffRDataMR                           // MR resource record data
 	SniffRDataMX                           // MX resource record data
+	SniffRDataNAPTR                        // NAPTR pseudo resource record data
 	SniffRDataNODATA                       // NODATA pseudo resource record data
 	SniffRDataNS                           // NS resource record data
 	SniffRDataNSAP                         // NSAP resource record data
@@ -278,6 +285,7 @@ const (
 	SniffRDataRRSIG                        // RRSIG resource record data
 	SniffRDataSIG                          // SIG resource record data
 	SniffRDataSOA                          // SOA resource record data
+	SniffRDataSRV                          // SRV resource record data
 	SniffRDataTXT                          // TXT resource record data
 	SniffRDataWKS                          // WKS resource record data
 	SniffRDataX25                          // X25 resource record data

@@ -130,6 +130,7 @@ type rrHead struct{
 	tBASE32EXT
 	tBASE64
 	tDOMAIN_NAME
+	tSRV_DOMAIN
 	tQSTR
 
 %token	<float>
@@ -173,6 +174,7 @@ type rrHead struct{
 	hinfo
 	isdn
 	key
+	kx
 	loc
 	mb
 	md
@@ -181,6 +183,7 @@ type rrHead struct{
 	minfo
 	mr
 	mx
+	naptr
 	ns
 	nsap
 	nsap_ptr
@@ -195,13 +198,16 @@ type rrHead struct{
 	rt
 	sig
 	soa
+	srv
 	txt
 	wks
 	x25
 
 %type <rr>
 	rr
+	srv_rr
 	rr2
+	srv_rr2
 
 %type <rrh>
 	rrHead
@@ -421,6 +427,21 @@ key:
 	}
 
 
+kx:
+	tKX
+	{
+		yylex.begin(sc_NUM)
+	}
+	uint16
+	{
+		yylex.begin(sc_DOMAIN)
+	}
+	tDOMAIN_NAME
+	{
+		$$ = &rr.KX{uint16($3), $5}
+	}
+
+
 line:
 	'\n'
 	{
@@ -436,6 +457,17 @@ line:
 		yylex.begin(sc_RRHEAD)
 	}
 	rr
+	{
+		$3.Name = $1
+		if !yylex.rrHandler($3) {
+			goto ret0
+		}
+	}
+|	tSRV_DOMAIN
+	{
+		yylex.begin(sc_RRHEAD)
+	}
+	srv_rr
 	{
 		$3.Name = $1
 		if !yylex.rrHandler($3) {
@@ -690,6 +722,21 @@ mx:
 	}
 
 
+naptr:
+	tNAPTR
+	{
+		yylex.begin(sc_NUM)
+	}
+	uint16 uint16 tQSTR tQSTR tQSTR
+	{
+		yylex.begin(sc_ANY_DOMAIN)
+	}
+	tDOMAIN_NAME
+	{
+		$$ = &rr.NAPTR{uint16($3), uint16($4), $5, $6, $7, $9}
+	}
+
+
 ns:
   	tNS
 	{
@@ -809,6 +856,22 @@ rp:
 	}
 
 
+srv_rr:
+	{
+		yylex.begin(sc_RRHEAD)
+	}
+	srv_rr2
+	{
+		$$ = $2
+	}
+
+
+srv_rr2:
+	rrHead srv
+	{
+		$$ = &rr.RR{"", rr.TYPE_SRV, $1.class, $1.ttl, $2}
+	}
+
 rr:
 	{
 		yylex.begin(sc_RRHEAD)
@@ -852,6 +915,10 @@ rr2:
 	{
 		$$ = &rr.RR{"", rr.TYPE_KEY, $1.class, $1.ttl, $2}
 	}
+|	rrHead kx
+	{
+		$$ = &rr.RR{"", rr.TYPE_KX, $1.class, $1.ttl, $2}
+	}
 |	rrHead loc
 	{
 		$$ = &rr.RR{"", rr.TYPE_LOC, $1.class, $1.ttl, $2}
@@ -884,6 +951,10 @@ rr2:
 |	rrHead mx
 	{
 		$$ = &rr.RR{"", rr.TYPE_MX, $1.class, $1.ttl, $2}
+	}
+|	rrHead naptr
+	{
+		$$ = &rr.RR{"", rr.TYPE_NAPTR, $1.class, $1.ttl, $2}
 	}
 |	rrHead ns
 	{
@@ -1308,6 +1379,21 @@ soa:
 	uint32 uint32 uint32 uint32 uint32 
 	{
 		$$ = &rr.SOA{$3, $4, uint32($6), uint32($7), uint32($8), uint32($9), uint32($10)}
+	}
+
+
+srv:
+	tSRV
+	{
+		yylex.begin(sc_NUM)
+	}
+	uint16 uint16 uint16
+	{
+		yylex.begin(sc_DOMAIN)
+	}
+	tDOMAIN_NAME
+	{
+		$$ = &rr.SRV{uint16($3), uint16($4), uint16($5), $7}
 	}
 
 

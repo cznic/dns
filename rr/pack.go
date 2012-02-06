@@ -7,8 +7,8 @@
 package rr
 
 import (
-	"github.com/cznic/dns"
 	"fmt"
+	"github.com/cznic/dns"
 )
 
 // Bytes is a packed binary representation of RRs.

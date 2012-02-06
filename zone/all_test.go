@@ -7,9 +7,9 @@
 package zone
 
 import (
-	"github.com/cznic/dns/rr"
 	"errors"
 	"flag"
+	"github.com/cznic/dns/rr"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -32,10 +32,19 @@ func TestLoad(t *testing.T) {
 			if r.TTL < 0 {
 				r.TTL = 12345
 			}
-			if !strings.HasPrefix(r.Name, "n"+rr.Types[r.Type]+".") {
-				err2 = errors.New("fail")
-				t.Error("!!!", r)
-				return false
+			switch r.Type {
+			case rr.TYPE_SRV:
+				if !strings.Contains(r.Name, ".nSRV.") {
+					err2 = errors.New("fail")
+					t.Error("!!!", r)
+					return false
+				}
+			default:
+				if !strings.HasPrefix(r.Name, "n"+rr.Types[r.Type]+".") {
+					err2 = errors.New("fail")
+					t.Error("!!!", r)
+					return false
+				}
 			}
 
 			a += r.String() + "\n"
@@ -69,10 +78,19 @@ func TestLoad(t *testing.T) {
 		fn,
 		nil,
 		func(r *rr.RR) bool {
-			if !strings.HasPrefix(r.Name, "n"+rr.Types[r.Type]+".") {
-				err2 = errors.New("fail")
-				t.Error("!!!", r)
-				return false
+			switch r.Type {
+			case rr.TYPE_SRV:
+				if !strings.Contains(r.Name, ".nSRV.") {
+					err2 = errors.New("fail")
+					t.Error("!!!", r)
+					return false
+				}
+			default:
+				if !strings.HasPrefix(r.Name, "n"+rr.Types[r.Type]+".") {
+					err2 = errors.New("fail")
+					t.Error("!!!", r)
+					return false
+				}
 			}
 
 			b += r.String() + "\n"

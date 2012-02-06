@@ -34,9 +34,9 @@ package zdb
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/cznic/fileutil/hdb"
 	"github.com/cznic/fileutil/storage"
-	"fmt"
 	"os"
 	"path"
 	"runtime"

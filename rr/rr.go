@@ -9,10 +9,10 @@ package rr
 
 import (
 	"bytes"
-	"github.com/cznic/dns"
-	"github.com/cznic/strutil"
 	"encoding/hex"
 	"fmt"
+	"github.com/cznic/dns"
+	"github.com/cznic/strutil"
 	"log"
 	"net"
 	"strconv"
@@ -27,7 +27,9 @@ func init() {
 	}
 }
 
-const timeLayout = "20060201150405"
+func quote(s string) string {
+	return dns.CharString(s).Quoted()
+}
 
 // A holds the zone A RData
 type A struct {
@@ -575,7 +577,7 @@ func (d *HINFO) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err e
 }
 
 func (d *HINFO) String() string {
-	return fmt.Sprintf(`"%s" "%s"`, strings.Replace(d.Cpu, `"`, `\"`, -1), strings.Replace(d.Os, `"`, `\"`, -1))
+	return fmt.Sprintf(`"%s" "%s"`, quote(d.Cpu), quote(d.Os))
 }
 
 // An ISDN (Integrated Service Digital Network) number is simply a telephone
@@ -621,7 +623,7 @@ func (d *ISDN) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err er
 }
 
 func (d *ISDN) String() string {
-	return fmt.Sprintf(`"%s" "%s"`, strings.Replace(d.ISDN, `"`, `\"`, -1), strings.Replace(d.Sa, `"`, `\"`, -1))
+	return fmt.Sprintf(`"%s" "%s"`, quote(d.ISDN), quote(d.Sa))
 }
 
 // The KEY resource record (RR) is used to store a public key that is
@@ -707,6 +709,46 @@ func (d *KEY) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 
 func (d *KEY) String() string {
 	return fmt.Sprintf("%d %d %d %s", d.Flags, d.Protocol, d.Algorithm, strutil.Base64Encode(d.Key))
+}
+
+type KX struct {
+	// A 16 bit non-negative integer which specifies the preference given
+	// to this RR among other KX records at the same owner.  Lower values
+	// are preferred.
+	Preference uint16
+	// A <domain-name> which specifies a host willing to act as a mail
+	// exchange for the owner name.
+	Exchanger string
+}
+
+// Implementation of dns.Wirer
+func (d *KX) Encode(b *dns.Wirebuf) {
+	b.DisableCompression()
+	defer b.EnableCompression()
+
+	dns.Octets2(d.Preference).Encode(b)
+	dns.DomainName(d.Exchanger).Encode(b)
+}
+
+// Implementation of dns.Wirer
+func (d *KX) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	p0 := &b[*pos]
+	if err = (*dns.Octets2)(&d.Preference).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if err = (*dns.DomainName)(&d.Exchanger).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataKX, d)
+	}
+	return
+}
+
+func (d *KX) String() string {
+	return fmt.Sprintf("%d %s", d.Preference, d.Exchanger)
 }
 
 // The LOC record is expressed in a master file in the following format:
@@ -1193,6 +1235,133 @@ func (d *MX) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err erro
 
 func (d *MX) String() string {
 	return fmt.Sprintf("%d %s", d.Preference, d.Exchange)
+}
+
+type NAPTR struct {
+	// A 16-bit unsigned integer specifying the order in which the NAPTR
+	// records MUST be processed in order to accurately represent the
+	// ordered list of Rules.  The ordering is from lowest to highest.  If
+	// two records have the same order value then they are considered to be
+	// the same rule and should be selected based on the combination of the
+	// Preference values and Services offered.
+	Order uint16
+
+	// Although it is called "preference" in deference to DNS terminology,
+	// this field is equivalent to the Priority value in the DDDS
+	// Algorithm.  It is a 16-bit unsigned integer that specifies the order
+	// in which NAPTR records with equal Order values SHOULD be processed,
+	// low numbers being processed before high numbers.  This is similar to
+	// the preference field in an MX record, and is used so domain
+	// administrators can direct clients towards more capable hosts or
+	// lighter weight protocols.  A client MAY look at records with higher
+	// preference values if it has a good reason to do so such as not
+	// supporting some protocol or service very well.
+	// 
+	// The important difference between Order and Preference is that once a
+	// match is found the client MUST NOT consider records with a different
+	// Order but they MAY process records with the same Order but different
+	// Preferences.  The only exception to this is noted in the second
+	// important Note in the DDDS algorithm specification concerning
+	// allowing clients to use more complex Service determination between
+	// steps 3 and 4 in the algorithm.  Preference is used to give
+	// communicate a higher quality of service to rules that are considered
+	// the same from an authority standpoint but not from a simple load
+	// balancing standpoint.
+	// 
+	// It is important to note that DNS contains several load balancing
+	// mechanisms and if load balancing among otherwise equal services
+	// should be needed then methods such as SRV records or multiple A
+	// records should be utilized to accomplish load balancing.
+	Preference uint16
+
+	// A <character-string> containing flags to control aspects of the
+	// rewriting and interpretation of the fields in the record.  Flags are
+	// single characters from the set A-Z and 0-9.  The case of the
+	// alphabetic characters is not significant.  The field can be empty.
+	// 
+	// It is up to the Application specifying how it is using this Database
+	// to define the Flags in this field.  It must define which ones are
+	// terminal and which ones are not.
+	Flags string
+
+	// A <character-string> that specifies the Service Parameters
+	// applicable to this this delegation path.  It is up to the
+	// Application Specification to specify the values found in this field.
+	Services string
+
+	// A <character-string> containing a substitution expression that is
+	// applied to the original string held by the client in order to
+	// construct the next domain name to lookup.  See the DDDS Algorithm
+	// specification for the syntax of this field.
+	// 
+	// As stated in the DDDS algorithm, The regular expressions MUST NOT be
+	// used in a cumulative fashion, that is, they should only be applied
+	// to the original string held by the client, never to the domain name
+	// produced by a previous NAPTR rewrite.  The latter is tempting in
+	// some applications but experience has shown such use to be extremely
+	// fault sensitive, very error prone, and extremely difficult to debug.
+	Regexp string
+
+	// A <domain-name> which is the next domain-name to query for depending
+	// on the potential values found in the flags field.  This field is
+	// used when the regular expression is a simple replacement operation.
+	// Any value in this field MUST be a fully qualified domain-name.  Name
+	// compression is not to be used for this field.
+	// 
+	// This field and the REGEXP field together make up the Substitution
+	// Expression in the DDDS Algorithm.  It is simply a historical
+	// optimization specifically for DNS compression that this field
+	// exists.  The fields are also mutually exclusive.  If a record is
+	// returned that has values for both fields then it is considered to be
+	// in error and SHOULD be either ignored or an error returned.
+	Replacement string
+}
+
+// Implementation of dns.Wirer
+func (d *NAPTR) Encode(b *dns.Wirebuf) {
+	dns.Octets2(d.Order).Encode(b)
+	dns.Octets2(d.Preference).Encode(b)
+	dns.CharString(d.Flags).Encode(b)
+	dns.CharString(d.Services).Encode(b)
+	dns.CharString(d.Regexp).Encode(b)
+	dns.DomainName(d.Replacement).Encode(b)
+}
+
+// Implementation of dns.Wirer
+func (d *NAPTR) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	p0 := &b[*pos]
+	if err = (*dns.Octets2)(&d.Order).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if err = (*dns.Octets2)(&d.Preference).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if err = (*dns.CharString)(&d.Flags).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if err = (*dns.CharString)(&d.Services).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if err = (*dns.CharString)(&d.Regexp).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if err = (*dns.DomainName)(&d.Replacement).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataNAPTR, d)
+	}
+	return
+}
+
+func (d *NAPTR) String() string {
+	return fmt.Sprintf("%d %d \"%s\" \"%s\" \"%s\" %s", d.Order, d.Preference, quote(d.Flags), quote(d.Services), quote(d.Regexp), d.Replacement)
 }
 
 // NODATA is used for negative caching of authoritative answers
@@ -1851,6 +2020,8 @@ func (rr *RR) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 		rr.RData = &ISDN{}
 	case TYPE_KEY:
 		rr.RData = &KEY{}
+	case TYPE_KX:
+		rr.RData = &KX{}
 	case TYPE_LOC:
 		rr.RData = &LOC{}
 	case TYPE_MB:
@@ -1867,6 +2038,8 @@ func (rr *RR) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 		rr.RData = &MR{}
 	case TYPE_MX:
 		rr.RData = &MX{}
+	case TYPE_NAPTR:
+		rr.RData = &NAPTR{}
 	case TYPE_NODATA:
 		rr.RData = &NODATA{}
 	case TYPE_NS:
@@ -1899,6 +2072,8 @@ func (rr *RR) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 		rr.RData = &SIG{}
 	case TYPE_SOA:
 		rr.RData = &SOA{}
+	case TYPE_SRV:
+		rr.RData = &SRV{}
 	case TYPE_TXT:
 		rr.RData = &TXT{}
 	case TYPE_WKS:
@@ -1980,6 +2155,10 @@ func (a *RR) Equal(b *RR) (equal bool) {
 			x.Protocol == y.Protocol &&
 			x.Algorithm == y.Algorithm &&
 			bytes.Equal(x.Key, y.Key)
+	case *KX:
+		y := b.RData.(*KX)
+		return x.Preference == y.Preference &&
+			strings.ToLower(x.Exchanger) == strings.ToLower(y.Exchanger)
 	case *LOC:
 		y := b.RData.(*LOC)
 		return x.Version == y.Version &&
@@ -2012,6 +2191,14 @@ func (a *RR) Equal(b *RR) (equal bool) {
 		y := b.RData.(*MX)
 		return x.Preference == y.Preference &&
 			strings.ToLower(x.Exchange) == strings.ToLower(y.Exchange)
+	case *NAPTR:
+		y := b.RData.(*NAPTR)
+		return x.Order == y.Order &&
+			x.Preference == y.Preference &&
+			x.Flags == y.Flags &&
+			x.Services == y.Services &&
+			x.Regexp == y.Regexp &&
+			strings.ToLower(x.Replacement) == strings.ToLower(y.Replacement)
 	case *NODATA:
 		y := b.RData.(*NODATA)
 		return x.Type == y.Type
@@ -2086,6 +2273,12 @@ func (a *RR) Equal(b *RR) (equal bool) {
 			x.Retry == y.Retry &&
 			x.Expire == y.Expire &&
 			x.Minimum == y.Minimum
+	case *SRV:
+		y := b.RData.(*SRV)
+		return x.Priority == y.Priority &&
+			x.Weight == y.Weight &&
+			x.Port == y.Port &&
+			strings.ToLower(x.Target) == strings.ToLower(y.Target)
 	case *TXT:
 		return x.S == b.RData.(*TXT).S
 	case *WKS:
@@ -2599,6 +2792,98 @@ func (d *SOA) String() string {
 	return fmt.Sprintf("%s %s %d %d %d %d %d", d.MName, d.RName, d.Serial, d.Refresh, d.Retry, d.Expire, d.Minimum)
 }
 
+type SRV struct {
+	// The priority of this target host.  A client MUST attempt to contact
+	// the target host with the lowest-numbered priority it can reach;
+	// target hosts with the same priority SHOULD be tried in an order
+	// defined by the weight field.  The range is 0-65535.  This is a 16
+	// bit unsigned integer in network byte order.
+	Priority uint16
+	// A server selection mechanism.  The weight field specifies a relative
+	// weight for entries with the same priority. Larger weights SHOULD be
+	// given a proportionately higher probability of being selected. The
+	// range of this number is 0-65535.  This is a 16 bit unsigned integer
+	// in network byte order.  Domain administrators SHOULD use Weight 0
+	// when there isn't any server selection to do, to make the RR easier
+	// to read for humans (less noisy).  In the presence of records
+	// containing weights greater than 0, records with weight 0 should have
+	// a very small chance of being selected.
+	//
+	// In the absence of a protocol whose specification calls for the use
+	// of other weighting information, a client arranges the SRV RRs of the
+	// same Priority in the order in which target hosts, specified by the
+	// SRV RRs, will be contacted. The following algorithm SHOULD be used
+	// to order the SRV RRs of the same priority:
+	//
+	// To select a target to be contacted next, arrange all SRV RRs (that
+	// have not been ordered yet) in any order, except that all those with
+	// weight 0 are placed at the beginning of the list.
+	//
+	// Compute the sum of the weights of those RRs, and with each RR
+	// associate the running sum in the selected order. Then choose a
+	// uniform random number between 0 and the sum computed (inclusive),
+	// and select the RR whose running sum value is the first in the
+	// selected order which is greater than or equal to the random number
+	// selected.  The target host specified in the selected SRV RR is the
+	// next one to be contacted by the client.  Remove this SRV RR from the
+	// set of the unordered SRV RRs and apply the described algorithm to
+	// the unordered SRV RRs to select the next target host.  Continue the
+	// ordering process until there are no unordered SRV RRs.  This process
+	// is repeated for each Priority.
+	Weight uint16
+	// The port on this target host of this service.  The range is 0-
+	// 65535.  This is a 16 bit unsigned integer in network byte order.
+	// This is often as specified in Assigned Numbers but need not be.
+	Port uint16
+	// The domain name of the target host.  There MUST be one or more
+	// address records for this name, the name MUST NOT be an alias (in the
+	// sense of RFC 1034 or RFC 2181).  Implementors are urged, but not
+	// required, to return the address record(s) in the Additional Data
+	// section.  Unless and until permitted by future standards action,
+	// name compression is not to be used for this field.
+	//
+	// A Target of "." means that the service is decidedly not available at
+	// this domain.
+	Target string
+}
+
+// Implementation of dns.Wirer
+func (d *SRV) Encode(b *dns.Wirebuf) {
+	dns.Octets2(d.Priority).Encode(b)
+	dns.Octets2(d.Weight).Encode(b)
+	dns.Octets2(d.Port).Encode(b)
+	dns.DomainName(d.Target).Encode(b)
+}
+
+// Implementation of dns.Wirer
+func (d *SRV) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	p0 := &b[*pos]
+	if err = (*dns.Octets2)(&d.Priority).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if err = (*dns.Octets2)(&d.Weight).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if err = (*dns.Octets2)(&d.Port).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if err = (*dns.DomainName)(&d.Target).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataSRV, d)
+	}
+	return
+}
+
+func (d *SRV) String() string {
+	return fmt.Sprintf("%d %d %d %s", d.Priority, d.Weight, d.Port, d.Target)
+}
+
 // TXT holds the TXT RData
 type TXT struct {
 	S string
@@ -2629,7 +2914,7 @@ func (t *TXT) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 }
 
 func (t *TXT) String() string {
-	return fmt.Sprintf(`"%s"`, strings.Replace(t.S, `"`, `\"`, -1))
+	return fmt.Sprintf(`"%s"`, quote(t.S))
 }
 
 // The WKS record is used to describe the well known services supported by
@@ -2976,5 +3261,5 @@ func (d *X25) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 }
 
 func (d *X25) String() string {
-	return fmt.Sprintf(`"%s"`, strings.Replace(d.PSDN, `"`, `\"`, -1))
+	return fmt.Sprintf(`"%s"`, quote(d.PSDN))
 }

@@ -131,6 +131,7 @@ const (
 	sc_PORT // 11
 	sc_0XHEX // 12
 	sc_FLOAT // 13
+	sc_ANY_DOMAIN // 14
 )
 
 
@@ -174,14 +175,17 @@ ipv4           {byte}"."{byte}"."{byte}"."{byte}
 ipv6           {hexpart}
 
 domain-name    {label}("."{label})*\.?|\.
+srv-domain     {srv-label}"."{srv-label}"."{domain-name}
+any-domain     ({srv-label}"."{srv-label})?"."{domain-name}?
 let-or-digit   [a-zA-Z0-9]
 label          {let-or-digit}(({let-or-digit}|"-")*{let-or-digit})?
+srv-label      _{label}
 
 float_lit	{D}"."{D}?{E}?|{D}{E}|"."{D}{E}?
 D		[0-9]+
 E		[eE][-+]?[0-9]+
 
-%x rrHead domain num ipv4 ipv6 base32ext base64 type hex proto port xhex float
+%x rrHead domain num ipv4 ipv6 base32ext base64 type hex proto port xhex float anydomain
 
 %%
 	if ret >= 0 {
@@ -215,12 +219,18 @@ E		[eE][-+]?[0-9]+
 
 <*>\)
 	if !l.inParen {
-		l.Error(`enexpected ")"`)
+		l.Error(`unexpected ")"`)
 	}
 	l.inParen = false
 	ret = '\n'
 
 ^{domain-name}
+	ret = tDOMAIN_NAME
+
+^{srv-domain}
+	ret = tSRV_DOMAIN
+
+<anydomain>{any-domain}
 	ret = tDOMAIN_NAME
 
 ^[ \t]+

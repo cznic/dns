@@ -192,6 +192,8 @@ func Test0(t *testing.T) {
 		&RR{"nKEY.example.com.", TYPE_KEY, CLASS_IN, -1,
 			&KEY{2, 3, 4,
 				[]byte{11, 12, 13, 14, 15, 16, 17, 18, 19}}},
+		&RR{"nKX.example.com.", TYPE_KX, CLASS_IN, -1,
+			&KX{0x1234, "exchanger.example.com."}},
 		&RR{"nLOC.example.com.", TYPE_LOC, CLASS_IN, -1,
 			loc},
 		&RR{"nMB.example.com.", TYPE_MB, CLASS_IN, -1,
@@ -208,6 +210,8 @@ func Test0(t *testing.T) {
 			&MR{"exchange.example.com."}},
 		&RR{"nMX.example.com.", TYPE_MX, CLASS_IN, -1,
 			&MX{0x1234, "exchange.example.com."}},
+		&RR{"nNAPTR.example.com.", TYPE_NAPTR, CLASS_IN, -1,
+			&NAPTR{1, 2, "U", "E2U+sip", "!^.*$!sip:customer-service@example.com!", "."}},
 		&RR{"nNS.example.com.", TYPE_NS, CLASS_IN, -1,
 			&NS{"ns.example.com."}},
 		&RR{"nNSAP.example.com.", TYPE_NSAP, CLASS_IN, -1,
@@ -244,6 +248,8 @@ func Test0(t *testing.T) {
 		},
 		&RR{"nSOA.example.com.", TYPE_SOA, CLASS_IN, -1,
 			&SOA{"mname.example.com.", "rname.example.com.", 0x12345678, 0x123456, 0x98765, 0x1331, 0x9812}},
+		&RR{"nSRV.example.com.", TYPE_SRV, CLASS_IN, -1,
+			&SRV{1, 2, 4, "y.example.com."}},
 		&RR{"nTXT.example.com.", TYPE_TXT, CLASS_IN, -1,
 			&TXT{"the quick \" brown fox"}},
 		&RR{"nWKS.example.com.", TYPE_WKS, CLASS_IN, -1,
@@ -289,11 +295,11 @@ func Test0(t *testing.T) {
 						break
 					}
 					if c1 := line1[j]; c2 != c1 {
-						t.Errorf("@ %d 0x%x != 0x%x", j, c2, c1)
+						t.Errorf("@ 0x%x 0x%x != 0x%x", j, c2, c1)
 						break
 					}
 				}
-				t.Fatalf("line %d\ng:%q\ne:%q", i, line2, line2)
+				t.Fatalf("line %d\ng:%q\ne:%q", i, line2, line1)
 			}
 		}
 	}
