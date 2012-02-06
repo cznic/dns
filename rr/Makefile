@@ -9,6 +9,8 @@ TARG=github.com/cznic/dns/rr
 GOFILES=\
 	bitmap.go\
 	pack.go\
+	port.go\
+	proto.go\
 	rr.go\
 	tree.go\
 

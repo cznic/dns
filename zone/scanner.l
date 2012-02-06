@@ -23,6 +23,7 @@ import(
 	"io"
 	"net"
 	"strconv"
+	"strings"
 	"unicode"
 )
 
@@ -116,17 +117,20 @@ func (l *lex) begin(sc int) {
 
 
 const (
-	sc_INITIAL = iota
-	sc_RRHEAD
-	sc_DOMAIN
-	sc_NUM
-	sc_IPV4
-	sc_IPV6
-	sc_BASE32EXT
-	sc_BASE64
-	sc_TYPE
-	sc_HEX
-	sc_QSTR
+	sc_INITIAL = iota // 0
+	sc_RRHEAD // 1
+	sc_DOMAIN // 2
+	sc_NUM // 3
+	sc_IPV4 // 4
+	sc_IPV6 // 5
+	sc_BASE32EXT  // 6
+	sc_BASE64  // 7
+	sc_TYPE // 8
+	sc_HEX // 9
+	sc_PROTO // 10
+	sc_PORT // 11
+	sc_0XHEX // 12
+	sc_FLOAT // 13
 )
 
 
@@ -136,10 +140,16 @@ func (l *lex) Lex(lval *yySymType) (ret int) {
 	/* debug helper
 	defer func(sc0 int) {
 		var s string
-		if ret > 255 {
-			if x := ret - 0xE002; x < len(yyToknames) {
-				s = yyToknames[x]
+		switch {
+		case ret < 127:
+			s = fmt.Sprintf("%q", rune(ret))
+		default:
+			i := ret-0xe002
+			if i < len(yyToknames) {
+				s = yyToknames[ret-0xe002]
+				break
 			}
+			s = fmt.Sprintf("?%d?", ret)
 		}
 		fmt.Printf("*lex.Lex() %s:%d:%d - %d %q %s buf %q, sc %d->%d\n", l.name, l.line, l.column, ret, string(ret), s, l.buf, sc0, l.startCond)
 	}(l.startCond) //*/
@@ -167,7 +177,11 @@ domain-name    {label}("."{label})*\.?|\.
 let-or-digit   [a-zA-Z0-9]
 label          {let-or-digit}(({let-or-digit}|"-")*{let-or-digit})?
 
-%x rrHead domain num ipv4 ipv6 base32ext base64 type hex
+float_lit	{D}"."{D}?{E}?|{D}{E}|"."{D}{E}?
+D		[0-9]+
+E		[eE][-+]?[0-9]+
+
+%x rrHead domain num ipv4 ipv6 base32ext base64 type hex proto port xhex float
 
 %%
 	if ret >= 0 {
@@ -211,6 +225,9 @@ label          {let-or-digit}(({let-or-digit}|"-")*{let-or-digit})?
 
 ^[ \t]+
 	ret = tBLANK_START
+
+<*>\\#
+	ret = tBACKSLASH_HASH
 
 <*>\"(\\.|[^\\"\n\r])*\"
 	lval.str = string(bytes.Replace(l.buf[1:len(l.buf)-1], []byte(`\"`), []byte(`"`), -1))
@@ -267,6 +284,12 @@ label          {let-or-digit}(({let-or-digit}|"-")*{let-or-digit})?
 <rrHead,type>KEY        ret = tKEY
 <rrHead,type>KX         ret = tKX
 <rrHead,type>LOC        ret = tLOC
+<rrHead,type>MB         ret = tMB
+<rrHead,type>MD         ret = tMD
+<rrHead,type>MF         ret = tMF
+<rrHead,type>MG         ret = tMG
+<rrHead,type>MINFO      ret = tMINFO
+<rrHead,type>MR         ret = tMR
 <rrHead,type>MX         ret = tMX
 <rrHead,type>NAPTR      ret = tNAPTR
 <rrHead,type>NIMLOC     ret = tNIMLOC
@@ -277,6 +300,7 @@ label          {let-or-digit}(({let-or-digit}|"-")*{let-or-digit})?
 <rrHead,type>NSEC       ret = tNSEC
 <rrHead,type>NSEC3      ret = tNSEC3
 <rrHead,type>NSEC3PARAM ret = tNSEC3PARAM
+<rrHead,type>NULL       ret = tNULL
 <rrHead,type>NXT        ret = tNXT
 <rrHead,type>PTR        ret = tPTR
 <rrHead,type>PX         ret = tPX
@@ -321,6 +345,16 @@ label          {let-or-digit}(({let-or-digit}|"-")*{let-or-digit})?
 <base64>[A-Za-z0-9+/=]+
 	ret = tBASE64
 
+<xhex>0x({hex}|\.)+
+	var err error
+	s := string(l.buf[2:])
+	s = strings.Replace(s, ".", "", -1)
+	lval.data, err = hex.DecodeString(s)
+	if err != nil {
+		l.Error("expected 0x style hex string")
+	}
+	ret = t0xHEX
+
 <hex>[0-9a-fA-F]+
 	var err error
 	lval.data, err = hex.DecodeString(string(l.buf))
@@ -332,6 +366,19 @@ label          {let-or-digit}(({let-or-digit}|"-")*{let-or-digit})?
 <hex>-
 	lval.data = nil
 	ret = tHEX
+
+<proto>UDP	lval.int, ret = int(rr.UDP_Protocol), tUDP_PROTO
+<proto>TCP	lval.int, ret = int(rr.TCP_Protocol), tTCP_PROTO
+
+<port>SMTP	lval.int, ret = int(rr.SMTP_Port), tSMTP_PORT
+<port>DNS	lval.int, ret = int(rr.DNS_Port), tDNS_PORT
+
+<float>[-+]?{float_lit}
+	if _, err = fmt.Sscanf(string(l.buf), "%f", &lval.float); err != nil {
+		l.Error(err.Error())
+	}
+	ret = tFLOAT
+
 
 %%
 	// no pattern recognized

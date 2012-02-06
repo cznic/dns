@@ -8,24 +8,93 @@ package zone
 
 import (
 	"github.com/cznic/dns/rr"
+	"errors"
 	"flag"
+	"io/ioutil"
 	"os"
+	"strings"
 	"testing"
 	"time"
 )
 
-var optZone = flag.String("zone", "", "text zone file for the parser benchmark")
+var (
+	optZone = flag.String("zone", "", "text zone file for the parser benchmark")
+	optKeep = flag.Bool("keep", false, "keep generated test files")
+)
 
 func TestLoad(t *testing.T) {
-	if err := Load(
+	var a, b string
+	var err, err2 error
+	if err = Load(
 		"./testzone",
 		nil,
 		func(r *rr.RR) bool {
+			if r.TTL < 0 {
+				r.TTL = 12345
+			}
+			if !strings.HasPrefix(r.Name, "n"+rr.Types[r.Type]+".") {
+				err2 = errors.New("fail")
+				t.Error("!!!", r)
+				return false
+			}
+
+			a += r.String() + "\n"
 			t.Log(r)
 			return true
 		},
 	); err != nil {
 		t.Fatal(err)
+	}
+
+	if err2 != nil {
+		t.Fatal(err2)
+	}
+
+	f, err := ioutil.TempFile("", "gotest")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fn := f.Name()
+	err = ioutil.WriteFile(fn, []byte(a), 0600)
+	ec := f.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ec != nil {
+		t.Fatal(ec)
+	}
+
+	if err = Load(
+		fn,
+		nil,
+		func(r *rr.RR) bool {
+			if !strings.HasPrefix(r.Name, "n"+rr.Types[r.Type]+".") {
+				err2 = errors.New("fail")
+				t.Error("!!!", r)
+				return false
+			}
+
+			b += r.String() + "\n"
+			t.Log(r)
+			return true
+		},
+	); err != nil {
+		if !*optKeep {
+			os.Remove(fn)
+		}
+		t.Fatal(err)
+	}
+
+	if err2 != nil {
+		t.Fatal(err2)
+	}
+
+	if !*optKeep {
+		os.Remove(fn)
+	}
+	if a != b {
+		t.Fatalf("\n%s\n%s", a, b)
 	}
 }
 

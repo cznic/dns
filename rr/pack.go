@@ -31,7 +31,9 @@ func (b *Bytes) Append(rrs RRs) {
 func (b *Bytes) Pack(rrs RRs) {
 	w := dns.NewWirebuf()
 	for _, rec := range rrs {
+		//n0 := len(w.Buf)
 		rec.Encode(w)
+		//fmt.Printf("%d->%d, .Pack(%q)\n", n0, len(w.Buf), rec)
 	}
 	*b = make([]byte, len(w.Buf)) // repack tight
 	copy(*b, w.Buf)
@@ -42,10 +44,12 @@ func (b Bytes) Unpack() (y RRs) {
 	pos := 0
 	for pos < len(b) {
 		rec := &RR{}
+		//n0 := pos
 		if err := rec.Decode(b, &pos, nil); err != nil {
 			panic(fmt.Errorf("dns.Unpack\n% x\n at %04x %q", b, pos, err))
 		}
 
+		//fmt.Printf("%d->%d, .Unpack(%q)\n", n0, pos, rec)
 		y = append(y, rec)
 	}
 	return

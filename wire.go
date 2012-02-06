@@ -246,23 +246,44 @@ const (
 	SniffRData                             // Resource record data
 	SniffRDataA                            // A resource record data
 	SniffRDataAAAA                         // AAAA resource record data
+	SniffRDataAFSDB                        // AFSDB resource record data
 	SniffRDataCNAME                        // CNAME resource record data
 	SniffRDataDNAME                        // DNAME resource record data
 	SniffRDataDNSKEY                       // DNSKEY resource record data
 	SniffRDataDS                           // DS resource record data
+	SniffRDataGPOS                         // GPOS resource record data
+	SniffRDataHINFO                        // HINFO resource record data
+	SniffRDataISDN                         // ISDN resource record data
+	SniffRDataKEY                          // KEY resource record data
+	SniffRDataLOC                          // LOC resource record data
+	SniffRDataMB                           // MB resource record data
+	SniffRDataMD                           // MD resource record data
+	SniffRDataMF                           // MF resource record data
+	SniffRDataMG                           // MG resource record data
+	SniffRDataMINFO                        // MINFO resource record data
+	SniffRDataMR                           // MR resource record data
 	SniffRDataMX                           // MX resource record data
 	SniffRDataNODATA                       // NODATA pseudo resource record data
 	SniffRDataNS                           // NS resource record data
+	SniffRDataNSAP                         // NSAP resource record data
+	SniffRDataNSAP_PTR                     // NSAP-PTR resource record data
 	SniffRDataNSEC3                        // NSEC3 resource record data
 	SniffRDataNSEC3PARAM                   // NSEC3PARAM resource record data
+	SniffRDataNULL                         // NULL resource record data
 	SniffRDataOPT                          // OPT resource record data
 	SniffRDataPTR                          // PTR resource record data
+	SniffRDataPX                           // PX resource record data
+	SniffRDataRT                           // RT resource record data
+	SniffRDataRP                           // RP resource record data
 	SniffRDataRRSIG                        // RRSIG resource record data
+	SniffRDataSIG                          // SIG resource record data
 	SniffRDataSOA                          // SOA resource record data
 	SniffRDataTXT                          // TXT resource record data
+	SniffRDataWKS                          // WKS resource record data
+	SniffRDataX25                          // X25 resource record data
 	SniffRR                                // Any or unknown/unsupported type resource record
 	SniffType                              // A TYPE
-)
+) //TODO +test
 
 // WireDecodeSniffer is the type of the hook called by Wirer.Decode.  p0 points
 // to a wire buffer on entry to Decode, p to the last byte of the buffer used

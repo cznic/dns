@@ -15,8 +15,8 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"strconv"
 	"strings"
-	"time"
 )
 
 const asserts = false
@@ -81,6 +81,46 @@ func (d *AAAA) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err er
 
 func (d *AAAA) String() string {
 	return d.Address.String()
+}
+
+// The AFS (originally the Andrew File System) system uses the DNS to map from
+// a domain name to the name of an AFS cell database server.  The DCE Naming
+// service uses the DNS for a similar function: mapping from the domain name of
+// a cell to authenticated name servers for that cell.  The method uses a new
+// RR type with mnemonic AFSDB and type code of 18 (decimal).
+type AFSDB struct {
+	// The <subtype> field is a 16 bit integer.
+	SubType uint16
+	// The <hostname> field is a domain name of a host that has a server
+	// for the cell named by the owner name of the RR.
+	Hostname string
+}
+
+// Implementation of dns.Wirer
+func (d *AFSDB) Encode(b *dns.Wirebuf) {
+	(dns.Octets2)(d.SubType).Encode(b)
+	(dns.DomainName)(d.Hostname).Encode(b)
+}
+
+// Implementation of dns.Wirer
+func (d *AFSDB) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	p0 := &b[*pos]
+	if err = (*dns.Octets2)(&d.SubType).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if err = (*dns.DomainName)(&d.Hostname).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataAFSDB, d)
+	}
+	return
+}
+
+func (d *AFSDB) String() string {
+	return fmt.Sprintf("%d %s", d.SubType, d.Hostname)
 }
 
 // CNAME holds the zone CNAME RData
@@ -428,6 +468,695 @@ func (d *ip6) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 	return
 }
 
+// The geographical location is defined with the mnemonic GPOS and type code
+// 27.
+//
+// A floating point format was chosen to specify geographical locations for
+// reasons of simplicity.  This also guarantees a concise unambiguous
+// description of a location by enforcing three compulsory numerical values to
+// be specified.
+type GPOS struct {
+	// The real number describing the longitude encoded as a printable
+	// string. The precision is limited by 256 charcters within the range
+	// -90..90 degrees. Positive numbers indicate locations north of the
+	// equator.
+	Longitude float64
+	// The real number describing the latitude encoded as a printable
+	// string. The precision is limited by 256 charcters within the range
+	// -180..180 degrees. Positive numbers indicate locations east of the
+	// prime meridian.
+	Latitude float64
+	// The real number describing the altitude (in meters) from mean
+	// sea-level encoded as a printable string. The precision is limited by
+	// 256 charcters. Positive numbers indicate locations above mean
+	// sea-level.
+	Altitude float64
+}
+
+// Implementation of dns.Wirer
+func (d *GPOS) Encode(b *dns.Wirebuf) {
+	var s dns.CharString
+	s = dns.CharString(fmt.Sprintf("%f", d.Longitude))
+	s.Encode(b)
+	s = dns.CharString(fmt.Sprintf("%f", d.Latitude))
+	s.Encode(b)
+	s = dns.CharString(fmt.Sprintf("%f", d.Altitude))
+	s.Encode(b)
+}
+
+// Implementation of dns.Wirer
+func (d *GPOS) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	p0 := &b[*pos]
+	var s dns.CharString
+
+	if err = s.Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if _, err = fmt.Sscanf(string(s), "%f", &d.Longitude); err != nil {
+		return
+	}
+
+	if err = s.Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if _, err = fmt.Sscanf(string(s), "%f", &d.Latitude); err != nil {
+		return
+	}
+
+	if err = s.Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if _, err = fmt.Sscanf(string(s), "%f", &d.Altitude); err != nil {
+		return
+	}
+
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataGPOS, d)
+	}
+	return
+}
+
+func (d *GPOS) String() string {
+	return fmt.Sprintf("%f %f %f", d.Longitude, d.Latitude, d.Altitude)
+}
+
+// HINFO records are used to acquire general information about a host.  The
+// main use is for protocols such as FTP that can use special procedures when
+// talking between machines or operating systems of the same type.
+type HINFO struct {
+	Cpu string // A <character-string> which specifies the CPU type.
+	Os  string // A <character-string> which specifies the operating system type.
+}
+
+// Implementation of dns.Wirer
+func (d *HINFO) Encode(b *dns.Wirebuf) {
+	(dns.CharString)(d.Cpu).Encode(b)
+	(dns.CharString)(d.Os).Encode(b)
+}
+
+// Implementation of dns.Wirer
+func (d *HINFO) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	p0 := &b[*pos]
+	if err = (*dns.CharString)(&d.Cpu).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if err = (*dns.CharString)(&d.Os).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataHINFO, d)
+	}
+	return
+}
+
+func (d *HINFO) String() string {
+	return fmt.Sprintf(`"%s" "%s"`, strings.Replace(d.Cpu, `"`, `\"`, -1), strings.Replace(d.Os, `"`, `\"`, -1))
+}
+
+// An ISDN (Integrated Service Digital Network) number is simply a telephone
+// number.  The intent of the members of the CCITT is to upgrade all telephone
+// and data network service to a common service.
+//
+// The <ISDN-address> field is required; <sa> is optional.
+type ISDN struct {
+	// <ISDN-address> identifies the ISDN number of <owner> and DDI (Direct
+	// Dial In) if any, as defined by E.164 [8] and E.163 [7], the ISDN and
+	// PSTN (Public Switched Telephone Network) numbering plan.  E.163
+	// defines the country codes, and E.164 the form of the addresses.  Its
+	// format in master files is a <character-string> syntactically
+	// identical to that used in TXT and HINFO.
+	ISDN string
+	// <sa> specifies the subaddress (SA).  The format of <sa> in master
+	// files is a <character-string> syntactically identical to that used
+	// in TXT and HINFO.
+	Sa string
+}
+
+// Implementation of dns.Wirer
+func (d *ISDN) Encode(b *dns.Wirebuf) {
+	(dns.CharString)(d.ISDN).Encode(b)
+	(dns.CharString)(d.Sa).Encode(b)
+}
+
+// Implementation of dns.Wirer
+func (d *ISDN) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	p0 := &b[*pos]
+	if err = (*dns.CharString)(&d.ISDN).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if err = (*dns.CharString)(&d.Sa).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataISDN, d)
+	}
+	return
+}
+
+func (d *ISDN) String() string {
+	return fmt.Sprintf(`"%s" "%s"`, strings.Replace(d.ISDN, `"`, `\"`, -1), strings.Replace(d.Sa, `"`, `\"`, -1))
+}
+
+// The KEY resource record (RR) is used to store a public key that is
+// associated with a Domain Name System (DNS) name.  This can be the public key
+// of a zone, a user, or a host or other end entity. Security aware DNS
+// implementations MUST be designed to handle at least two simultaneously valid
+// keys of the same type associated with the same name.
+//
+// A KEY RR is, like any other RR, authenticated by a SIG RR.  KEY RRs must be
+// signed by a zone level key.
+type KEY struct {
+	// Bit 7 of the Flags field is the Zone Key flag.  If bit 7 has value 1,
+	// then the KEY record holds a DNS zone key, and the KEY RR's
+	// owner name MUST be the name of a zone.  If bit 7 has value 0, then
+	// the KEY record holds some other type of DNS public key and MUST
+	// NOT be used to verify RRSIGs that cover RRsets.
+	// 
+	// Bit 15 of the Flags field is the Secure Entry Point flag, described
+	// in [RFC3757].  If bit 15 has value 1, then the KEY record holds a
+	// key intended for use as a secure entry point.  This flag is only
+	// intended to be a hint to zone signing or debugging software as to the
+	// intended use of this KEY record; validators MUST NOT alter their
+	// behavior during the signature validation process in any way based on
+	// the setting of this bit.  This also means that a KEY RR with the
+	// SEP bit set would also need the Zone Key flag set in order to be able
+	// to generate signatures legally.  A KEY RR with the SEP set and the
+	// Zone Key flag not set MUST NOT be used to verify RRSIGs that cover
+	// RRsets.
+	// 
+	// Bits 0-6 and 8-14 are reserved: these bits MUST have value 0 upon
+	// creation of the KEY RR and MUST be ignored upon receipt.
+	Flags uint16
+	// The Protocol Field MUST have value 3, and the KEY RR MUST be
+	// treated as invalid during signature verification if it is found to be
+	// some value other than 3.
+	Protocol byte
+	// The Algorithm field identifies the public key's cryptographic
+	// algorithm and determines the format of the Public Key field.  A list
+	// of DNSSEC algorithm types can be found in Appendix A.1
+	Algorithm AlgorithmType
+	// The Public Key Field holds the public key material.  The format
+	// depends on the algorithm of the key being stored and is described in
+	// separate documents.
+	Key []byte
+}
+
+func NewKEY(Flags uint16, Algorithm AlgorithmType, Key []byte) *KEY {
+	return &KEY{Flags, 3, Algorithm, Key}
+}
+
+// Implementation of dns.Wirer
+func (d *KEY) Encode(b *dns.Wirebuf) {
+	dns.Octets2(d.Flags).Encode(b)
+	dns.Octet(d.Protocol).Encode(b)
+	dns.Octet(d.Algorithm).Encode(b)
+	b.Buf = append(b.Buf, d.Key...)
+}
+
+// Implementation of dns.Wirer
+func (d *KEY) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	p0 := &b[*pos]
+	if err = (*dns.Octets2)(&d.Flags).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+	if err = (*dns.Octet)(&d.Protocol).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+	if err = (*dns.Octet)(&d.Algorithm).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+	n := len(b) - *pos
+	if n <= 0 {
+		return fmt.Errorf("(*KEY).Decode: no key data")
+	}
+	d.Key = make([]byte, n)
+	copy(d.Key, b[*pos:])
+	*pos += n
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataKEY, d)
+	}
+	return
+}
+
+func (d *KEY) String() string {
+	return fmt.Sprintf("%d %d %d %s", d.Flags, d.Protocol, d.Algorithm, strutil.Base64Encode(d.Key))
+}
+
+// The LOC record is expressed in a master file in the following format:
+//
+//  <owner> <TTL> <class> LOC ( d1 [m1 [s1]] {"N"|"S"} d2 [m2 [s2]]
+//                            {"E"|"W"} alt["m"] [siz["m"] [hp["m"]
+//                            [vp["m"]]]] )
+//
+// (The parentheses are used for multi-line data as specified in [RFC 1035]
+// section 5.1.)
+//
+// where:
+//
+//    d1:     [0 .. 90]            (degrees latitude)
+//    d2:     [0 .. 180]           (degrees longitude)
+//    m1, m2: [0 .. 59]            (minutes latitude/longitude)
+//    s1, s2: [0 .. 59.999]        (seconds latitude/longitude)
+//    alt:    [-100000.00 .. 42849672.95] BY .01 (altitude in meters)
+//    siz, hp, vp: [0 .. 90000000.00] (size/precision in meters)
+//
+// If omitted, minutes and seconds default to zero, size defaults to 1m,
+// horizontal precision defaults to 10000m, and vertical precision defaults to
+// 10m.  These defaults are chosen to represent typical ZIP/postal code area
+// sizes, since it is often easy to find approximate geographical location by
+// ZIP/postal code.
+type LOC struct {
+	// Version number of the representation.  This must be zero.
+	// Implementations are required to check this field and make no
+	// assumptions about the format of unrecognized versions.
+	Version byte
+	// The diameter of a sphere enclosing the described entity, in
+	// centimeters, expressed as a pair of four-bit unsigned integers, each
+	// ranging from zero to nine, with the most significant four bits
+	// representing the base and the second number representing the power
+	// of ten by which to multiply the base.  This allows sizes from 0e0
+	// (<1cm) to 9e9 (90,000km) to be expressed.  This representation was
+	// chosen such that the hexadecimal representation can be read by eye;
+	// 0x15 = 1e5.  Four-bit values greater than 9 are undefined, as are
+	// values with a base of zero and a non-zero exponent.
+	//
+	// Since 20000000m (represented by the value 0x29) is greater than the
+	// equatorial diameter of the WGS 84 ellipsoid (12756274m), it is
+	// therefore suitable for use as a "worldwide" size.
+	Size byte
+	// The horizontal precision of the data, in centimeters, expressed
+	// using the same representation as SIZE.  This is the diameter of the
+	// horizontal "circle of error", rather than a "plus or minus" value.
+	// (This was chosen to match the interpretation of SIZE; to get a "plus
+	// or minus" value, divide by 2.)
+	HorizPre byte
+	// The vertical precision of the data, in centimeters, expressed using
+	// the sane representation as for SIZE.  This is the total potential
+	// vertical error, rather than a "plus or minus" value.  (This was
+	// chosen to match the interpretation of SIZE; to get a "plus or minus"
+	// value, divide by 2.)  Note that if altitude above or below sea level
+	// is used as an approximation for altitude relative to the [WGS 84]
+	// ellipsoid, the precision value should be adjusted.
+	VertPre byte
+	// The latitude of the center of the sphere described by the SIZE
+	// field, expressed as a 32-bit integer, most significant octet first
+	// (network standard byte order), in thousandths of a second of arc.
+	// 2^31 represents the equator; numbers above that are north latitude.
+	Latitude uint32
+	// The longitude of the center of the sphere described by the SIZE
+	// field, expressed as a 32-bit integer, most significant octet first
+	// (network standard byte order), in thousandths of a second of arc,
+	// rounded away from the prime meridian.  2^31 represents the prime
+	// meridian; numbers above that are east longitude.
+	Longitude uint32
+	// The altitude of the center of the sphere described by the SIZE
+	// field, expressed as a 32-bit integer, most significant octet first
+	// (network standard byte order), in centimeters, from a base of
+	// 100,000m below the [WGS 84] reference spheroid used by GPS
+	// (semimajor axis a=6378137.0, reciprocal flattening
+	// rf=298.257223563).  Altitude above (or below) sea level may be used
+	// as an approximation of altitude relative to the the [WGS 84]
+	// spheroid, though due to the Earth's surface not being a perfect
+	// spheroid, there will be differences.  (For example, the geoid (which
+	// sea level approximates) for the continental US ranges from 10 meters
+	// to 50 meters below the [WGS 84] spheroid.  Adjustments to ALTITUDE
+	// and/or VERT PRE will be necessary in most cases.  The Defense
+	// Mapping Agency publishes geoid height values relative to the [WGS
+	// 84] ellipsoid.
+	Altitude uint32
+}
+
+// Implementation of dns.Wirer
+func (d *LOC) Encode(b *dns.Wirebuf) {
+	dns.Octet(d.Version).Encode(b)
+	dns.Octet(d.Size).Encode(b)
+	dns.Octet(d.HorizPre).Encode(b)
+	dns.Octet(d.VertPre).Encode(b)
+	dns.Octets4(d.Longitude).Encode(b)
+	dns.Octets4(d.Latitude).Encode(b)
+	dns.Octets4(d.Altitude).Encode(b)
+}
+
+// Implementation of dns.Wirer
+func (d *LOC) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	p0 := &b[*pos]
+	if (*dns.Octet)(&d.Version).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if (*dns.Octet)(&d.Size).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if (*dns.Octet)(&d.HorizPre).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if (*dns.Octet)(&d.VertPre).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if (*dns.Octets4)(&d.Longitude).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if (*dns.Octets4)(&d.Latitude).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if (*dns.Octets4)(&d.Altitude).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataLOC, d)
+	}
+	return
+}
+
+func (*LOC) Degrees(x uint32) (deg int) {
+	f := int64(x) - (1 << 31)
+	deg = int(f / (60 * 60 * 1000)) // 0.001 sec of arc
+	return
+}
+
+func (*LOC) Minutes(x uint32) (min int) {
+	f := int64(x) - (1 << 31)
+	if f < 0 {
+		f = -f
+	}
+	return int((f / (60000)) % 60)
+}
+
+func (*LOC) ThousandsSecs(x uint32) (ts int) {
+	f := int64(x) - (1 << 31)
+	if f < 0 {
+		f = -f
+	}
+	return int(f % 60000)
+}
+
+func (d *LOC) DecAlt() (cm int64) {
+	return int64(d.Altitude) - 10000000
+}
+
+func (d *LOC) EncAlt(cm int64) {
+	d.Altitude = uint32(cm + 10000000)
+}
+
+func (d *LOC) DecDMTS(x uint32) (deg, min, ts int, positive bool) {
+	deg = d.Degrees(x)
+	if positive = deg >= 0; !positive {
+		deg = -deg
+	}
+	min = d.Minutes(x)
+	ts = d.ThousandsSecs(x)
+	return
+}
+
+func (*LOC) EncDMTS(deg, min, ts int, positive bool) uint32 {
+	x := int64(ts)
+	x += int64(min) * 60000
+	x += int64(deg) * 3600000
+	switch positive {
+	case true:
+		x += 1 << 31
+	case false:
+		x = 1<<31 - x
+	}
+	return uint32(x)
+}
+
+var precs = [10]int64{
+	1,
+	10,
+	100,
+	1000,
+	10000,
+	100000,
+	1000000,
+	10000000,
+	100000000,
+	1000000000,
+}
+
+func (*LOC) DecPrec(x byte) (cm int64) {
+	e := int(x & 15)
+	if e > len(precs) {
+		e = len(precs) - 1
+	}
+	return int64(x>>4) * precs[e]
+}
+
+func (*LOC) EncPrec(cm uint64) byte {
+	var e byte
+	var x uint64
+	for e, x = 0, cm; x > 9; e, x = e+1, x/10 {
+	}
+	if e > 9 {
+		e = 9
+	}
+	return byte(x<<4) | e
+}
+
+func (d *LOC) String() string {
+	latDeg, latMin, latTS, north := d.DecDMTS(d.Latitude)
+	lonDeg, lonMin, lonTS, east := d.DecDMTS(d.Longitude)
+	altM := d.DecAlt()
+	altCm := altM % 100
+	if altCm < 0 {
+		altCm = -altCm
+	}
+	sn := "S"
+	if north {
+		sn = "N"
+	}
+	we := "W"
+	if east {
+		we = "E"
+	}
+	siz, hp, vp := d.DecPrec(d.Size), d.DecPrec(d.HorizPre), d.DecPrec(d.VertPre)
+	return fmt.Sprintf(
+		"%d %d %d.%03d %s %d %d %d.%03d %s %d.%02dm %dm %dm %dm",
+		latDeg, latMin, latTS/1000, latTS%1000, sn,
+		lonDeg, lonMin, lonTS/1000, lonTS%1000, we,
+		altM/100, altCm,
+		siz/100, hp/100, vp/100,
+	)
+}
+
+// MB records cause additional section processing which looks up an A type RRs
+// corresponding to MADNAME.
+type MB struct {
+	// A <domain-name> which specifies a host which has the specified
+	// mailbox.
+	MADNAME string
+}
+
+// Implementation of dns.Wirer
+func (d *MB) Encode(b *dns.Wirebuf) {
+	dns.DomainName(d.MADNAME).Encode(b)
+}
+
+// Implementation of dns.Wirer
+func (d *MB) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	p0 := &b[*pos]
+	if err = (*dns.DomainName)(&d.MADNAME).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataMB, d)
+	}
+	return
+}
+
+func (d *MB) String() string {
+	return d.MADNAME
+}
+
+// MD records cause additional section processing which looks up an A type
+// record corresponding to MADNAME.
+//
+// MD is obsolete.  See the definition of MX and [RFC-974] for details of the
+// new scheme.  The recommended policy for dealing with MD RRs found in a
+// master file is to reject them, or to convert them to MX RRs with a
+// preference of 0.
+type MD struct {
+	// A <domain-name> which specifies a host which has a mail agent for
+	// the domain which should be able to deliver mail for the domain.
+	MADNAME string
+}
+
+// Implementation of dns.Wirer
+func (d *MD) Encode(b *dns.Wirebuf) {
+	dns.DomainName(d.MADNAME).Encode(b)
+}
+
+// Implementation of dns.Wirer
+func (d *MD) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	p0 := &b[*pos]
+	if err = (*dns.DomainName)(&d.MADNAME).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataMD, d)
+	}
+	return
+}
+
+func (d *MD) String() string {
+	return d.MADNAME
+}
+
+// MF records cause additional section processing which looks up an A type
+// record corresponding to MADNAME.
+//
+// MF is obsolete.  See the definition of MX and [RFC-974] for details ofw the
+// new scheme.  The recommended policy for dealing with MD RRs found in a
+// master file is to reject them, or to convert them to MX RRs with a
+// preference of 10.
+type MF struct {
+	// A <domain-name> which specifies a host which has a mail agent for
+	// the domain which will accept mail for forwarding to the domain.
+	MADNAME string
+}
+
+// Implementation of dns.Wirer
+func (d *MF) Encode(b *dns.Wirebuf) {
+	dns.DomainName(d.MADNAME).Encode(b)
+}
+
+// Implementation of dns.Wirer
+func (d *MF) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	p0 := &b[*pos]
+	if err = (*dns.DomainName)(&d.MADNAME).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataMF, d)
+	}
+	return
+}
+
+func (d *MF) String() string {
+	return d.MADNAME
+}
+
+// MG records cause no additional section processing.
+type MG struct {
+	// A <domain-name> which specifies a mailbox which is a member of the
+	// mail group specified by the domain name.
+	MGNAME string
+}
+
+// Implementation of dns.Wirer
+func (d *MG) Encode(b *dns.Wirebuf) {
+	dns.DomainName(d.MGNAME).Encode(b)
+}
+
+// Implementation of dns.Wirer
+func (d *MG) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	p0 := &b[*pos]
+	if err = (*dns.DomainName)(&d.MGNAME).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataMG, d)
+	}
+	return
+}
+
+func (d *MG) String() string {
+	return d.MGNAME
+}
+
+// MINFO records cause no additional section processing.  Although these
+// records can be associated with a simple mailbox, they are usually used with
+// a mailing list.
+type MINFO struct {
+	// A <domain-name> which specifies a mailbox which is responsible for
+	// the mailing list or mailbox.  If this domain name names the root,
+	// the owner of the MINFO RR is responsible for itself.  Note that many
+	// existing mailing lists use a mailbox X-request for the RMAILBX field
+	// of mailing list X, e.g., Msgroup-request for Msgroup.  This field
+	// provides a more general mechanism.
+	RMAILBX string
+	// A <domain-name> which specifies a mailbox which is to receive error
+	// messages related to the mailing list or mailbox specified by the
+	// owner of the MINFO RR (similar to the ERRORS-TO: field which has
+	// been proposed).  If this domain name names the root, errors should
+	// be returned to the sender of the message.
+	EMAILBX string
+}
+
+// Implementation of dns.Wirer
+func (d *MINFO) Encode(b *dns.Wirebuf) {
+	(dns.DomainName)(d.RMAILBX).Encode(b)
+	(dns.DomainName)(d.EMAILBX).Encode(b)
+}
+
+// Implementation of dns.Wirer
+func (d *MINFO) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	p0 := &b[*pos]
+	if err = (*dns.DomainName)(&d.RMAILBX).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if err = (*dns.DomainName)(&d.EMAILBX).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataMINFO, d)
+	}
+	return
+}
+
+func (d *MINFO) String() string {
+	return fmt.Sprintf("%s %s", d.RMAILBX, d.EMAILBX)
+}
+
+// MR records cause no additional section processing.  The main use for MR is
+// as a forwarding entry for a user who has moved to a different mailbox.
+type MR struct {
+	// A <domain-name> which specifies a mailbox which is the proper rename
+	// of the specified mailbox.
+	NEWNAME string
+}
+
+// Implementation of dns.Wirer
+func (d *MR) Encode(b *dns.Wirebuf) {
+	dns.DomainName(d.NEWNAME).Encode(b)
+}
+
+// Implementation of dns.Wirer
+func (d *MR) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	p0 := &b[*pos]
+	if err = (*dns.DomainName)(&d.NEWNAME).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataMR, d)
+	}
+	return
+}
+
+func (d *MR) String() string {
+	return d.NEWNAME
+}
+
 // MX holds the zone MX RData
 type MX struct {
 	// A 16 bit integer which specifies the preference given to
@@ -541,6 +1270,75 @@ func (d *NS) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err erro
 
 func (d *NS) String() string {
 	return d.NSDName
+}
+
+// The NSAP RR is used to map from domain names to NSAPs. Name-to-NSAP mapping
+// in the DNS using the NSAP RR operates analogously to IP address lookup. A
+// query is generated by the resolver requesting an NSAP RR for a provided
+// domain name.
+//
+// NSAP RRs conform to the top level RR format and semantics as defined in
+// Section 3.2.1 of RFC 1035.
+type NSAP struct {
+	// A variable length string of octets containing the NSAP.  The value
+	// is the binary encoding of the NSAP as it would appear in the CLNP
+	// source or destination address field.
+	NSAP []byte
+}
+
+// Implementation of dns.Wirer
+func (d *NSAP) Encode(b *dns.Wirebuf) {
+	b.Buf = append(b.Buf, d.NSAP...)
+}
+
+// Implementation of dns.Wirer
+func (d *NSAP) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	if *pos >= len(b) {
+		d.NSAP = []byte{}
+		if sniffer != nil {
+			sniffer(nil, nil, dns.SniffRDataNSAP, d)
+		}
+		return
+	}
+
+	p0 := &b[*pos]
+	d.NSAP = append([]byte{}, b[*pos:]...)
+	*pos = len(b)
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataNSAP, d)
+	}
+	return
+}
+
+func (d *NSAP) String() string {
+	return fmt.Sprintf("0x%x", d.NSAP)
+}
+
+// NSAP_PTR has a function analogous to the PTR record used for IP addresses
+type NSAP_PTR struct {
+	Name string
+}
+
+// Implementation of dns.Wirer
+func (c NSAP_PTR) Encode(b *dns.Wirebuf) {
+	(dns.DomainName)(c.Name).Encode(b)
+}
+
+// Implementation of dns.Wirer
+func (c *NSAP_PTR) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	p0 := &b[*pos]
+	if err = (*dns.DomainName)(&c.Name).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataCNAME, c)
+	}
+	return
+}
+
+func (c NSAP_PTR) String() string {
+	return c.Name
 }
 
 // HashAlgorithm is the type of the hash algorithm in the NSEC3 RR
@@ -681,6 +1479,47 @@ func (d *NSEC3PARAM) String() string {
 		s = "-"
 	}
 	return fmt.Sprintf("%d %d %d %s", d.HashAlgorithm, d.Flags, d.Iterations, s)
+}
+
+type NULL struct {
+	Data []byte
+}
+
+// Implementation of dns.Wirer
+func (d *NULL) Encode(b *dns.Wirebuf) {
+	b.Buf = append(b.Buf, d.Data...)
+}
+
+// Implementation of dns.Wirer
+func (d *NULL) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	n := 0
+	var p0 *byte
+	if *pos < len(b) {
+		p0 = &b[*pos]
+		n = len(b) - *pos
+		d.Data = make([]byte, n)
+		copy(d.Data, b[*pos:])
+	} else {
+		d.Data = []byte{}
+		if sniffer != nil {
+			sniffer(nil, nil, dns.SniffRDataNULL, d)
+		}
+		return
+	}
+
+	*pos += n
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataNULL, d)
+	}
+	return
+}
+
+func (d *NULL) String() string {
+	if len(d.Data) == 0 {
+		return "\\#"
+	}
+
+	return fmt.Sprintf("\\# %d %x", len(d.Data), d.Data)
 }
 
 // OPT_DATA holds an {attribute, value} pair of the OPT RR
@@ -831,6 +1670,51 @@ func (d *PTR) String() string {
 	return d.PTRDName
 }
 
+type PX struct {
+	// A 16 bit integer which specifies the preference given to
+	// this RR among others at the same owner.  Lower values
+	// are preferred.
+	Preference uint16
+	// A <domain-name> element containing <rfc822-domain>, the RFC822 part
+	// of the MCGAM.
+	MAP822 string
+	// A <domain-name> element containing the value of
+	// <x400-in-domain-syntax> derived from the X.400 part of the MCGAM.
+	MAPX400 string
+}
+
+// Implementation of dns.Wirer
+func (d *PX) Encode(b *dns.Wirebuf) {
+	dns.Octets2(d.Preference).Encode(b)
+	dns.DomainName(d.MAP822).Encode(b)
+	dns.DomainName(d.MAPX400).Encode(b)
+}
+
+// Implementation of dns.Wirer
+func (d *PX) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	p0 := &b[*pos]
+	if err = (*dns.Octets2)(&d.Preference).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if err = (*dns.DomainName)(&d.MAP822).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if err = (*dns.DomainName)(&d.MAPX400).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataPX, d)
+	}
+	return
+}
+
+func (d *PX) String() string {
+	return fmt.Sprintf("%d %s %s", d.Preference, d.MAP822, d.MAPX400)
+}
+
 // RDATA hodls DNS RR rdata for a unknown/unsupported RR type
 type RDATA []byte
 
@@ -841,6 +1725,14 @@ func (d *RDATA) Encode(b *dns.Wirebuf) {
 
 // Implementation of dns.Wirer
 func (d *RDATA) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	if *pos >= len(b) {
+		*d = RDATA{}
+		if sniffer != nil {
+			sniffer(nil, nil, dns.SniffRData, d)
+		}
+		return
+	}
+
 	p0 := &b[*pos]
 	n := len(b) - *pos
 	*d = b[*pos:]
@@ -852,7 +1744,7 @@ func (d *RDATA) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err e
 }
 
 func (d *RDATA) String() string {
-	return fmt.Sprintf("\\# %d % 02x", len(*d), *d)
+	return fmt.Sprintf("\\# %d %02x", len(*d), *d)
 }
 
 // RR holds a zone resource record data.
@@ -941,6 +1833,8 @@ func (rr *RR) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 		rr.RData = &A{}
 	case TYPE_AAAA:
 		rr.RData = &AAAA{}
+	case TYPE_AFSDB:
+		rr.RData = &AFSDB{}
 	case TYPE_CNAME:
 		rr.RData = &CNAME{}
 	case TYPE_DNAME:
@@ -949,28 +1843,68 @@ func (rr *RR) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 		rr.RData = &DNSKEY{}
 	case TYPE_DS:
 		rr.RData = &DS{}
+	case TYPE_GPOS:
+		rr.RData = &GPOS{}
+	case TYPE_HINFO:
+		rr.RData = &HINFO{}
+	case TYPE_ISDN:
+		rr.RData = &ISDN{}
+	case TYPE_KEY:
+		rr.RData = &KEY{}
+	case TYPE_LOC:
+		rr.RData = &LOC{}
+	case TYPE_MB:
+		rr.RData = &MB{}
+	case TYPE_MD:
+		rr.RData = &MD{}
+	case TYPE_MF:
+		rr.RData = &MF{}
+	case TYPE_MG:
+		rr.RData = &MG{}
+	case TYPE_MINFO:
+		rr.RData = &MINFO{}
+	case TYPE_MR:
+		rr.RData = &MR{}
 	case TYPE_MX:
 		rr.RData = &MX{}
 	case TYPE_NODATA:
 		rr.RData = &NODATA{}
 	case TYPE_NS:
 		rr.RData = &NS{}
+	case TYPE_NSAP:
+		rr.RData = &NSAP{}
+	case TYPE_NSAP_PTR:
+		rr.RData = &NSAP_PTR{}
 	case TYPE_NXDOMAIN:
 		rr.RData = &NXDOMAIN{}
 	case TYPE_NSEC3:
 		rr.RData = &NSEC3{}
 	case TYPE_NSEC3PARAM:
 		rr.RData = &NSEC3PARAM{}
+	case TYPE_NULL:
+		rr.RData = &NULL{}
 	case TYPE_OPT:
 		rr.RData = &OPT{}
 	case TYPE_PTR:
 		rr.RData = &PTR{}
+	case TYPE_PX:
+		rr.RData = &PX{}
+	case TYPE_RP:
+		rr.RData = &RP{}
 	case TYPE_RRSIG:
 		rr.RData = &RRSIG{}
+	case TYPE_RT:
+		rr.RData = &RT{}
+	case TYPE_SIG:
+		rr.RData = &SIG{}
 	case TYPE_SOA:
 		rr.RData = &SOA{}
 	case TYPE_TXT:
 		rr.RData = &TXT{}
+	case TYPE_WKS:
+		rr.RData = &WKS{}
+	case TYPE_X25:
+		rr.RData = &X25{}
 	default:
 		rr.RData = &RDATA{}
 	}
@@ -991,6 +1925,10 @@ func (rr *RR) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 
 // Equal compares a and b as per rfc2136/1.1
 func (a *RR) Equal(b *RR) (equal bool) {
+	//defer func() {
+	//fmt.Printf("Equal(%q vs %q):%t\n", a, b, equal)
+	//}()
+
 	if a.Type != b.Type || a.Class != b.Class || strings.ToLower(a.Name) != strings.ToLower(b.Name) {
 		return
 	}
@@ -1005,6 +1943,10 @@ func (a *RR) Equal(b *RR) (equal bool) {
 		return x.Address.String() == b.RData.(*A).Address.String()
 	case *AAAA:
 		return x.Address.String() == b.RData.(*AAAA).Address.String()
+	case *AFSDB:
+		y := b.RData.(*AFSDB)
+		return x.SubType == y.SubType &&
+			strings.ToLower(x.Hostname) == strings.ToLower(y.Hostname)
 	case *CNAME:
 		return strings.ToLower(x.Name) == strings.ToLower(b.RData.(*CNAME).Name)
 	case *DNAME:
@@ -1021,6 +1963,51 @@ func (a *RR) Equal(b *RR) (equal bool) {
 			x.AlgorithmType == y.AlgorithmType &&
 			x.DigestType == y.DigestType &&
 			bytes.Equal(x.Digest, y.Digest)
+	case *GPOS:
+		y := b.RData.(*GPOS)
+		return x.Longitude == y.Longitude &&
+			x.Latitude == y.Latitude &&
+			x.Altitude == y.Altitude
+	case *HINFO:
+		y := b.RData.(*HINFO)
+		return x.Cpu == y.Cpu && x.Os == y.Os
+	case *ISDN:
+		y := b.RData.(*ISDN)
+		return x.ISDN == y.ISDN && x.Sa == y.Sa
+	case *KEY:
+		y := b.RData.(*KEY)
+		return x.Flags == y.Flags &&
+			x.Protocol == y.Protocol &&
+			x.Algorithm == y.Algorithm &&
+			bytes.Equal(x.Key, y.Key)
+	case *LOC:
+		y := b.RData.(*LOC)
+		return x.Version == y.Version &&
+			x.Size == y.Size &&
+			x.HorizPre == y.HorizPre &&
+			x.VertPre == y.VertPre &&
+			x.Longitude == y.Longitude &&
+			x.Latitude == y.Latitude &&
+			x.Altitude == y.Altitude
+	case *MB:
+		y := b.RData.(*MB)
+		return strings.ToLower(x.MADNAME) == strings.ToLower(y.MADNAME)
+	case *MD:
+		y := b.RData.(*MD)
+		return strings.ToLower(x.MADNAME) == strings.ToLower(y.MADNAME)
+	case *MF:
+		y := b.RData.(*MF)
+		return strings.ToLower(x.MADNAME) == strings.ToLower(y.MADNAME)
+	case *MG:
+		y := b.RData.(*MG)
+		return strings.ToLower(x.MGNAME) == strings.ToLower(y.MGNAME)
+	case *MINFO:
+		y := b.RData.(*MINFO)
+		return strings.ToLower(x.RMAILBX) == strings.ToLower(y.RMAILBX) &&
+			strings.ToLower(x.EMAILBX) == strings.ToLower(y.EMAILBX)
+	case *MR:
+		y := b.RData.(*MR)
+		return strings.ToLower(x.NEWNAME) == strings.ToLower(y.NEWNAME)
 	case *MX:
 		y := b.RData.(*MX)
 		return x.Preference == y.Preference &&
@@ -1033,6 +2020,10 @@ func (a *RR) Equal(b *RR) (equal bool) {
 	case *NS:
 		y := b.RData.(*NS)
 		return strings.ToLower(x.NSDName) == strings.ToLower(y.NSDName)
+	case *NSAP:
+		return bytes.Compare(x.NSAP, b.RData.(*NSAP).NSAP) == 0
+	case *NSAP_PTR:
+		return strings.ToLower(x.Name) == strings.ToLower(b.RData.(*NSAP_PTR).Name)
 	case *NSEC3:
 		y := b.RData.(*NSEC3)
 		return x.HashAlgorithm == y.HashAlgorithm &&
@@ -1047,11 +2038,37 @@ func (a *RR) Equal(b *RR) (equal bool) {
 			x.Flags == y.Flags &&
 			x.Iterations == y.Iterations &&
 			bytes.Equal(x.Salt, y.Salt)
+	case *NULL:
+		y := b.RData.(*NULL)
+		return bytes.Equal(x.Data, y.Data)
 	case *PTR:
 		y := b.RData.(*PTR)
 		return strings.ToLower(x.PTRDName) == strings.ToLower(y.PTRDName)
+	case *PX:
+		y := b.RData.(*PX)
+		return x.Preference == y.Preference &&
+			strings.ToLower(x.MAP822) == strings.ToLower(y.MAP822) &&
+			strings.ToLower(x.MAPX400) == strings.ToLower(y.MAPX400)
+	case *RP:
+		y := b.RData.(*RP)
+		return strings.ToLower(x.Mbox) == strings.ToLower(y.Mbox) &&
+			strings.ToLower(x.Txt) == strings.ToLower(y.Txt)
 	case *RRSIG:
 		y := b.RData.(*RRSIG)
+		return x.Type == y.Type &&
+			x.AlgorithmType == y.AlgorithmType &&
+			x.Labels == y.Labels &&
+			x.TTL == y.TTL &&
+			x.Expiration == y.Expiration &&
+			x.KeyTag == y.KeyTag &&
+			strings.ToLower(x.Name) == strings.ToLower(y.Name) &&
+			bytes.Equal(x.Signature, y.Signature)
+	case *RT:
+		y := b.RData.(*RT)
+		return x.Preference == y.Preference &&
+			strings.ToLower(x.Hostname) == strings.ToLower(y.Hostname)
+	case *SIG:
+		y := b.RData.(*SIG)
 		return x.Type == y.Type &&
 			x.AlgorithmType == y.AlgorithmType &&
 			x.Labels == y.Labels &&
@@ -1071,6 +2088,21 @@ func (a *RR) Equal(b *RR) (equal bool) {
 			x.Minimum == y.Minimum
 	case *TXT:
 		return x.S == b.RData.(*TXT).S
+	case *WKS:
+		y := b.RData.(*WKS)
+		if x.Protocol != y.Protocol ||
+			len(x.Ports) != len(y.Ports) ||
+			x.Address.String() != y.Address.String() {
+			return false
+		}
+		for k := range x.Ports {
+			if _, ok := y.Ports[k]; !ok {
+				return false
+			}
+		}
+		return true
+	case *X25:
+		return x.PSDN == b.RData.(*X25).PSDN
 	}
 	return
 }
@@ -1173,6 +2205,53 @@ func (a Parts) SetAdd(b Parts) {
 
 	}
 	return
+}
+
+// The Responsible Person RR can be associated with any node in the Domain Name
+// System hierarchy, not just at the leaves of the tree.
+type RP struct {
+	// The first field, <mbox-dname>, is a domain name that specifies the
+	// mailbox for the responsible person.  Its format in master files uses
+	// the DNS convention for mailbox encoding, identical to that used for
+	// the RNAME mailbox field in the SOA RR.  The root domain name (just
+	// ".") may be specified for <mbox-dname> to indicate that no mailbox
+	// is available.
+	Mbox string
+	// The second field, <txt-dname>, is a domain name for which TXT RR's
+	// exist.  A subsequent query can be performed to retrieve the
+	// associated TXT resource records at <txt-dname>.  This provides a
+	// level of indirection so that the entity can be referred to from
+	// multiple places in the DNS.  The root domain name (just ".") may be
+	// specified for <txt-dname> to indicate that the TXT_DNAME is absent,
+	// and no associated TXT RR exists.
+	Txt string
+}
+
+// Implementation of dns.Wirer
+func (d *RP) Encode(b *dns.Wirebuf) {
+	(dns.DomainName)(d.Mbox).Encode(b)
+	(dns.DomainName)(d.Txt).Encode(b)
+}
+
+// Implementation of dns.Wirer
+func (d *RP) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	p0 := &b[*pos]
+	if err = (*dns.DomainName)(&d.Mbox).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if err = (*dns.DomainName)(&d.Txt).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataRP, d)
+	}
+	return
+}
+
+func (d *RP) String() string {
+	return fmt.Sprintf("%s %s", d.Mbox, d.Txt)
 }
 
 // RRSIG holds the zone RRSIG RData (RFC4034)
@@ -1280,8 +2359,167 @@ func (r *RRSIG) String() string {
 		r.AlgorithmType,
 		r.Labels,
 		r.TTL,
-		time.Unix(int64(r.Expiration), 0).UTC().Format(timeLayout),
-		time.Unix(int64(r.Inception), 0).UTC().Format(timeLayout),
+		dns.Seconds2String(int64(r.Expiration)),
+		dns.Seconds2String(int64(r.Inception)),
+		r.KeyTag,
+		r.Name,
+		strutil.Base64Encode(r.Signature),
+	)
+}
+
+// The RT resource record provides a route-through binding for hosts that do
+// not have their own direct wide area network addresses.  It is used in much
+// the same way as the MX RR.
+//
+// Both RDATA fields are required in all RT RRs.
+type RT struct {
+	// The first field, <preference>, is a 16 bit integer, representing the
+	// preference of the route.  Smaller numbers indicate more preferred
+	// routes.
+	Preference uint16
+	// <intermediate-host> is the domain name of a host which will serve as
+	// an intermediate in reaching the host specified by <owner>.  The DNS
+	// RRs associated with <intermediate-host> are expected to include at
+	// least one A, X25, or ISDN record.
+	Hostname string
+}
+
+// Implementation of dns.Wirer
+func (d *RT) Encode(b *dns.Wirebuf) {
+	(dns.Octets2)(d.Preference).Encode(b)
+	(dns.DomainName)(d.Hostname).Encode(b)
+}
+
+// Implementation of dns.Wirer
+func (d *RT) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	p0 := &b[*pos]
+	if err = (*dns.Octets2)(&d.Preference).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if err = (*dns.DomainName)(&d.Hostname).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataRT, d)
+	}
+	return
+}
+
+func (d *RT) String() string {
+	return fmt.Sprintf("%d %s", d.Preference, d.Hostname)
+}
+
+// The SIG or "signature" resource record (RR) is the fundamental way that data
+// is authenticated in the secure Domain Name System (DNS). As such it is the
+// heart of the security provided.
+type SIG struct {
+	// The Type Covered field identifies the type of the RRset that is covered 
+	// by this SIG record.
+	Type
+	//  The Algorithm Number field identifies the cryptographic algorithm used
+	// to create the signature. 
+	AlgorithmType
+	// The Labels field specifies the number of labels in the original SIG RR owner name.
+	Labels byte
+	// The Original TTL field specifies the TTL of the covered RRset as it appears
+	// in the authoritative zone.
+	TTL int32
+	// The Signature Expiration field specifies a validity period for the signature.
+	// The SIG record MUST NOT be used for authentication after the expiration date.
+	Expiration uint32
+	// The Signature Inception field specifies a validity period for the signature.
+	// The SIG record MUST NOT be used for authentication prior to the inception date.
+	Inception uint32
+	// The Key Tag field contains the key tag value of the DNSKEY RR that validates
+	// this signature, in network byte order.
+	KeyTag uint16
+	// The Signer's Name field value identifies the owner name of the DNSKEY
+	// RR that a validator is supposed to use to validate this signature.
+	Name string
+	// The Signature field contains the cryptographic signature that covers
+	// the SIG RDATA (excluding the Signature field) and the RRset
+	// specified by the SIG owner name, SIG class, and SIG Type
+	// Covered field.
+	Signature []byte
+}
+
+// Implementation of dns.Wirer
+func (r *SIG) Encode(b *dns.Wirebuf) {
+	dns.Octets2(r.Type).Encode(b)
+	dns.Octet(r.AlgorithmType).Encode(b)
+	dns.Octet(r.Labels).Encode(b)
+	dns.Octets4(r.TTL).Encode(b)
+	dns.Octets4(r.Expiration).Encode(b)
+	dns.Octets4(r.Inception).Encode(b)
+	dns.Octets2(r.KeyTag).Encode(b)
+	b.DisableCompression()
+	(*dns.DomainName)(&r.Name).Encode(b)
+	b.EnableCompression()
+	b.Buf = append(b.Buf, r.Signature...)
+}
+
+// Implementation of dns.Wirer
+func (r *SIG) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	p0 := &b[*pos]
+	if err = (*dns.Octets2)(&r.Type).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if err = (*dns.Octet)(&r.AlgorithmType).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if err = (*dns.Octet)(&r.Labels).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	var ttl dns.Octets4
+	if err = ttl.Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	r.TTL = int32(ttl)
+
+	if err = (*dns.Octets4)(&r.Expiration).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if err = (*dns.Octets4)(&r.Inception).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if err = (*dns.Octets2)(&r.KeyTag).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if err = (*dns.DomainName)(&r.Name).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	n := len(b) - *pos
+	if n <= 0 {
+		return fmt.Errorf("(*SIG).Decode: no signature data")
+	}
+
+	r.Signature = make([]byte, n)
+	copy(r.Signature, b[*pos:])
+	*pos += n
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataSIG, r)
+	}
+	return
+}
+
+func (r *SIG) String() string {
+	return fmt.Sprintf("%s %d %d %d %s %s %d %s %s",
+		r.Type,
+		r.AlgorithmType,
+		r.Labels,
+		r.TTL,
+		dns.Seconds2String(int64(r.Expiration)),
+		dns.Seconds2String(int64(r.Inception)),
 		r.KeyTag,
 		r.Name,
 		strutil.Base64Encode(r.Signature),
@@ -1392,6 +2630,105 @@ func (t *TXT) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 
 func (t *TXT) String() string {
 	return fmt.Sprintf(`"%s"`, strings.Replace(t.S, `"`, `\"`, -1))
+}
+
+// The WKS record is used to describe the well known services supported by
+// a particular protocol on a particular internet address.  The PROTOCOL
+// field specifies an IP protocol number, and the bit map has one bit per
+// port of the specified protocol.  The first bit corresponds to port 0,
+// the second to port 1, etc.  If the bit map does not include a bit for a
+// protocol of interest, that bit is assumed zero.  The appropriate values
+// and mnemonics for ports and protocols are specified in [RFC-1010].
+//
+// For example, if PROTOCOL=TCP (6), the 26th bit corresponds to TCP port
+// 25 (SMTP).  If this bit is set, a SMTP server should be listening on TCP
+// port 25; if zero, SMTP service is not supported on the specified
+// address.
+//
+// The purpose of WKS RRs is to provide availability information for
+// servers for TCP and UDP.  If a server supports both TCP and UDP, or has
+// multiple Internet addresses, then multiple WKS RRs are used.
+//
+// WKS RRs cause no additional section processing.
+//
+// In master files, both ports and protocols are expressed using mnemonics
+// or decimal numbers.
+type WKS struct {
+	Address  net.IP
+	Protocol IP_Protocol
+	Ports    map[IP_Port]struct{}
+}
+
+// Implementation of dns.Wirer
+func (d *WKS) Encode(b *dns.Wirebuf) {
+	ip4(d.Address).Encode(b)
+	dns.Octet(d.Protocol).Encode(b)
+	bits := make([]byte, 0, 1024/8)
+	for k := range d.Ports {
+		i := int(k)
+		x := i >> 3
+		mask := 1 << uint(i&7)
+		if x >= len(bits) {
+			bits = bits[:x+1]
+		}
+		bits[x] |= byte(mask)
+	}
+	b.Buf = append(b.Buf, bits...)
+}
+
+// Implementation of dns.Wirer
+func (d *WKS) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	p0 := &b[*pos]
+	if err = (*ip4)(&d.Address).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if err = (*dns.Octet)(&d.Protocol).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	d.Ports = map[IP_Port]struct{}{}
+	n := len(b) - *pos
+	if n == 0 {
+		if sniffer != nil {
+			sniffer(p0, &b[*pos-1], dns.SniffRDataWKS, d)
+		}
+		return
+	}
+
+	b = b[*pos:]
+	for i, v := range b {
+		for bit := 0; v != 0; bit, v = bit+1, v>>1 {
+			if v&1 != 0 {
+				d.Ports[IP_Port(i<<3+bit)] = struct{}{}
+			}
+		}
+	}
+	*pos += n
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataWKS, d)
+	}
+	return
+}
+
+func (d *WKS) String() string {
+	buf := &bytes.Buffer{}
+	buf.WriteString(d.Address.String())
+	buf.WriteString(" ")
+	proto := IP_Protocols[d.Protocol]
+	if proto == "" {
+		proto = strconv.Itoa(int(d.Protocol))
+	}
+	buf.WriteString(proto)
+	for k := range d.Ports {
+		port := IP_Ports[k]
+		if port == "" {
+			port = strconv.Itoa(int(k))
+		}
+		buf.WriteString(" ")
+		buf.WriteString(port)
+	}
+	return buf.String()
 }
 
 // TYPE fields are used in resource records.  Note that these types are a
@@ -1507,7 +2844,7 @@ const (
 	TYPE_NXDOMAIN
 )
 
-var typeStr = map[Type]string{
+var Types = map[Type]string{
 	TYPE_A6:         "A6",
 	TYPE_A:          "A",
 	TYPE_AAAA:       "AAAA",
@@ -1585,7 +2922,7 @@ var typeStr = map[Type]string{
 
 func (n Type) String() (s string) {
 	var ok bool
-	if s, ok = typeStr[n]; !ok {
+	if s, ok = Types[n]; !ok {
 		return fmt.Sprintf("TYPE%d", uint16(n))
 	}
 	return
@@ -1607,4 +2944,37 @@ func (n *Type) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err er
 		sniffer(p0, &b[*pos-1], dns.SniffType, *n)
 	}
 	return
+}
+
+// X25 RData
+type X25 struct {
+	// <PSDN-address> is required in all X25 RRs.
+	//
+	// <PSDN-address> identifies the PSDN (Public Switched Data Network)
+	// address in the X.121 [10] numbering plan associated with <owner>.
+	// Its format in master files is a <character-string> syntactically
+	// identical to that used in TXT and HINFO.
+	PSDN string
+}
+
+// Implementation of dns.Wirer
+func (d *X25) Encode(b *dns.Wirebuf) {
+	(dns.CharString)(d.PSDN).Encode(b)
+}
+
+// Implementation of dns.Wirer
+func (d *X25) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	p0 := &b[*pos]
+	if err = (*dns.CharString)(&d.PSDN).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataX25, d)
+	}
+	return
+}
+
+func (d *X25) String() string {
+	return fmt.Sprintf(`"%s"`, strings.Replace(d.PSDN, `"`, `\"`, -1))
 }

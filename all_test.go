@@ -8,10 +8,12 @@ package dns
 
 import (
 	"github.com/cznic/mathutil"
+	"fmt"
 	"net"
 	"sort"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestLabels(t *testing.T) {
@@ -35,35 +37,35 @@ func TestLabels(t *testing.T) {
 	}
 
 	if _, err := Labels("www." + strings.Repeat("a", 63) + ".org"); err != nil {
-		t.Fatal(10, err)
+		t.Fatal(err)
 	}
 
 	if _, err := Labels("www." + strings.Repeat("a", 64) + ".org"); err == nil {
-		t.Fatal(20)
+		t.Fatal()
 	}
 
 	if _, err := Labels(strings.Repeat("123456789.", 25) + "12345"); err != nil {
-		t.Fatal(30, err)
+		t.Fatal(err)
 	}
 
 	if _, err := Labels(strings.Repeat("123456789.", 25) + "123456"); err == nil {
-		t.Fatal(40)
+		t.Fatal()
 	}
 
 	for i, pair := range test {
 		got, err := Labels(pair.str)
 		if err != nil {
-			t.Fatal(50, err)
+			t.Fatal(err)
 		}
 
 		expect := pair.expect
 		if len(got) != len(expect) {
-			t.Fatalf("60 %d %q %d %d %v %v", i, pair.str, len(got), len(expect), got, expect)
+			t.Fatalf("%d %q %d %d %v %v", i, pair.str, len(got), len(expect), got, expect)
 		}
 
 		for i, label := range got {
 			if label != expect[i] {
-				t.Fatalf("70 %d %q %q", i, label, expect[i])
+				t.Fatalf("%d %q %q", i, label, expect[i])
 			}
 		}
 	}
@@ -279,10 +281,60 @@ func TestRevLookupName(t *testing.T) {
 	const e6 = "b.a.9.8.7.6.5.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.b.d.0.1.0.0.2.ip6.arpa."
 
 	if s := strings.ToLower(RevLookupName(net.ParseIP("145.97.39.155"))); s != e4 {
-		t.Fatal(10, s, "!=", e4)
+		t.Fatal(s, "!=", e4)
 	}
 
 	if s := strings.ToLower(RevLookupName(net.ParseIP("2001:db8::567:89ab"))); s != e6 {
-		t.Fatal(20, s, "!=", e6)
+		t.Fatal(s, "!=", e6)
+	}
+}
+
+func TestSeconds2String(t *testing.T) {
+	ti := time.Date(2012, 1, 2, 3, 4, 5, 0, time.UTC)
+	secs := ti.Unix()
+	g, e := Seconds2String(secs), "20120102030405"
+	if g != e {
+		t.Fatalf("%s != %s", g, e)
+	}
+
+	// round trip
+	secs2, err := String2Seconds(g)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if g, e := secs2, secs; g != e {
+		t.Fatalf("%d != %d", g, e)
+	}
+
+}
+
+func TestString2Seconds(t *testing.T) {
+	secs0 := "20120102030405"
+	secs, err := String2Seconds(secs0)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ti := time.Date(2012, 1, 2, 3, 4, 5, 0, time.UTC)
+	secs2 := ti.Unix()
+	if g, e := secs2, secs; g != e {
+		t.Fatalf("%d != %d", g, e)
+	}
+
+	secs3 := fmt.Sprintf("%d", secs)
+	secs4, err := String2Seconds(secs3)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if g, e := secs4, secs; g != e {
+		t.Fatalf("%d != %d", g, e)
+	}
+
+	// round trip
+	secs5 := Seconds2String(secs)
+	if g, e := secs5, secs0; g != e {
+		t.Fatalf("%s != %s", g, e)
 	}
 }
