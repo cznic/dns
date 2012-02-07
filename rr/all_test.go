@@ -177,6 +177,10 @@ func Test0(t *testing.T) {
 			&AFSDB{12345, "exchange.example.com."}},
 		&RR{"nCNAME.example.com.", TYPE_CNAME, CLASS_IN, -1,
 			&CNAME{"cname.example.com."}},
+		&RR{"nCERT.example.com.", TYPE_CERT, CLASS_IN, -1,
+			&CERT{CertPKIX, 0x1234, AlgorithmDSA_SHA1,
+				[]byte{0, 6, 0x40, 0x01, 0x00, 0x00, 0x00, 0x03}},
+		},
 		&RR{"nDNSKEY.example.com.", TYPE_DNSKEY, CLASS_IN, -1,
 			&DNSKEY{2, 3, 4,
 				[]byte{11, 12, 13, 14, 15, 16, 17, 18, 19}}},
@@ -230,6 +234,12 @@ func Test0(t *testing.T) {
 			&NULL{[]byte{}}},
 		&RR{"nNULL.example.com.", TYPE_NULL, CLASS_IN, -1,
 			&NULL{[]byte{3, 7, 31, 127}}},
+		&RR{"nOPT.example.com.", TYPE_OPT, Class(4096), -1,
+			&OPT{}},
+		&RR{"nOPT.example.com.", TYPE_OPT, Class(4096), -1,
+			&OPT{[]OPT_DATA{{1, []byte{1, 2, 3, 4}}}}},
+		&RR{"nOPT.example.com.", TYPE_OPT, Class(4096), -1,
+			&OPT{[]OPT_DATA{{1, []byte{1, 2, 3, 4}}, {5, []byte{6, 7}}}}},
 		&RR{"nPTR.example.com.", TYPE_PTR, CLASS_IN, -1,
 			&PTR{"ptr.example.com."}},
 		&RR{"nPX.example.com.", TYPE_PX, CLASS_IN, -1,
@@ -258,6 +268,10 @@ func Test0(t *testing.T) {
 			&WKS{net.ParseIP("8.9.10.11"), TCP_Protocol, map[IP_Port]struct{}{SMTP_Port: struct{}{}}}},
 		&RR{"nX25.example.com.", TYPE_X25, CLASS_IN, -1,
 			&X25{"Linux \"rulez!\""}},
+
+		// keep last, it's a RR which can have rdlength == 0
+		&RR{"nOPT.example.com.", TYPE_OPT, Class(4096), -1,
+			&OPT{}},
 	}
 
 	for i, r := range data {
@@ -314,7 +328,7 @@ func Test0(t *testing.T) {
 			t.Fatal()
 		}
 
-		if r.Class != CLASS_IN {
+		if r.Class != CLASS_IN && r.Type != TYPE_OPT {
 			t.Fatal()
 		}
 

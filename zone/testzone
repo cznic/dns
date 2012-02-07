@@ -8,6 +8,7 @@ nA.example.com. IN A 1.2.3.4
 nA.example.com. 1 IN A 1.2.3.4
 nAAAA.example.com. IN AAAA ::1
 nAFSDB.example.com. IN AFSDB 12345 x.example.com.
+nCERT.example.com. IN CERT 1 2 3 AAZAAQAAAAM=
 nCNAME.example.com. IN CNAME cname.example.com
 nDNAME.example.com. IN DNAME dname.example.com
 nDNSKEY.example.com. IN DNSKEY 2 3 4 CwwNDg8QERIT

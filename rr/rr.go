@@ -125,6 +125,124 @@ func (d *AFSDB) String() string {
 	return fmt.Sprintf("%d %s", d.SubType, d.Hostname)
 }
 
+// CertType is the type of the Type field in the CERT RData
+type CertType uint16
+
+// Values of CertifiacteType as defined in rfc4398.
+//
+//  2.1.  Certificate Type Values
+//
+//   The following values are defined or reserved:
+//
+//         Value  Mnemonic  Certificate Type
+//         -----  --------  ----------------
+//             0            Reserved
+//             1  PKIX      X.509 as per PKIX
+//             2  SPKI      SPKI certificate
+//             3  PGP       OpenPGP packet
+//             4  IPKIX     The URL of an X.509 data object
+//             5  ISPKI     The URL of an SPKI certificate
+//             6  IPGP      The fingerprint and URL of an OpenPGP packet
+//             7  ACPKIX    Attribute Certificate
+//             8  IACPKIX   The URL of an Attribute Certificate
+//         9-252            Available for IANA assignment
+//           253  URI       URI private
+//           254  OID       OID private
+//           255            Reserved
+//     256-65279            Available for IANA assignment
+//   65280-65534            Experimental
+//         65535            Reserved
+const (
+	CertReserved0 CertType = iota
+	CertPKIX
+	CertSPKI
+	CertPGP
+	CertIPKIX
+	CertIPGP
+	CertACPKIX
+	CertIACPKIX
+	CertURI = iota + 244
+	CertOID
+	CertReserved255
+	CertExperimental65280 = 65280
+	CertExperimental65534 = 65534
+	CertReserved          = 65535
+)
+
+type CERT struct {
+	// The type field is the certificate type as defined by CertType.
+	Type CertType
+	// The key tag field is the 16-bit value computed for the key embedded
+	// in the certificate, using the RRSIG Key Tag algorithm described in
+	// Appendix B of [12].  This field is used as an efficiency measure to
+	// pick which CERT RRs may be applicable to a particular key.  The key
+	// tag can be calculated for the key in question, and then only CERT RRs
+	// with the same key tag need to be examined.  Note that two different
+	// keys can have the same key tag.  However, the key MUST be transformed
+	// to the format it would have as the public key portion of a DNSKEY RR
+	// before the key tag is computed.  This is only possible if the key is
+	// applicable to an algorithm and complies to limits (such as key size)
+	// defined for DNS security.  If it is not, the algorithm field MUST be
+	// zero and the tag field is meaningless and SHOULD be zero.
+	KeyTag uint16
+	// The algorithm field has the same meaning as the algorithm field in
+	// DNSKEY and RRSIG RRs [12], except that a zero algorithm field
+	// indicates that the algorithm is unknown to a secure DNS, which may
+	// simply be the result of the algorithm not having been standardized
+	// for DNSSEC [11].
+	//
+	// Defined by AlgorithmType
+	Algorithm AlgorithmType
+	// Certificate or CRL
+	Cert []byte
+}
+
+// Implementation of dns.Wirer
+func (r *CERT) Encode(b *dns.Wirebuf) {
+	dns.Octets2(r.Type).Encode(b)
+	dns.Octets2(r.KeyTag).Encode(b)
+	dns.Octet(r.Algorithm).Encode(b)
+	b.Buf = append(b.Buf, r.Cert...)
+}
+
+// Implementation of dns.Wirer
+func (r *CERT) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	p0 := &b[*pos]
+	if err = (*dns.Octets2)(&r.Type).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if err = (*dns.Octets2)(&r.KeyTag).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if err = (*dns.Octet)(&r.Algorithm).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	n := len(b) - *pos
+	if n <= 0 {
+		return fmt.Errorf("(*CERT).Decode: no certificate data")
+	}
+
+	r.Cert = make([]byte, n)
+	copy(r.Cert, b[*pos:])
+	*pos += n
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataCERT, r)
+	}
+	return
+}
+
+func (r *CERT) String() string {
+	return fmt.Sprintf("%d %d %d %s",
+		r.Type,
+		r.KeyTag,
+		r.Algorithm,
+		strutil.Base64Encode(r.Cert),
+	)
+}
+
 // CNAME holds the zone CNAME RData
 type CNAME struct {
 	Name string
@@ -216,10 +334,10 @@ const (
 	AlgorithmDSA_SHA1
 	AlgorithmElliptic
 	AlgorithmRSA_SHA1
-	AlgorithmIndirect     AlgorithmType = 252
-	AlgorithmPrivateDNS   AlgorithmType = 253
-	AlgorithmPrivateOID   AlgorithmType = 254
-	AlgorithmReserved1255 AlgorithmType = 255
+	AlgorithmIndirect AlgorithmType = iota + 246 // 252
+	AlgorithmPrivateDNS
+	AlgorithmPrivateOID
+	AlgorithmReserved1255
 )
 
 // Class is a RR CLASS
@@ -354,7 +472,7 @@ type DS struct {
 	// The key tag is calculated as specified in RFC 2535
 	KeyTag uint16
 	// Algorithm MUST be allowed to sign DNS data
-	AlgorithmType
+	Algorithm AlgorithmType
 	// The digest type is an identifier for the digest algorithm used
 	DigestType HashAlgorithm
 	// The digest is calculated over the
@@ -366,7 +484,7 @@ type DS struct {
 // Implementation of dns.Wirer
 func (d *DS) Encode(b *dns.Wirebuf) {
 	dns.Octets2(d.KeyTag).Encode(b)
-	dns.Octet(d.AlgorithmType).Encode(b)
+	dns.Octet(d.Algorithm).Encode(b)
 	dns.Octet(d.DigestType).Encode(b)
 	b.Buf = append(b.Buf, d.Digest...)
 }
@@ -377,7 +495,7 @@ func (d *DS) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err erro
 	if err = (*dns.Octets2)(&d.KeyTag).Decode(b, pos, sniffer); err != nil {
 		return
 	}
-	if err = (*dns.Octet)(&d.AlgorithmType).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octet)(&d.Algorithm).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 	if err = (*dns.Octet)(&d.DigestType).Decode(b, pos, sniffer); err != nil {
@@ -408,7 +526,7 @@ func (d *DS) String() string {
 		panic("internal error")
 	}
 
-	return fmt.Sprintf("%d %d %d %s", d.KeyTag, d.AlgorithmType, d.DigestType, hex.EncodeToString(d.Digest))
+	return fmt.Sprintf("%d %d %d %s", d.KeyTag, d.Algorithm, d.DigestType, hex.EncodeToString(d.Digest))
 }
 
 type ip4 net.IP
@@ -1721,6 +1839,11 @@ func (d *OPT_DATA) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (er
 	}
 	d.Data = b[p:next]
 	*pos = next
+	if next > len(b) {
+		sniffer(p0, nil, dns.SniffOPT_DATA, d)
+		return
+	}
+
 	if sniffer != nil {
 		sniffer(p0, &b[*pos-1], dns.SniffOPT_DATA, d)
 	}
@@ -2004,6 +2127,8 @@ func (rr *RR) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 		rr.RData = &AAAA{}
 	case TYPE_AFSDB:
 		rr.RData = &AFSDB{}
+	case TYPE_CERT:
+		rr.RData = &CERT{}
 	case TYPE_CNAME:
 		rr.RData = &CNAME{}
 	case TYPE_DNAME:
@@ -2088,8 +2213,10 @@ func (rr *RR) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 		return fmt.Errorf("malformed packet, len(RData) %d, len(buf) %d", rdlength, len(b)-*pos)
 	}
 
-	if err = rr.RData.Decode(b[:*pos+int(rdlength)], pos, sniffer); err != nil {
-		return
+	if rdlength != 0 {
+		if err = rr.RData.Decode(b[:*pos+int(rdlength)], pos, sniffer); err != nil {
+			return
+		}
 	}
 
 	if sniffer != nil {
@@ -2122,6 +2249,12 @@ func (a *RR) Equal(b *RR) (equal bool) {
 		y := b.RData.(*AFSDB)
 		return x.SubType == y.SubType &&
 			strings.ToLower(x.Hostname) == strings.ToLower(y.Hostname)
+	case *CERT:
+		y := b.RData.(*CERT)
+		return x.Type == y.Type &&
+			x.KeyTag == y.KeyTag &&
+			x.Algorithm == y.Algorithm &&
+			bytes.Equal(x.Cert, y.Cert)
 	case *CNAME:
 		return strings.ToLower(x.Name) == strings.ToLower(b.RData.(*CNAME).Name)
 	case *DNAME:
@@ -2135,7 +2268,7 @@ func (a *RR) Equal(b *RR) (equal bool) {
 	case *DS:
 		y := b.RData.(*DS)
 		return x.KeyTag == y.KeyTag &&
-			x.AlgorithmType == y.AlgorithmType &&
+			x.Algorithm == y.Algorithm &&
 			x.DigestType == y.DigestType &&
 			bytes.Equal(x.Digest, y.Digest)
 	case *GPOS:
@@ -2228,6 +2361,23 @@ func (a *RR) Equal(b *RR) (equal bool) {
 	case *NULL:
 		y := b.RData.(*NULL)
 		return bytes.Equal(x.Data, y.Data)
+	case *OPT:
+		y := b.RData.(*OPT)
+		if len(x.Values) != len(y.Values) {
+			return false
+		}
+		for i, v := range x.Values {
+			w := y.Values[i]
+			if v.Code != w.Code {
+				return false
+			}
+
+			if !bytes.Equal(v.Data, w.Data) {
+				return false
+			}
+		}
+
+		return true
 	case *PTR:
 		y := b.RData.(*PTR)
 		return strings.ToLower(x.PTRDName) == strings.ToLower(y.PTRDName)
@@ -2243,7 +2393,7 @@ func (a *RR) Equal(b *RR) (equal bool) {
 	case *RRSIG:
 		y := b.RData.(*RRSIG)
 		return x.Type == y.Type &&
-			x.AlgorithmType == y.AlgorithmType &&
+			x.Algorithm == y.Algorithm &&
 			x.Labels == y.Labels &&
 			x.TTL == y.TTL &&
 			x.Expiration == y.Expiration &&
@@ -2257,7 +2407,7 @@ func (a *RR) Equal(b *RR) (equal bool) {
 	case *SIG:
 		y := b.RData.(*SIG)
 		return x.Type == y.Type &&
-			x.AlgorithmType == y.AlgorithmType &&
+			x.Algorithm == y.Algorithm &&
 			x.Labels == y.Labels &&
 			x.TTL == y.TTL &&
 			x.Expiration == y.Expiration &&
@@ -2451,10 +2601,10 @@ func (d *RP) String() string {
 type RRSIG struct {
 	// The Type Covered field identifies the type of the RRset that is covered 
 	// by this RRSIG record.
-	Type
+	Type Type
 	//  The Algorithm Number field identifies the cryptographic algorithm used
 	// to create the signature. 
-	AlgorithmType
+	Algorithm AlgorithmType
 	// The Labels field specifies the number of labels in the original RRSIG RR owner name.
 	Labels byte
 	// The Original TTL field specifies the TTL of the covered RRset as it appears
@@ -2482,7 +2632,7 @@ type RRSIG struct {
 // Implementation of dns.Wirer
 func (r *RRSIG) Encode(b *dns.Wirebuf) {
 	dns.Octets2(r.Type).Encode(b)
-	dns.Octet(r.AlgorithmType).Encode(b)
+	dns.Octet(r.Algorithm).Encode(b)
 	dns.Octet(r.Labels).Encode(b)
 	dns.Octets4(r.TTL).Encode(b)
 	dns.Octets4(r.Expiration).Encode(b)
@@ -2501,7 +2651,7 @@ func (r *RRSIG) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err e
 		return
 	}
 
-	if err = (*dns.Octet)(&r.AlgorithmType).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octet)(&r.Algorithm).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
@@ -2549,7 +2699,7 @@ func (r *RRSIG) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err e
 func (r *RRSIG) String() string {
 	return fmt.Sprintf("%s %d %d %d %s %s %d %s %s",
 		r.Type,
-		r.AlgorithmType,
+		r.Algorithm,
 		r.Labels,
 		r.TTL,
 		dns.Seconds2String(int64(r.Expiration)),
@@ -2610,10 +2760,10 @@ func (d *RT) String() string {
 type SIG struct {
 	// The Type Covered field identifies the type of the RRset that is covered 
 	// by this SIG record.
-	Type
+	Type Type
 	//  The Algorithm Number field identifies the cryptographic algorithm used
 	// to create the signature. 
-	AlgorithmType
+	Algorithm AlgorithmType
 	// The Labels field specifies the number of labels in the original SIG RR owner name.
 	Labels byte
 	// The Original TTL field specifies the TTL of the covered RRset as it appears
@@ -2641,7 +2791,7 @@ type SIG struct {
 // Implementation of dns.Wirer
 func (r *SIG) Encode(b *dns.Wirebuf) {
 	dns.Octets2(r.Type).Encode(b)
-	dns.Octet(r.AlgorithmType).Encode(b)
+	dns.Octet(r.Algorithm).Encode(b)
 	dns.Octet(r.Labels).Encode(b)
 	dns.Octets4(r.TTL).Encode(b)
 	dns.Octets4(r.Expiration).Encode(b)
@@ -2660,7 +2810,7 @@ func (r *SIG) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 		return
 	}
 
-	if err = (*dns.Octet)(&r.AlgorithmType).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octet)(&r.Algorithm).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
@@ -2708,7 +2858,7 @@ func (r *SIG) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 func (r *SIG) String() string {
 	return fmt.Sprintf("%s %d %d %d %s %s %d %s %s",
 		r.Type,
-		r.AlgorithmType,
+		r.Algorithm,
 		r.Labels,
 		r.TTL,
 		dns.Seconds2String(int64(r.Expiration)),
@@ -3054,18 +3204,18 @@ const (
 	TYPE_AAAA       // 28 IP6 Address                                 [RFC3596]
 	TYPE_LOC        // 29 Location Information                        [RFC1876]
 	TYPE_NXT        // 30 Next Domain - OBSOLETE                      [RFC3755][RFC2535]
-	TYPE_EID        // 31 Endpoint Identifier                         [Patton]
-	TYPE_NIMLOC     // 32 Nimrod Locator                              [Patton]
+	TYPE_EID        // 31 Endpoint Identifier                         [Patton]           NOT supported by this package
+	TYPE_NIMLOC     // 32 Nimrod Locator                              [Patton]           NOT supported by this package
 	TYPE_SRV        // 33 Server Selection                            [RFC2782]
-	TYPE_ATMA       // 34 ATM Address                                 [ATMDOC]
+	TYPE_ATMA       // 34 ATM Address                                 [ATMDOC]           NOT supported by this package
 	TYPE_NAPTR      // 35 Naming Authority Pointer                    [RFC2915][RFC2168][RFC3403]
 	TYPE_KX         // 36 Key Exchanger                               [RFC2230]
 	TYPE_CERT       // 37 CERT                                        [RFC4398]
-	TYPE_A6         // 38 A6 (Experimental)                           [RFC3226][RFC2874]
+	TYPE_A6         // 38 A6 (Experimental)                           [RFC3226][RFC2874] NOT supported by this package
 	TYPE_DNAME      // 39 DNAME                                       [RFC2672]
-	TYPE_SINK       // 40 SINK                                        [Eastlake]
+	TYPE_SINK       // 40 SINK                                        [Eastlake]         NOT supported by this package
 	TYPE_OPT        // 41 OPT                                         [RFC2671]
-	TYPE_APL        // 42 APL                                         [RFC3123]
+	TYPE_APL        // 42 APL (Experimental)                          [RFC3123]          NOT supported by this package
 	TYPE_DS         // 43 Delegation Signer                           [RFC4034][RFC3658]
 	TYPE_SSHFP      // 44 SSH Key Fingerprint                         [RFC4255]
 	TYPE_IPSECKEY   // 45 IPSECKEY                                    [RFC4025]
@@ -3081,20 +3231,20 @@ const (
 	_ Type = iota + 54
 
 	TYPE_HIP    // 55 Host Identity Protocol                      [RFC5205]
-	TYPE_NINFO  // 56 NINFO                                       [Reid]
-	TYPE_RKEY   // 57 RKEY                                        [Reid]
-	TYPE_TALINK // 58 Trust Anchor LINK                           [Wijngaards]
-	TYPE_CDS    // 59 Child DS                                    [Barwood]
+	TYPE_NINFO  // 56 NINFO                                       [Reid]                 NOT supported by this package
+	TYPE_RKEY   // 57 RKEY                                        [Reid]                 NOT supported by this package
+	TYPE_TALINK // 58 Trust Anchor LINK                           [Wijngaards]           NOT supported by this package
+	TYPE_CDS    // 59 Child DS                                    [Barwood]              NOT supported by this package
 )
 
 const (
 	_ Type = iota + 98
 
 	TYPE_SPF    //  99                                             [RFC4408]
-	TYPE_UINFO  // 100                                             [IANA-Reserved]
-	TYPE_UID    // 101                                             [IANA-Reserved]
-	TYPE_GID    // 102                                             [IANA-Reserved]
-	TYPE_UNSPEC // 103                                             [IANA-Reserved]
+	TYPE_UINFO  // 100                                             [IANA-Reserved]       NOT supported by this package
+	TYPE_UID    // 101                                             [IANA-Reserved]       NOT supported by this package
+	TYPE_GID    // 102                                             [IANA-Reserved]       NOT supported by this package
+	TYPE_UNSPEC // 103                                             [IANA-Reserved]       NOT supported by this package
 )
 
 const (
@@ -3111,14 +3261,14 @@ const (
 const (
 	_ Type = iota + 255
 
-	TYPE_URI // 256 URI                                        [Faltstrom]
-	TYPE_CAA // 257 Certification Authority Authorization      [Hallam-Baker]
+	TYPE_URI // 256 URI                                        [Faltstrom]               NOT supported by this package
+	TYPE_CAA // 257 Certification Authority Authorization      [Hallam-Baker]            NOT supported by this package
 )
 
 const (
 	_ Type = iota + 0x7FFF
 
-	TYPE_TA  // 32768   DNSSEC Trust Authorities               [Weiler]           2005-12-13
+	TYPE_TA  // 32768   DNSSEC Trust Authorities               [Weiler]                  NOT supported by this package
 	TYPE_DLV // 32769   DNSSEC Lookaside Validation            [RFC4431]
 )
 

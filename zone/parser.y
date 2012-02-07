@@ -166,6 +166,7 @@ type rrHead struct{
 	a
 	aaaa
 	afsdb
+	cert
 	cname
 	dname
 	dnskey
@@ -333,6 +334,17 @@ base64str:
 |	base64str tBASE64
 	{
 		$$ += $2
+	}
+
+
+cert:
+	tCERT
+	{
+		yylex.begin(sc_NUM)
+	}
+	uint16 uint16 alg base64
+	{
+		$$ = &rr.CERT{rr.CertType($3), uint16($4), $5, $6}
 	}
 
 
@@ -894,6 +906,10 @@ rr2:
 |	rrHead afsdb
 	{
 		$$ = &rr.RR{"", rr.TYPE_AFSDB, $1.class, $1.ttl, $2}
+	}
+|	rrHead cert
+	{
+		$$ = &rr.RR{"", rr.TYPE_CERT, $1.class, $1.ttl, $2}
 	}
 |	rrHead cname
 	{
