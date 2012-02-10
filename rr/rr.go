@@ -2095,6 +2095,10 @@ func (rr *RR) Encode(b *dns.Wirebuf) {
 
 // Implementation of dns.Wirer
 func (rr *RR) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	if *pos >= len(b) {
+		return fmt.Errorf("rr.Decode buffer underflow, len(b) %d(0x%x), pos %d(0x%x)", len(b), len(b), *pos, *pos)
+	}
+
 	p0 := &b[*pos]
 	if err = (*dns.DomainName)(&rr.Name).Decode(b, pos, sniffer); err != nil {
 		return

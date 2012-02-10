@@ -4,10 +4,13 @@
 
 # blame: jnml, labs.nic.cz
 
-all: scanner.go
+all: resolverexample.go
 
-scanner.go: scanner.l
-	golex -o scanner.go scanner.l && gofmt -w scanner.go
+resolverexample.go: resolverexample.l
+	golex -t resolverexample.l | gofmt > resolverexample.go
 
 clean:
-	rm -f scanner.go lex.yy.go temp_db y.output *~
+	rm -f resolverexample.go *~
+
+nuke: clean
+	rm -f example

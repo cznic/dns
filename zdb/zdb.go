@@ -73,7 +73,7 @@ func (a *hdbAccessor) Stat() (fi os.FileInfo, err error) {
 	if fi, err = a.accessor.Stat(); err != nil {
 		return
 	}
-	i := storage.NewFileInfo(fi)
+	i := storage.NewFileInfo(fi, a)
 	i.FSize -= a.delta
 	return i, nil
 }

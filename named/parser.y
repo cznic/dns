@@ -14,8 +14,8 @@ package named
 
 
 import (
-	"github.com/cznic/dns/rr"
-	"github.com/cznic/strutil"
+	"cznic/dns/rr"
+	"cznic/strutil"
 	"fmt"
 	"io/ioutil"
 	"math"
