@@ -9,5 +9,5 @@ package dns
 // Pull test dependencies too.
 // Enables easy 'go test X' after 'go get X'
 import (
-	"github.com/cznic/mathutil"
+	_ "github.com/cznic/mathutil"
 )
