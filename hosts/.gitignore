@@ -1,3 +1,2 @@
 parser.tab
-parser.go
-scanner.go
+y.output
