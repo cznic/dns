@@ -191,6 +191,26 @@ func Test0(t *testing.T) {
 			&GPOS{-32.6882, 116.8652, 10.0}},
 		&RR{"nHINFO.example.com.", TYPE_HINFO, CLASS_IN, -1,
 			&HINFO{"x86_64", "Linux"}},
+		&RR{"nIPSECKEY.example.com.", TYPE_IPSECKEY, CLASS_IN, -1,
+			&IPSECKEY{10, GatewayNone, IPSECKEYAlgorithmRSA,
+				nil,
+				[]byte{13, 14, 15, 16}},
+		},
+		&RR{"nIPSECKEY.example.com.", TYPE_IPSECKEY, CLASS_IN, -1,
+			&IPSECKEY{11, GatewayIPV4, IPSECKEYAlgorithmRSA,
+				net.IPv4(1, 2, 3, 4),
+				[]byte{12, 13, 14, 15, 16}},
+		},
+		&RR{"nIPSECKEY.example.com.", TYPE_IPSECKEY, CLASS_IN, -1,
+			&IPSECKEY{11, GatewayIPV6, IPSECKEYAlgorithmRSA,
+				net.ParseIP("2001:4860:0:2001::68"),
+				[]byte{11, 12, 13, 14, 15, 16}},
+		},
+		&RR{"nIPSECKEY.example.com.", TYPE_IPSECKEY, CLASS_IN, -1,
+			&IPSECKEY{11, GatewayDomain, IPSECKEYAlgorithmRSA,
+				"gateway.example.com.",
+				[]byte{10, 11, 12, 13, 14, 15, 16}},
+		},
 		&RR{"nISDN.example.com.", TYPE_ISDN, CLASS_IN, -1,
 			&ISDN{"\"isdn", "\"sa"}},
 		&RR{"nKEY.example.com.", TYPE_KEY, CLASS_IN, -1,
@@ -306,7 +326,7 @@ func Test0(t *testing.T) {
 		lines2, lines1 := strings.Split(s2, "\n"), strings.Split(s, "\n")
 		for i, line2 := range lines2 {
 			if line1 := lines1[i]; line2 != line1 {
-				t.Errorf("g:\n%s\ne:\n%s", hex.Dump([]byte(line2)), hex.Dump([]byte(line1)))
+				t.Errorf("\ngot:\n%sexp:\n%s", hex.Dump([]byte(line2)), hex.Dump([]byte(line1)))
 				for j, c2 := range []byte(line2) {
 					if j >= len(line1) {
 						t.Errorf("len diff @ %d, %d != %d", j, len(line2), len(line1))

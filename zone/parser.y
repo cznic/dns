@@ -173,6 +173,8 @@ type rrHead struct{
 	ds
 	gpos
 	hinfo
+	ipseckey
+	ipseckey_0
 	isdn
 	key
 	kx
@@ -426,6 +428,81 @@ hex:
 		$$ = $2
 	}
 
+
+ipseckey_0:
+	tIPSECKEY
+	{
+		yylex.begin(sc_NUM)
+	}
+	uint8 uint8 uint8
+	{
+		x := &rr.IPSECKEY{Precedence: byte($3), GatewayType: rr.GatewayType($4), Algorithm: rr.IPSECKEYAlgorithm($5)}
+		$$ = x
+		switch x.GatewayType {
+		default:
+			yylex.Error("Unknown gateway type")
+		case rr.GatewayNone, rr.GatewayIPV4, rr.GatewayIPV6, rr.GatewayDomain:
+			// OK
+		}
+
+		switch x.Algorithm {
+		default:
+			yylex.Error("Unknown algorithm")
+		case rr.IPSECKEYAlgorithmDSA, rr.IPSECKEYAlgorithmRSA:
+			// OK
+		}
+
+		yylex.begin(sc_IPSSECKEY)
+	}
+
+ipseckey:
+	ipseckey_0 '.' base64
+	{
+		x := $1.(*rr.IPSECKEY)
+		x.PublicKey = $3
+		$$ = x
+		switch x.GatewayType {
+		case rr.GatewayNone:
+			// OK
+		case rr.GatewayIPV4:
+			yylex.Error("missing gateway IPv4 address")
+		case rr.GatewayIPV6:
+			yylex.Error("missing gateway IPv6 address")
+		case rr.GatewayDomain:
+			yylex.Error("missing gateway <domain-name>")
+		}
+	}
+|	ipseckey_0 tIPV4 base64
+	{
+		x := $1.(*rr.IPSECKEY)
+		x.Gateway = $2
+		x.PublicKey = $3
+		$$ = x
+		if x.GatewayType != rr.GatewayIPV4 {
+			yylex.Error("expected IPv4 gateway")
+		}
+	}
+|	ipseckey_0 tIPV6 base64
+	{
+		x := $1.(*rr.IPSECKEY)
+		x.Gateway = $2
+		x.PublicKey = $3
+		$$ = x
+		if x.GatewayType != rr.GatewayIPV6 {
+			yylex.Error("expected IPv6 gateway")
+		}
+	}
+|	ipseckey_0 tDOMAIN_NAME base64
+	{
+		x := $1.(*rr.IPSECKEY)
+		x.Gateway = $2
+		x.PublicKey = $3
+		$$ = x
+		if x.GatewayType != rr.GatewayDomain {
+	println($2)
+			yylex.Error("expected <domain-name> gateway")
+		}
+	}
 
 key:
 	tKEY uint16 uint8 alg
@@ -927,6 +1004,10 @@ rr2:
 |	rrHead ds
 	{
 		$$ = &rr.RR{"", rr.TYPE_DS, $1.class, $1.ttl, $2}
+	}
+|	rrHead ipseckey
+	{
+		$$ = &rr.RR{"", rr.TYPE_IPSECKEY, $1.class, $1.ttl, $2}
 	}
 |	rrHead key
 	{

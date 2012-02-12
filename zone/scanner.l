@@ -132,6 +132,7 @@ const (
 	sc_0XHEX // 12
 	sc_FLOAT // 13
 	sc_ANY_DOMAIN // 14
+	sc_IPSSECKEY // 15
 )
 
 
@@ -177,15 +178,16 @@ ipv6           {hexpart}
 domain-name    {label}("."{label})*\.?|\.
 srv-domain     {srv-label}"."{srv-label}"."{domain-name}
 any-domain     ({srv-label}"."{srv-label})?"."{domain-name}?
-let-or-digit   [a-zA-Z0-9]
-label          {let-or-digit}(({let-or-digit}|"-")*{let-or-digit})?
+letter         [a-zA-Z]
+let-or-digit   {letter}|{digit}
+label          {letter}(({let-or-digit}|"-")*{let-or-digit})?
 srv-label      _{label}
 
 float_lit	{D}"."{D}?{E}?|{D}{E}|"."{D}{E}?
 D		[0-9]+
 E		[eE][-+]?[0-9]+
 
-%x rrHead domain num ipv4 ipv6 base32ext base64 type hex proto port xhex float anydomain
+%x rrHead domain num ipv4 ipv6 base32ext base64 type hex proto port xhex float anydomain ipseckey
 
 %%
 	if ret >= 0 {
@@ -243,7 +245,10 @@ E		[eE][-+]?[0-9]+
 	lval.str = string(bytes.Replace(l.buf[1:len(l.buf)-1], []byte(`\"`), []byte(`"`), -1))
 	return tQSTR
 
-<domain>{domain-name}
+<ipseckey>\.
+	ret = '.'
+
+<domain,ipseckey>{domain-name}
 	ret = tDOMAIN_NAME
 
 <*>[ \t]+
@@ -333,7 +338,7 @@ E		[eE][-+]?[0-9]+
 <rrHead,type>WKS        ret = tWKS
 <rrHead,type>X25        ret = tX25
 
-<ipv4>{ipv4}
+<ipv4,ipseckey>{ipv4}
 	ip := net.ParseIP(string(l.buf))
 	if ip == nil {
 		l.Error(fmt.Sprintf("invalid IP %q", l.buf))
@@ -341,7 +346,7 @@ E		[eE][-+]?[0-9]+
 	lval.ip = ip
 	return tIPV4
 
-<ipv6>{ipv6}
+<ipv6,ipseckey>{ipv6}
 	ip := net.ParseIP(string(l.buf))
 	if ip == nil {
 		l.Error(fmt.Sprintf("invalid IP %q", l.buf))
@@ -352,7 +357,7 @@ E		[eE][-+]?[0-9]+
 <base32ext>[0-9A-V=]+
 	ret = tBASE32EXT
 
-<base64>[A-Za-z0-9+/=]+
+<base64,ipseckey>[A-Za-z0-9+/=]+
 	ret = tBASE64
 
 <xhex>0x({hex}|\.)+

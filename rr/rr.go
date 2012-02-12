@@ -10,6 +10,7 @@ package rr
 import (
 	"bytes"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"github.com/cznic/dns"
 	"github.com/cznic/strutil"
@@ -696,6 +697,245 @@ func (d *HINFO) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err e
 
 func (d *HINFO) String() string {
 	return fmt.Sprintf(`"%s" "%s"`, quote(d.Cpu), quote(d.Os))
+}
+
+// IPSECKEYAlgorithm is the type of the IPSECKEY RData Algorithm field
+type IPSECKEYAlgorithm byte
+
+// Values of IPSECKEYAlgorithm
+const (
+	IPSECKEYAlgorithmNone IPSECKEYAlgorithm = iota
+	IPSECKEYAlgorithmDSA
+	IPSECKEYAlgorithmRSA
+)
+
+// GatewayType type is the type of the IPSECKEY GatewayType field.
+type GatewayType byte
+
+// Values of GatewayType
+const (
+	GatewayNone GatewayType = iota
+	GatewayIPV4
+	GatewayIPV6
+	GatewayDomain
+)
+
+// IPSECKEY type represents the IPSECKEY RR RData.  The IPSECKEY resource
+// record (RR) is used to publish a public key that is to be associated with a
+// Domain Name System (DNS) [1] name for use with the IPsec protocol suite.
+// This can be the public key of a host, network, or application (in the case
+// of per-port keying).
+//
+// NOTE: IPSECKEY.Encode(), .String() will panic and/or fail to perform
+// properly if GatewayType doesn't reflect the appropriate type stored in
+// Gateway. Use the SetGateway helper to avoid such situation.
+type IPSECKEY struct {
+	// This is an 8-bit precedence for this record.  It is interpreted in
+	// the same way as the PREFERENCE field described in section 3.3.9 of
+	// RFC 1035.
+	//
+	// Gateways listed in IPSECKEY records with lower precedence are to be
+	// attempted first.  Where there is a tie in precedence, the order
+	// should be non-deterministic.
+	Precedence byte
+	// The gateway type field indicates the format of the information that
+	// is stored in the gateway field.
+	//
+	// The following values are defined:
+	// 0  No gateway is present.
+	//    Gateway == nil
+	// 1  A 4-byte IPv4 address is present.
+	//    Gateway.(type) == net.IP w/ len() == 4
+	// 2  A 16-byte IPv6 address is present.
+	//    Gateway.(type) == net.IP w/ len() == 16
+	// 3  A wire-encoded domain name is present.  The wire-encoded format is
+	//    self-describing, so the length is implicit.  The domain name MUST
+	//    NOT be compressed.  (See Section 3.3 of RFC 1035.)
+	//    Gateway.(type) == dns.DomainName
+	GatewayType GatewayType
+	// The algorithm type field identifies the public key's cryptographic
+	// algorithm and determines the format of the public key field.
+	//
+	// A value of 0 indicates that no key is present.
+	//
+	// The following values are defined:
+	// 1  A DSA key is present, in the format defined in RFC 2536.
+	// 2  A RSA key is present, in the format defined in RFC 3110.
+	Algorithm IPSECKEYAlgorithm
+	// The gateway field indicates a gateway to which an IPsec tunnel may be
+	// created in order to reach the entity named by this resource record.
+	//
+	// There are three formats:
+	//
+	// A 32-bit IPv4 address is present in the gateway field.  The data
+	// portion is an IPv4 address as described in section 3.4.1 of RFC 1035
+	// [2].  This is a 32-bit number in network byte order.
+	//
+	// A 128-bit IPv6 address is present in the gateway field.  The data
+	// portion is an IPv6 address as described in section 2.2 of RFC 3596
+	// [12].  This is a 128-bit number in network byte order.
+	//
+	// The gateway field is a normal wire-encoded domain name, as described
+	// in section 3.3 of RFC 1035 [2].  Compression MUST NOT be used.
+	Gateway interface{}
+	// Both the public key types defined in this document (RSA and DSA)
+	// inherit their public key formats from the corresponding KEY RR
+	// formats.  Specifically, the public key field contains the
+	// algorithm-specific portion of the KEY RR RDATA, which is all the KEY
+	// RR DATA after the first four octets.  This is the same portion of the
+	// KEY RR that must be specified by documents that define a DNSSEC
+	// algorithm.  Those documents also specify a message digest to be used
+	// for generation of SIG RRs; that specification is not relevant for
+	// IPSECKEY RRs.
+	//
+	// Future algorithms, if they are to be used by both DNSSEC (in the KEY
+	// RR) and IPSECKEY, are likely to use the same public key encodings in
+	// both records.  Unless otherwise specified, the IPSECKEY public key
+	// field will contain the algorithm-specific portion of the KEY RR RDATA
+	// for the corresponding algorithm.  The algorithm must still be
+	// designated for use by IPSECKEY, and an IPSECKEY algorithm type number
+	// (which might be different from the DNSSEC algorithm number) must be
+	// assigned to it.
+	//
+	// The DSA key format is defined in RFC 2536.
+	//
+	// The RSA key format is defined in RFC 3110, with the following
+	// changes:
+	//
+	// The earlier definition of RSA/MD5 in RFC 2065 limited the exponent
+	// and modulus to 2552 bits in length.  RFC 3110 extended that limit to
+	// 4096 bits for RSA/SHA1 keys.  The IPSECKEY RR imposes no length
+	// limit on RSA public keys, other than the 65535 octet limit imposed
+	// by the two-octet length encoding.  This length extension is
+	// applicable only to IPSECKEY; it is not applicable to KEY RRs.
+	PublicKey []byte
+}
+
+// SetGeteway will safely set d.Gateway and d.GatewayType or return an error
+// otherwise if g type is not (nil or net.IP or a string).
+func (d *IPSECKEY) SetGateway(g interface{}) (t GatewayType, err error) {
+	switch x := g.(type) {
+	default:
+		err = fmt.Errorf("(*IPSECKEY).SetGateway(%T): unsupported", g)
+	case nil:
+		d.GatewayType, d.Gateway = GatewayNone, nil
+	case net.IP:
+		if ip := x.To4(); ip != nil {
+			d.GatewayType, d.Gateway = GatewayIPV4, ip
+			break
+		}
+
+		if ip := x.To16(); ip != nil {
+			d.GatewayType, d.Gateway = GatewayIPV6, ip
+			break
+		}
+
+		err = fmt.Errorf("(*IPSECKEY).SetGateway(%#v): unsupported", g)
+	case string:
+		d.GatewayType, d.Gateway = GatewayDomain, dns.DomainName(x)
+	case dns.DomainName:
+		d.GatewayType, d.Gateway = GatewayDomain, string(x)
+	}
+
+	t = d.GatewayType
+	return
+}
+
+// Implementation of dns.Wirer
+func (d *IPSECKEY) Encode(b *dns.Wirebuf) {
+	dns.Octet(d.Precedence).Encode(b)
+	dns.Octet(d.GatewayType).Encode(b)
+	dns.Octet(d.Algorithm).Encode(b)
+	switch d.GatewayType {
+	case GatewayNone:
+		// nop
+	case GatewayIPV4:
+		b.Buf = append(b.Buf, d.Gateway.(net.IP).To4()...)
+	case GatewayIPV6:
+		b.Buf = append(b.Buf, d.Gateway.(net.IP).To16()...)
+	case GatewayDomain:
+		b.DisableCompression()
+		dns.DomainName(d.Gateway.(string)).Encode(b)
+		b.EnableCompression()
+	}
+	b.Buf = append(b.Buf, d.PublicKey...)
+}
+
+// Implementation of dns.Wirer
+func (d *IPSECKEY) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	p0 := &b[*pos]
+	if err = (*dns.Octet)(&d.Precedence).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if err = (*dns.Octet)(&d.GatewayType).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if err = (*dns.Octet)(&d.Algorithm).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	switch d.GatewayType {
+	default:
+		return fmt.Errorf("(*IPSECKEY.Decode(): Unknown GatewayType %d", d.GatewayType)
+	case GatewayNone:
+		// nop
+	case GatewayIPV4:
+		if *pos+4 > len(b)+1 {
+			return errors.New("(*IPSECKEY.Decode(): Buffer undeflow")
+		}
+
+		d.Gateway = net.IP(append([]byte{}, b[*pos:*pos+4]...))
+		*pos += 4
+	case GatewayIPV6:
+		if *pos+16 > len(b)+1 {
+			return errors.New("(*IPSECKEY.Decode(): Buffer undeflow")
+		}
+
+		d.Gateway = net.IP(append([]byte{}, b[*pos:*pos+16]...))
+		*pos += 16
+	case GatewayDomain:
+		var n dns.DomainName
+		if err = (*dns.DomainName)(&n).Decode(b, pos, sniffer); err != nil {
+			return
+		}
+
+		d.Gateway = string(n)
+	}
+
+	n := len(b) - *pos
+	if n <= 0 {
+		return fmt.Errorf("(*IPSECKEY).Decode: no key data")
+	}
+
+	d.PublicKey = make([]byte, n)
+	copy(d.PublicKey, b[*pos:])
+	*pos += n
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataIPSECKEY, d)
+	}
+	return
+}
+
+func (d *IPSECKEY) String() (s string) {
+	defer func() {
+		if e := recover(); e != nil {
+			s = fmt.Sprintf("; (*IPSECKEY).String(%#v): %v", d, e)
+		}
+	}()
+
+	switch d.GatewayType {
+	default:
+		panic(fmt.Errorf("(*IPSECKEY.Decode(): Unknown GatewayType %d", d.GatewayType))
+	case GatewayNone:
+		return fmt.Sprintf("%d %d %d . %s", d.Precedence, d.GatewayType, d.Algorithm, strutil.Base64Encode(d.PublicKey))
+	case GatewayIPV4, GatewayIPV6:
+		return fmt.Sprintf("%d %d %d %s %s", d.Precedence, d.GatewayType, d.Algorithm, d.Gateway.(net.IP), strutil.Base64Encode(d.PublicKey))
+	case GatewayDomain:
+		return fmt.Sprintf("%d %d %d %s %s", d.Precedence, d.GatewayType, d.Algorithm, d.Gateway.(string), strutil.Base64Encode(d.PublicKey))
+	}
+	panic("unreachable")
 }
 
 // An ISDN (Integrated Service Digital Network) number is simply a telephone
@@ -2145,6 +2385,8 @@ func (rr *RR) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 		rr.RData = &GPOS{}
 	case TYPE_HINFO:
 		rr.RData = &HINFO{}
+	case TYPE_IPSECKEY:
+		rr.RData = &IPSECKEY{}
 	case TYPE_ISDN:
 		rr.RData = &ISDN{}
 	case TYPE_KEY:
@@ -2285,6 +2527,44 @@ func (a *RR) Equal(b *RR) (equal bool) {
 	case *HINFO:
 		y := b.RData.(*HINFO)
 		return x.Cpu == y.Cpu && x.Os == y.Os
+	case *IPSECKEY:
+		y := b.RData.(*IPSECKEY)
+		if x.Precedence != y.Precedence ||
+			x.GatewayType != y.GatewayType &&
+				x.Algorithm != y.Algorithm {
+			return false
+		}
+
+		switch x.GatewayType {
+		default:
+			return false
+		case GatewayNone:
+			return x.Gateway == nil && y.Gateway == nil
+		case GatewayIPV4, GatewayIPV6:
+			ipx, ok := x.Gateway.(net.IP)
+			if !ok {
+				return false
+			}
+
+			ipy, ok := y.Gateway.(net.IP)
+			if !ok {
+				return false
+			}
+
+			return ipx.Equal(ipy)
+		case GatewayDomain:
+			nx, ok := x.Gateway.(string)
+			if !ok {
+				return false
+			}
+
+			ny, ok := y.Gateway.(string)
+			if !ok {
+				return false
+			}
+
+			return nx == ny
+		}
 	case *ISDN:
 		y := b.RData.(*ISDN)
 		return x.ISDN == y.ISDN && x.Sa == y.Sa

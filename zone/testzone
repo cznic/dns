@@ -15,6 +15,35 @@ nDNSKEY.example.com. IN DNSKEY 2 3 4 CwwNDg8QERIT
 nDS.example.com. IN DS 4660 86 1 000102030405060708090a0b0c0d0e0f10111213
 nGPOS.example.com.	IN	6	GPOS -32.6882 116.8652 10.0
 nHINFO.example.com. IN HINFO "x86_\"64" "Linux"
+
+nIPSECKEY.example.com. 7200 IN     IPSECKEY ( 10 0 1
+                    .
+                    AQNRU3mG7TVTO2BkR47usntb102uFJtugbo6BSGvgqt4AQ== )
+nIPSECKEY.example.com. 7200 IN     IPSECKEY ( 10 1 2 1.2.3.4
+                    AQNRU3mG7TVTO2BkR47usntb102uFJtugbo6BSGvgqt4AQ== )
+nIPSECKEY.example.com. 7200 IN     IPSECKEY ( 10 2 2 2001:4860:0:2001::68
+                    AQNRU3mG7TVTO2BkR47usntb102uFJtugbo6BSGvgqt4AQ== )
+nIPSECKEY.example.com. 7200 IN     IPSECKEY ( 10 3 2 gateway.example.com.
+                    AQNRU3mG7TVTO2BkR47usntb102uFJtugbo6BSGvgqt4AQ== )
+nIPSECKEY.example.com. 7200 IN     IPSECKEY ( 10 0 2
+                    .
+                    AQNRU3mG7TVTO2BkR47usntb102uFJtugbo6BSGvgqt4AQ== )
+nIPSECKEY.example.com. 7200 IN     IPSECKEY ( 10 1 2
+                 192.0.2.38
+                 AQNRU3mG7TVTO2BkR47usntb102uFJtugbo6BSGvgqt4AQ== )
+nIPSECKEY.example.com. 7200 IN     IPSECKEY ( 10 0 2
+                 .
+                 AQNRU3mG7TVTO2BkR47usntb102uFJtugbo6BSGvgqt4AQ== )
+nIPSECKEY.example.com. 7200 IN     IPSECKEY ( 10 1 2
+                 192.0.2.3
+                 AQNRU3mG7TVTO2BkR47usntb102uFJtugbo6BSGvgqt4AQ== )
+nIPSECKEY.example.com. 7200 IN     IPSECKEY ( 10 3 2
+                 mygateway.example.com.
+                 AQNRU3mG7TVTO2BkR47usntb102uFJtugbo6BSGvgqt4AQ== )
+nIPSECKEY.example.com. 7200 IN     IPSECKEY ( 10 2 2
+                 2001:0DB8:0:8002::2000:1
+                 AQNRU3mG7TVTO2BkR47usntb102uFJtugbo6BSGvgqt4AQ== )
+
 nISDN.example.com. IN ISDN "\"phone"
 nISDN.example.com. IN ISDN "\"phone" "\"home"
 nKEY.example.com. IN KEY 2 3 4 CwwNDg8QERIT

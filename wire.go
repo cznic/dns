@@ -259,6 +259,7 @@ const (
 	SniffRDataDS                           // DS resource record data
 	SniffRDataGPOS                         // GPOS resource record data
 	SniffRDataHINFO                        // HINFO resource record data
+	SniffRDataIPSECKEY                     // IPSECKEY resource record data
 	SniffRDataISDN                         // ISDN resource record data
 	SniffRDataKEY                          // KEY resource record data
 	SniffRDataKX                           // KX resource record data
