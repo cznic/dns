@@ -338,6 +338,18 @@ E		[eE][-+]?[0-9]+
 <rrHead,type>WKS        ret = tWKS
 <rrHead,type>X25        ret = tX25
 
+<type>TYPE{digit}+
+	s := string(l.buf[4:])
+	n, err := strconv.ParseUint(s, 10, 16)
+	lval.uint = uint(n)
+	if err != nil {
+		l.Error(fmt.Sprintf("%s: %v", s, err))
+	}
+	ret = tTYPE_X
+	if _, ok := typex[int(n)]; ok {
+		ret = int(n)
+	}
+
 <ipv4,ipseckey>{ipv4}
 	ip := net.ParseIP(string(l.buf))
 	if ip == nil {

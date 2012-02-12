@@ -117,6 +117,8 @@ type rrHead struct{
 	tWKS
 	tX25
 
+	tTYPE_X
+
 	tTCP_PROTO
 	tUDP_PROTO
 	tSMTP_PORT
@@ -190,6 +192,7 @@ type rrHead struct{
 	ns
 	nsap
 	nsap_ptr
+	nsec
 	nsec3
 	nsec3param
 	null
@@ -247,6 +250,7 @@ type rrHead struct{
 	loc_s_h_v
 	loc_h_v
 	loc_v
+	tTYPE_X
 
 %%
 
@@ -859,6 +863,21 @@ nsap_ptr:
 
 
 
+nsec:
+	tNSEC
+	{
+		yylex.begin(sc_DOMAIN)
+	}
+	tDOMAIN_NAME
+	{
+		yylex.begin(sc_TYPE)
+	}
+	rrtypes
+	{
+		$$ = &rr.NSEC{$3, rr.TypesEncode($5)}
+	}
+
+
 nsec3:
 	tNSEC3
 	{
@@ -1065,6 +1084,10 @@ rr2:
 |	rrHead nsap_ptr
 	{
 		$$ = &rr.RR{"", rr.TYPE_NSAP_PTR, $1.class, $1.ttl, $2}
+	}
+|	rrHead nsec
+	{
+		$$ = &rr.RR{"", rr.TYPE_NSEC, $1.class, $1.ttl, $2}
 	}
 |	rrHead nsec3
 	{
@@ -1436,6 +1459,10 @@ rrtypetok:
 |	tX25
 	{
 		$$ = rr.TYPE_X25
+	}
+|	tTYPE_X
+	{
+		$$ = rr.Type($1)
 	}
 
 

@@ -82,6 +82,11 @@ nNSAP.example.com. IN NSAP 0x67.78
 nNSAP.example.com. IN NSAP 0x89.9a.
 nNSAP.example.com. IN NSAP 0x.Ab.Bc.
 nNSAP-PTR.example.com. IN NSAP-PTR owner.example.com
+
+nNSEC.example.com. IN NSEC next.example.com A AAAA CNAME PTR
+nNSEC.example.com 86400 IN NSEC host.example.com. (
+                                   A MX RRSIG NSEC TYPE1234 )
+
 nNSEC3.example.com. IN NSEC3 1 2 772 0b0c0d0e0f10111213 041GA1OB A MX RRSIG NSEC
 nNSEC3PARAM.example.com. IN NSEC3PARAM 1 2 772 0b0c0d0e0f10111213
 nNULL.example.com. IN NULL \# 4 03071fFF

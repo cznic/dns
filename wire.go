@@ -276,6 +276,7 @@ const (
 	SniffRDataNS                           // NS resource record data
 	SniffRDataNSAP                         // NSAP resource record data
 	SniffRDataNSAP_PTR                     // NSAP-PTR resource record data
+	SniffRDataNSEC                         // NSEC resource record data
 	SniffRDataNSEC3                        // NSEC3 resource record data
 	SniffRDataNSEC3PARAM                   // NSEC3PARAM resource record data
 	SniffRDataNULL                         // NULL resource record data

@@ -1878,6 +1878,82 @@ const (
 	HashAlgorithmSHA1
 )
 
+// Type NSEC represents NSEC RR RData.  The NSEC resource record lists two
+// separate things: the next owner name (in the canonical ordering of the zone)
+// that contains authoritative data or a delegation point NS RRset, and the set
+// of RR types present at the NSEC RR's owner name [RFC3845].  The complete set
+// of NSEC RRs in a zone indicates which authoritative RRsets exist in a zone
+// and also form a chain of authoritative owner names in the zone.  This
+// information is used to provide authenticated denial of existence for DNS
+// data, as described in [RFC4035].
+//
+// Because every authoritative name in a zone must be part of the NSEC chain,
+// NSEC RRs must be present for names containing a CNAME RR.  This is a change
+// to the traditional DNS specification [RFC1034], which stated that if a CNAME
+// is present for a name, it is the only type allowed at that name.  An RRSIG
+// (see Section 3) and NSEC MUST exist for the same name as does a CNAME
+// resource record in a signed zone.
+//
+// See [RFC4035] for discussion of how a zone signer determines precisely which
+// NSEC RRs it has to include in a zone.
+//
+// The NSEC RR is class independent.
+//
+// The NSEC RR SHOULD have the same TTL value as the SOA minimum TTL field.
+// This is in the spirit of negative caching ([RFC2308]).
+type NSEC struct {
+	// The Next Domain field contains the next owner name (in the canonical
+	// ordering of the zone) that has authoritative data or contains a
+	// delegation point NS RRset; see Section 6.1 for an explanation of
+	// canonical ordering.  The value of the Next Domain Name field in the
+	// last NSEC record in the zone is the name of the zone apex (the owner
+	// name of the zone's SOA RR).  This indicates that the owner name of
+	// the NSEC RR is the last name in the canonical ordering of the zone.
+	//
+	// A sender MUST NOT use DNS name compression on the Next Domain Name
+	// field when transmitting an NSEC RR.
+	//
+	// Owner names of RRsets for which the given zone is not authoritative
+	// (such as glue records) MUST NOT be listed in the Next Domain Name
+	// unless at least one authoritative RRset exists at the same owner
+	// name.	
+	NextDomainName string
+	// The Type Bit Maps field identifies the RRset types that exist at the
+	// NSEC RR's owner name.
+	TypeBitMaps []byte
+}
+
+// Implementation of dns.Wirer
+func (d *NSEC) Encode(b *dns.Wirebuf) {
+	(dns.DomainName)(d.NextDomainName).Encode(b)
+	b.Buf = append(b.Buf, d.TypeBitMaps...)
+}
+
+// Implementation of dns.Wirer
+func (d *NSEC) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	p0 := &b[*pos]
+	if err = (*dns.DomainName)(&d.NextDomainName).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	end := len(b)
+	d.TypeBitMaps = append([]byte{}, b[*pos:end]...)
+	*pos = end
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataNSEC, d)
+	}
+	return
+}
+
+func (d *NSEC) String() string {
+	types, err := TypesDecode(d.TypeBitMaps)
+	if err != nil {
+		panic(err)
+	}
+
+	return fmt.Sprintf("%s %s", d.NextDomainName, TypesString(types))
+}
+
 // The NSEC3 Resource Record (RR) provides authenticated denial of
 // existence for DNS Resource Record Sets. (RFC 5155)
 type NSEC3 struct {
@@ -2421,6 +2497,8 @@ func (rr *RR) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 		rr.RData = &NSAP_PTR{}
 	case TYPE_NXDOMAIN:
 		rr.RData = &NXDOMAIN{}
+	case TYPE_NSEC:
+		rr.RData = &NSEC{}
 	case TYPE_NSEC3:
 		rr.RData = &NSEC3{}
 	case TYPE_NSEC3PARAM:
@@ -2630,6 +2708,10 @@ func (a *RR) Equal(b *RR) (equal bool) {
 		return bytes.Compare(x.NSAP, b.RData.(*NSAP).NSAP) == 0
 	case *NSAP_PTR:
 		return strings.ToLower(x.Name) == strings.ToLower(b.RData.(*NSAP_PTR).Name)
+	case *NSEC:
+		y := b.RData.(*NSEC)
+		return x.NextDomainName == y.NextDomainName &&
+			bytes.Equal(x.TypeBitMaps, y.TypeBitMaps)
 	case *NSEC3:
 		y := b.RData.(*NSEC3)
 		return x.HashAlgorithm == y.HashAlgorithm &&
