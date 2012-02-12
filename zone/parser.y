@@ -200,6 +200,7 @@ type rrHead struct{
 	sig
 	soa
 	srv
+	sshfp
 	txt
 	wks
 	x25
@@ -1024,6 +1025,10 @@ rr2:
 	{
 		$$ = &rr.RR{"", rr.TYPE_SOA, $1.class, $1.ttl, $2}
 	}
+|	rrHead sshfp
+	{
+		$$ = &rr.RR{"", rr.TYPE_SSHFP, $1.class, $1.ttl, $2}
+	}
 |	rrHead gpos
 	{
 		$$ = &rr.RR{"", rr.TYPE_GPOS, $1.class, $1.ttl, $2}
@@ -1410,6 +1415,16 @@ srv:
 	tDOMAIN_NAME
 	{
 		$$ = &rr.SRV{uint16($3), uint16($4), uint16($5), $7}
+	}
+
+sshfp:
+	tSSHFP
+	{
+		yylex.begin(sc_NUM)
+	}
+	uint8 uint8 hex
+	{
+		$$ = &rr.SSHFP{rr.SSHFPAlgorithm($3), rr.SSHFPType($4), $5}
 	}
 
 

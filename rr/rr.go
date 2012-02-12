@@ -2203,6 +2203,8 @@ func (rr *RR) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 		rr.RData = &SOA{}
 	case TYPE_SRV:
 		rr.RData = &SRV{}
+	case TYPE_SSHFP:
+		rr.RData = &SSHFP{}
 	case TYPE_TXT:
 		rr.RData = &TXT{}
 	case TYPE_WKS:
@@ -2433,6 +2435,11 @@ func (a *RR) Equal(b *RR) (equal bool) {
 			x.Weight == y.Weight &&
 			x.Port == y.Port &&
 			strings.ToLower(x.Target) == strings.ToLower(y.Target)
+	case *SSHFP:
+		y := b.RData.(*SSHFP)
+		return x.Algorithm == y.Algorithm &&
+			x.Type == y.Type &&
+			bytes.Equal(x.Fingerprint, y.Fingerprint)
 	case *TXT:
 		return x.S == b.RData.(*TXT).S
 	case *WKS:
@@ -3036,6 +3043,96 @@ func (d *SRV) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 
 func (d *SRV) String() string {
 	return fmt.Sprintf("%d %d %d %s", d.Priority, d.Weight, d.Port, d.Target)
+}
+
+// SSHFPAlgorithm is the type of the SSHFP RData Algorithm field
+type SSHFPAlgorithm byte
+
+// Values of SSHFPAlgorithm
+const (
+	SSHFPAlgorithmReserved SSHFPAlgorithm = iota
+	SSHFPAlgorithmRSA
+	SSHFPAlgorithmDSA
+)
+
+// SSHFPType is the type of the SSHFP RData Type field
+type SSHFPType byte
+
+// Values of SSHFPType
+const (
+	SSHFPTypeReserved SSHFPType = iota
+	SSHFPTypeSHA1
+)
+
+// SSHFP type represents RData of a SSHFP RR.  The SSHFP resource record (RR)
+// is used to store a fingerprint of an    SSH public host key that is
+// associated with a Domain Name System (DNS) name.
+type SSHFP struct {
+	// This algorithm number octet describes the algorithm of the public
+	// key.  The following values are assigned:
+	// 
+	//           Value    Algorithm name
+	//           -----    --------------
+	//           0        reserved
+	//           1        RSA
+	//           2        DSS
+	Algorithm SSHFPAlgorithm
+	// The fingerprint type octet describes the message-digest algorithm
+	// used to calculate the fingerprint of the public key.  The following
+	// values are assigned:
+	// 
+	//           Value    Fingerprint type
+	//           -----    ----------------
+	//           0        reserved
+	//           1        SHA-1
+	Type SSHFPType
+	// The fingerprint is calculated over the public key blob as described
+	// in: Ylonen, T. and C. Lonvick, Ed., "The Secure Shell (SSH)
+	// Transport Layer Protocol", RFC 4253, January 2006.
+	// 
+	// The message-digest algorithm is presumed to produce an opaque octet
+	// string output, which is placed as-is in the RDATA fingerprint field.
+	Fingerprint []byte
+}
+
+// Implementation of dns.Wirer
+func (r *SSHFP) Encode(b *dns.Wirebuf) {
+	dns.Octet(r.Algorithm).Encode(b)
+	dns.Octet(r.Type).Encode(b)
+	b.Buf = append(b.Buf, r.Fingerprint...)
+}
+
+// Implementation of dns.Wirer
+func (r *SSHFP) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	p0 := &b[*pos]
+	if err = (*dns.Octet)(&r.Algorithm).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if err = (*dns.Octet)(&r.Type).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	n := len(b) - *pos
+	if n <= 0 {
+		return fmt.Errorf("(*SSHFP).Decode: no fingerprint data")
+	}
+
+	r.Fingerprint = make([]byte, n)
+	copy(r.Fingerprint, b[*pos:])
+	*pos += n
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataSSHFP, r)
+	}
+	return
+}
+
+func (r *SSHFP) String() string {
+	return fmt.Sprintf("%d %d %x",
+		r.Algorithm,
+		r.Type,
+		r.Fingerprint,
+	)
 }
 
 // TXT holds the TXT RData

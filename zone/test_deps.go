@@ -6,7 +6,7 @@
 
 package zone
 
-// Pull test dependencies too.
+// Pull additional test dependencies too.
 // Enables easy 'go test X' after 'go get X'
 import (
 // nothing yet
