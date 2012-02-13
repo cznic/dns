@@ -10,7 +10,7 @@ scanner.go: scanner.l
 	golex -t scanner.l | gofmt > scanner.go
 
 parser.go: parser.y
-	go tool yacc -l -o parser.go -v parser.tab parser.y
+	go tool yacc -l -o parser.go parser.y
 	sed -i -e 's/^func yyParse(yylex yyLexer) int {/func yyParse(yylex *lex) int {/' -e 's|//line.*||' parser.go
 	gofmt -w parser.go
 

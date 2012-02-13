@@ -44,6 +44,7 @@ type rrHead struct{
 	rr     *rr.RR
 	typ    rr.Type
 	types  []rr.Type
+	strs   []string
 }
 
 
@@ -222,7 +223,8 @@ type rrHead struct{
 
 %type <str>
 	base64str
-	txt2
+
+%type	<strs>	txt2
 
 %type <typ>
 	rrtype
@@ -1560,11 +1562,11 @@ txt:
 
 txt2:
 	{
-		$$ = ""
+		$$ = nil
 	}
 |	txt2 tQSTR
 	{
-		$$ += $2
+		$$ = append($$, $2)
 	}
 
 gpos:

@@ -2857,7 +2857,17 @@ func (a *RR) Equal(b *RR) (equal bool) {
 			x.Type == y.Type &&
 			bytes.Equal(x.Fingerprint, y.Fingerprint)
 	case *TXT:
-		return x.S == b.RData.(*TXT).S
+		y := b.RData.(*TXT)
+		if len(x.S) != len(y.S) {
+			return false
+		}
+		for i, s := range x.S {
+			if s != y.S[i] {
+				return false
+			}
+		}
+
+		return true
 	case *WKS:
 		y := b.RData.(*WKS)
 		if x.Protocol != y.Protocol ||
@@ -3553,25 +3563,27 @@ func (r *SSHFP) String() string {
 
 // TXT holds the TXT RData
 type TXT struct {
-	S string
+	S []string
 }
 
 // Implementation of dns.Wirer
 func (t *TXT) Encode(b *dns.Wirebuf) {
-	dns.CharString(t.S).Encode(b)
+	for _, s := range t.S {
+		dns.CharString(s).Encode(b)
+	}
 }
 
 // Implementation of dns.Wirer
 func (t *TXT) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	s := ""
+	s := []string{}
 	for *pos < len(b) {
 		var part dns.CharString
 		if err = part.Decode(b, pos, sniffer); err != nil {
 			return
 		}
 
-		s += string(part)
+		s = append(s, string(part))
 	}
 	t.S = s
 	if sniffer != nil {
@@ -3581,7 +3593,11 @@ func (t *TXT) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 }
 
 func (t *TXT) String() string {
-	return fmt.Sprintf(`"%s"`, quote(t.S))
+	a := []string{}
+	for _, s := range t.S {
+		a = append(a, fmt.Sprintf(`"%s"`, quote(s)))
+	}
+	return strings.Join(a, " ")
 }
 
 // The WKS record is used to describe the well known services supported by

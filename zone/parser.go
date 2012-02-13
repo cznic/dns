@@ -39,6 +39,7 @@ type yySymType struct {
 	rr     *rr.RR
 	typ    rr.Type
 	types  []rr.Type
+	strs   []string
 }
 
 const tA = 57346
@@ -1882,15 +1883,15 @@ yydefault:
 		yyVAL.int = yyS[yypt-0].int
 	case 262:
 		{
-			yyVAL.rrData = &rr.TXT{yyS[yypt-0].str}
+			yyVAL.rrData = &rr.TXT{yyS[yypt-0].strs}
 		}
 	case 263:
 		{
-			yyVAL.str = ""
+			yyVAL.strs = nil
 		}
 	case 264:
 		{
-			yyVAL.str += yyS[yypt-0].str
+			yyVAL.strs = append(yyVAL.strs, yyS[yypt-0].str)
 		}
 	case 265:
 		{

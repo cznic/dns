@@ -19,10 +19,21 @@ type Logger struct {
 	Level  LogLevel
 }
 
+type devNull struct{}
+
+// Write implements io.Writer.
+func (d devNull) Write(p []byte) (n int, err error) {
+	return len(p), nil
+}
+
+// NoLogger doesn't log anything.
+var NoLogger = &Logger{log.New(devNull{}, "", 0), 0}
+
 // NewLogger returns a newly created Logger initialized with logger and level.
 // If the logger is nil and level != LOG_NONE then a defualt log.New logger is provided.
 func NewLogger(logger *log.Logger, level LogLevel) *Logger {
-	if logger == nil && level != LOG_NONE {
+	switch {
+	case logger == nil && level != LOG_NONE:
 		prefix, flags := "", 0
 		switch level {
 		case LOG_ERRORS:
@@ -42,6 +53,8 @@ func NewLogger(logger *log.Logger, level LogLevel) *Logger {
 			prefix = fmt.Sprintf("[%d %s] ", os.Getpid(), path.Base(prefix))
 		}
 		logger = log.New(os.Stderr, prefix, flags)
+	case logger == nil && level == LOG_NONE:
+		return NoLogger
 	}
 	return &Logger{logger, level}
 }

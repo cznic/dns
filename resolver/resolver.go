@@ -8,6 +8,7 @@
 package resolver
 
 import (
+	"encoding/hex"
 	"fmt"
 	"github.com/cznic/dns"
 	"github.com/cznic/dns/cache"
@@ -141,7 +142,19 @@ type Resolver struct {
 	pendingA, pendingAAAA *goStrMapBool // paralel NS addr requests recursion protector
 }
 
+// New returns a new Resolver or an error if any.
+//
+// 'hostsFName' is like "/etc/hosts" and may be empty in which case hosts.Sys()
+// will be used.
+//
+// 'resolvFName' is like "/etc/resolv.conf" and may again be empty in which
+// case resolv.Sys() is used.
+//
+// 'logger' may be nil.
 func New(hostsFName, resolvFName string, logger *dns.Logger) (r *Resolver, err error) {
+	if logger == nil {
+		logger = dns.NoLogger
+	}
 	r = &Resolver{cache: cache.New(), log: logger, pendingA: newGoStrMapBool(), pendingAAAA: newGoStrMapBool()}
 
 	defer func() {
@@ -271,22 +284,24 @@ func (r *Resolver) getHostByName(name string, qtype msg.QType) (ipList []net.IP,
 	panic("unreachable")
 }
 
-// GetHostByNameIPv4 will try to Lookup an IN A address (i.e. IPv4) list for name.
-// Used CNAMEs chain, if any, is returned in redirects.
+// GetHostByNameIPv4 will try to Lookup an IN A address (i.e. IPv4) list for
+// name.  Used CNAMEs chain, if any, is returned in redirects.
 func (r *Resolver) GetHostByNameIPv4(name string) (ipList []net.IP, redirects rr.RRs, err error) {
 	return r.getHostByName(name, msg.QTYPE_A)
 }
 
-// GetHostByNameIPv6 will try to Lookup an IN AAAA address (i.e. IPv6) list for name.
-// Used CNAMEs chain, if any, is returned in redirects.
+// GetHostByNameIPv6 will try to Lookup an IN AAAA address (i.e. IPv6) list for
+// name.  Used CNAMEs chain, if any, is returned in redirects.
 func (r *Resolver) GetHostByNameIPv6(name string) (ipList []net.IP, redirects rr.RRs, err error) {
 	return r.getHostByName(name, msg.QTYPE_AAAA)
 }
 
-// GetHostByName will try to Lookup an IN A or AAAA address (i.e. IPv4 or IPv6) list for name.
-// Used CNAMEs chain, if any, is returned in redirects. Initially an attempt for IPv4 addresses
-// is performed. Query for the IPv6 addresses is afterwards invoked iff no IPv4 addresses were
-// returned by the initial attempt. If preferIPv6 == true then the above query order is reversed.
+// GetHostByName will try to Lookup an IN A or AAAA address (i.e. IPv4 or IPv6)
+// list for name.  Used CNAMEs chain, if any, is returned in redirects.
+// Initially an attempt for IPv4 addresses is performed. Query for the IPv6
+// addresses is afterwards invoked iff no IPv4 addresses were returned by the
+// initial attempt. If preferIPv6 == true then the above query order is
+// reversed.
 func (r *Resolver) GetHostByName(name string, preferIPv6 bool) (ipList []net.IP, redirects rr.RRs, err error) {
 	a, b := (*Resolver).GetHostByNameIPv4, (*Resolver).GetHostByNameIPv6
 	if preferIPv6 {
@@ -376,11 +391,15 @@ func (r *Resolver) needNSAdr(name string) {
 	go f(r.pendingAAAA, msg.QTYPE_AAAA)
 }
 
-// Lookup is a general DNS lookup function (rfc1034/p.30). It attempts to retrieve arbitrary
-// information from the DNS. The caller supplies a sname, stype and sclass, and wants all of the
-// matching RRs. Lookup should normally report "DNS lookup error" results via the return result variable.
-// A non-nil Error is returned for any non-lookup error event. The rd parameter is the msg.Messsage.Header
-// "Recursion Desired" flag. Lookup CNAMEs chain walked, if any, is returned in redirects.
+var optRR = &rr.RR{".", rr.TYPE_OPT, rr.Class(4096), (&rr.EXT_RCODE{}).ToTTL(), &rr.OPT{}}
+
+// Lookup is a general DNS lookup function (rfc1034/p.30). It attempts to
+// retrieve arbitrary information from the DNS. The caller supplies a sname,
+// stype and sclass, and wants all of the matching RRs. Lookup should normally
+// report "DNS lookup error" results via the return result variable.  A non-nil
+// Error is returned for any non-lookup error event. The rd parameter is the
+// msg.Messsage.Header "Recursion Desired" flag. Lookup CNAMEs chain walked, if
+// any, is returned in redirects.
 func (r *Resolver) Lookup(sname string, stype msg.QType, sclass rr.Class, rd bool) (answer, redirects rr.RRs, result LookupResult, err error) {
 
 	defer func() {
@@ -473,12 +492,12 @@ step2:
 	// grandparent, and so on toward the root.  Thus if SNAME were
 	// Mockapetris.ISI.EDU, this step would look for NS RRs for
 	// Mockapetris.ISI.EDU, then ISI.EDU, then EDU, and then . (the root).
-	// These NS RRs list the names of hosts for a zone at or above SNAME.  Copy
-	// the names into SLIST.  Set up their addresses using local data.  It may
-	// be the case that the addresses are not available.  The resolver has many
-	// choices here; the best is to start parallel resolver processes looking
-	// for the addresses while continuing onward with the addresses which are
-	// available.
+	// These NS RRs list the names of hosts for a zone at or above SNAME.
+	// Copy the names into SLIST.  Set up their addresses using local data.
+	// It may be the case that the addresses are not available.  The
+	// resolver has many choices here; the best is to start parallel
+	// resolver processes looking for the addresses while continuing onward
+	// with the addresses which are available.
 
 	var slabels []string
 	if slabels, err = dns.Labels(sname); err != nil {
@@ -496,10 +515,15 @@ step2:
 			func(rec *rr.RR) bool {
 				if rec.Class == sclass && rec.Type == rr.TYPE_NS {
 					nm := strings.ToLower(rec.RData.(*rr.NS).NSDName)
-					// Name servers for a domain are themselves generally anywhere in the DNS tree 
-					// and the same NS may serve otherwise unrelated parts of the DNS tree
-					// (i.e. separated zones). Thus we can see the same one(s) again while walking the slabels towards root.
-					// Avoid adding a same NS more than once to the SLIST.
+					// Name servers for a domain are
+					// themselves generally anywhere in the
+					// DNS tree and the same NS may serve
+					// otherwise unrelated parts of the DNS
+					// tree (i.e. separated zones). Thus we
+					// can see the same one(s) again while
+					// walking the slabels towards root.
+					// Avoid adding a same NS more than
+					// once to the SLIST.
 					if !srvmap[nm] {
 						srvmap[nm] = true
 						return true
@@ -552,9 +576,11 @@ step2:
 					continue
 				}
 
-				// We have a nice candidate NS but have no A nor AAAA RRs for it.
-				// Could be due to missing glue record(s) or their expired TTLs.
-				// Enter emergency panic mode for the missing address(es).
+				// We have a nice candidate NS but have no A
+				// nor AAAA RRs for it.  Could be due to
+				// missing glue record(s) or their expired
+				// TTLs.  Enter emergency panic mode for the
+				// missing address(es).
 				r.needNSAdr(nsdname)
 				retry++
 
@@ -579,7 +605,7 @@ step3:
 	if r.log.Level >= dns.LOG_DEBUG {
 		r.log.Log("slist servers %d", len(slist.servers))
 	}
-	rxbuf := make([]byte, 2000)
+	rxbuf := make([]byte, 4500)
 
 asking:
 	for {
@@ -619,11 +645,23 @@ asking:
 		const qmark = "------------------------------------------------------------------------------"
 		const rmark = "=============================================================================="
 
+		const (
+			attemptUDP = iota
+			attemptENDS
+		)
+
 		// try server srv
 		for attempts := 0; attempts < srv.attempts; attempts++ {
 			for _, ip = range srv.ips {
+
+				attempting := attemptUDP
+
+			reAttempt:
 				m := msg.New()
 				m.Question.Append(sname, stype, sclass)
+				if attempting == attemptENDS {
+					m.Additional = rr.RRs{optRR}
+				}
 				m.Header.RD = rd // Recursion Desired
 				if r.log.Level >= dns.LOG_TRACE {
 					if r.log.Level >= dns.LOG_DEBUG {
@@ -643,7 +681,8 @@ asking:
 				defer c.Close()
 
 				c.SetDeadline(time.Now().Add(time.Duration(slist.conf.Conf.Opt.TimeoutSecs) * time.Second))
-				if _, reply, err = m.ExchangeBuf(c, rxbuf); err != nil {
+				var rxbytes int
+				if rxbytes, reply, err = m.ExchangeBuf(c, rxbuf); err != nil {
 					if r.log.Level >= dns.LOG_ERRORS {
 						r.log.Log("FAIL ExchangeBuf: %s", err)
 					}
@@ -653,12 +692,21 @@ asking:
 				// got a response
 				if r.log.Level >= dns.LOG_TRACE {
 					if r.log.Level >= dns.LOG_DEBUG {
-						r.log.Log("\n%s(REPLY MSG from %q @ %s)\n%s\n%s\n", rmark, srv.name, ip, reply, rmark)
+						r.log.Log("\n%s(REPLY MSG from %q @ %s)\n%s\nWire:\n%s\n%s\n", rmark, srv.name, ip, reply, hex.Dump(rxbuf[:rxbytes]), rmark)
 					} else {
 						r.log.Log("got a response for %q from %q @ %s", sname, srv.name, ip)
 					}
 				}
 				h := &reply.Header
+
+				if h.TC {
+					switch attempting {
+					case attemptUDP:
+						attempting = attemptENDS
+						goto reAttempt
+					}
+				}
+
 				reject := h.ID != m.Header.ID ||
 					!h.QR ||
 					h.Opcode != m.Header.Opcode ||
@@ -752,9 +800,9 @@ asking:
 	//-----------------------------------------------------------------
 	//   rfc2038/2.2 - No Data
 	//
-	//   NODATA is indicated by an answer with the RCODE set to NOERROR and no
-	//   relevant answers in the answer section.  The authority section will
-	//   contain an SOA record, or there will be no NS records there.	
+	//   NODATA is indicated by an answer with the RCODE set to NOERROR and
+	//   no relevant answers in the answer section.  The authority section
+	//   will contain an SOA record, or there will be no NS records there.	
 	case reply.RCODE == msg.RC_NO_ERROR && reply.ANCOUNT == 0 && (len(soas) == 1 || len(ns) == 0):
 		r.cache.Add(reply.Answer, soas, ns, reply.Additional)
 
