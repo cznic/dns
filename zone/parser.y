@@ -14,9 +14,9 @@ package zone
 
 
 import (
-	"cznic/dns"
-	"cznic/dns/rr"
-	"cznic/strutil"
+	"github.com/cznic/dns"
+	"github.com/cznic/dns/rr"
+	"github.com/cznic/strutil"
 	"fmt"
 	"math"
 	"net"

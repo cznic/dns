@@ -18,11 +18,11 @@ package main
 
 import (
 	"bufio"
-	"cznic/dns"
-	"cznic/dns/hosts"
-	"cznic/dns/resolv"
-	"cznic/dns/resolver"
-	"cznic/dns/rr"
+	"github.com/cznic/dns"
+	"github.com/cznic/dns/hosts"
+	"github.com/cznic/dns/resolv"
+	"github.com/cznic/dns/resolver"
+	"github.com/cznic/dns/rr"
 	"flag"
 	"fmt"
 	"log"

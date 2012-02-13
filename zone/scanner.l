@@ -16,7 +16,7 @@ package zone
 import(
 	"bufio"
 	"bytes"
-	"cznic/dns/rr"
+	"github.com/cznic/dns/rr"
 	"encoding/hex"
 	"errors"
 	"fmt"

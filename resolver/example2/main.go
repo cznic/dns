@@ -1,11 +1,11 @@
 package main
 
 import (
-	"cznic/dns"
-	"cznic/dns/msg"
-	"cznic/dns/resolver"
-	"cznic/dns/rr"
 	"fmt"
+	"github.com/cznic/dns"
+	"github.com/cznic/dns/msg"
+	"github.com/cznic/dns/resolver"
+	"github.com/cznic/dns/rr"
 	"log"
 )
 
