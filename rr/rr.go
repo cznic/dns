@@ -9,6 +9,8 @@ package rr
 
 import (
 	"bytes"
+	"crypto"
+	_ "crypto/sha256"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -21,6 +23,8 @@ import (
 )
 
 const asserts = false
+
+var sha256 = crypto.SHA256
 
 func init() {
 	if asserts {
@@ -269,6 +273,51 @@ func (c *CNAME) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err e
 
 func (c CNAME) String() string {
 	return c.Name
+}
+
+type DHCID struct {
+	Data []byte
+}
+
+// SetData computes and sets d.Data as per RFC4701/3.3-3.5.  SetData supports
+// only SHA-256 (digest type code 1).
+//
+// See also TestDHCID is all_test.go fo examples.
+func (d *DHCID) SetData(identifierType uint16, identifier []byte, fqdn string) {
+	w := dns.NewWirebuf()
+	w.Buf = identifier
+	w.DisableCompression()
+	dns.DomainName(dns.RootedName(fqdn)).Encode(w)
+	h := sha256.New()
+	h.Write(w.Buf)
+	d.Data = h.Sum([]byte{byte(identifierType >> 8), byte(identifierType), 1})
+
+}
+
+// Implementation of dns.Wirer
+func (d DHCID) Encode(b *dns.Wirebuf) {
+	b.Buf = append(b.Buf, d.Data...)
+}
+
+// Implementation of dns.Wirer
+func (d *DHCID) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	p0 := &b[*pos]
+	n := len(b) - *pos
+	if n <= 0 {
+		return fmt.Errorf("(*DHCID).Decode: no key data")
+	}
+	d.Data = make([]byte, n)
+	copy(d.Data, b[*pos:])
+	*pos += n
+
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataDHCID, d)
+	}
+	return
+}
+
+func (d DHCID) String() string {
+	return string(strutil.Base64Encode(d.Data))
 }
 
 // DNAME holds the zone DNAME RData
@@ -2451,6 +2500,8 @@ func (rr *RR) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 		rr.RData = &CERT{}
 	case TYPE_CNAME:
 		rr.RData = &CNAME{}
+	case TYPE_DHCID:
+		rr.RData = &DHCID{}
 	case TYPE_DNAME:
 		rr.RData = &DNAME{}
 	case TYPE_DNSKEY:
@@ -2583,6 +2634,9 @@ func (a *RR) Equal(b *RR) (equal bool) {
 			bytes.Equal(x.Cert, y.Cert)
 	case *CNAME:
 		return strings.ToLower(x.Name) == strings.ToLower(b.RData.(*CNAME).Name)
+	case *DHCID:
+		y := b.RData.(*DHCID)
+		return bytes.Equal(x.Data, y.Data)
 	case *DNAME:
 		return strings.ToLower(x.Name) == strings.ToLower(b.RData.(*DNAME).Name)
 	case *DNSKEY:

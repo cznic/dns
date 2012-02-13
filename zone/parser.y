@@ -170,6 +170,7 @@ type rrHead struct{
 	afsdb
 	cert
 	cname
+	dhcid
 	dname
 	dnskey
 	ds
@@ -363,6 +364,13 @@ cname:
 	tDOMAIN_NAME
 	{
 		$$ = &rr.CNAME{$3}
+	}
+
+
+dhcid:
+	tDHCID base64
+	{
+		$$ = &rr.DHCID{$2}
 	}
 
 
@@ -1011,6 +1019,10 @@ rr2:
 |	rrHead cname
 	{
 		$$ = &rr.RR{"", rr.TYPE_CNAME, $1.class, $1.ttl, $2}
+	}
+|	rrHead dhcid
+	{
+		$$ = &rr.RR{"", rr.TYPE_DHCID, $1.class, $1.ttl, $2}
 	}
 |	rrHead dname
 	{

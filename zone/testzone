@@ -10,6 +10,15 @@ nAAAA.example.com. IN AAAA ::1
 nAFSDB.example.com. IN AFSDB 12345 x.example.com.
 nCERT.example.com. IN CERT 1 2 3 AAZAAQAAAAM=
 nCNAME.example.com. IN CNAME cname.example.com
+
+; from RFC4701/3.6
+nDHCID.chi6.example.com.     IN DHCID   ( AAIBY2/AuCccgoJbsaxcQc9TUapptP69l
+                                     OjxfNuVAA2kjEA= )
+nDHCID.chi.example.com.      IN DHCID   ( AAEBOSD+XR3Os/0LozeXVqcNc7FwCfQdW
+                                     L3b/NaiUDlW2No= )
+nDHCID.client.example.com.   IN DHCID   ( AAABxLmlskllE0MVjd57zHcWmEH3pCQ6V
+                                     ytcKD//7es/deY= )
+
 nDNAME.example.com. IN DNAME dname.example.com
 nDNSKEY.example.com. IN DNSKEY 2 3 4 CwwNDg8QERIT
 nDS.example.com. IN DS 4660 86 1 000102030405060708090a0b0c0d0e0f10111213

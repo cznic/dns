@@ -254,6 +254,7 @@ const (
 	SniffRDataAFSDB                        // AFSDB resource record data
 	SniffRDataCERT                         // CERT resource record data
 	SniffRDataCNAME                        // CNAME resource record data
+	SniffRDataDHCID                        // DHCID resource record data
 	SniffRDataDNAME                        // DNAME resource record data
 	SniffRDataDNSKEY                       // DNSKEY resource record data
 	SniffRDataDS                           // DS resource record data

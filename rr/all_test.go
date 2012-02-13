@@ -11,6 +11,7 @@ import (
 	"encoding/hex"
 	"flag"
 	"fmt"
+	"github.com/cznic/strutil"
 	"math/rand"
 	"net"
 	"strconv"
@@ -181,6 +182,10 @@ func Test0(t *testing.T) {
 			&CERT{CertPKIX, 0x1234, AlgorithmDSA_SHA1,
 				[]byte{0, 6, 0x40, 0x01, 0x00, 0x00, 0x00, 0x03}},
 		},
+		&RR{"nDHCID.example.com.", TYPE_DHCID, CLASS_IN, -1,
+			&DHCID{[]byte{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19}}},
+		&RR{"nDNAME.example.com.", TYPE_DNAME, CLASS_IN, -1,
+			&DNAME{"dname.example.com."}},
 		&RR{"nDNSKEY.example.com.", TYPE_DNSKEY, CLASS_IN, -1,
 			&DNSKEY{2, 3, 4,
 				[]byte{11, 12, 13, 14, 15, 16, 17, 18, 19}}},
@@ -832,4 +837,117 @@ func TestTreePut(t *testing.T) {
 		t.Fatal()
 	}
 
+}
+
+// RFC4701
+func TestDHCID(t *testing.T) {
+
+	// 3.6.1.  Example 1
+	// 
+	//    A DHCP server allocates the IPv6 address 2001:DB8::1234:5678 to a
+	//    client that included the DHCPv6 client-identifier option data 00:01:
+	//    00:06:41:2d:f1:66:01:02:03:04:05:06 in its DHCPv6 request.  The
+	//    server updates the name "chi6.example.com" on the client's behalf and
+	//    uses the DHCP client identifier option data as input in forming a
+	//    DHCID RR.  The DHCID RDATA is formed by setting the two type octets
+	//    to the value 0x0002, the 1-octet digest type to 1 for SHA-256, and
+	//    performing a SHA-256 hash computation across a buffer containing the
+	//    14 octets from the client-id option and the FQDN (represented as
+	//    specified in Section 3.5).
+	// 
+	//      chi6.example.com.     AAAA    2001:DB8::1234:5678
+	//      chi6.example.com.     DHCID   ( AAIBY2/AuCccgoJbsaxcQc9TUapptP69l
+	//                                      OjxfNuVAA2kjEA= )
+	// 
+	//    If the DHCID RR type is not supported, the RDATA would be encoded
+	//    [13] as:
+	// 
+	//      \# 35 ( 000201636fc0b8271c82825bb1ac5c41cf5351aa69b4febd94e8f17cd
+	//             b95000da48c40 )
+
+	rd := &DHCID{}
+	dhcid := &RR{"chi6.example.com.", TYPE_DHCID, CLASS_IN, 100, rd}
+	rd.SetData(
+		2, // Identifier type
+		[]byte{ // DHCPv6 client-identifier option data
+			0x00, 0x01, 0x00, 0x06, 0x41, 0x2d, 0xf1, 0x66, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06,
+		},
+		"chi6.example.com.",
+	)
+	t.Log(dhcid)
+	if g, e := string(strutil.Base64Encode(rd.Data)), "AAIBY2/AuCccgoJbsaxcQc9TUapptP69lOjxfNuVAA2kjEA="; g != e {
+		t.Errorf("\ngot: %q\nexp: %q", g, e)
+	}
+
+	// 3.6.2.  Example 2
+	// 
+	//    A DHCP server allocates the IPv4 address 192.0.2.2 to a client that
+	//    included the DHCP client-identifier option data 01:07:08:09:0a:0b:0c
+	//    in its DHCP request.  The server updates the name "chi.example.com"
+	//    on the client's behalf and uses the DHCP client identifier option
+	//    data as input in forming a DHCID RR.  The DHCID RDATA is formed by
+	//    setting the two type octets to the value 0x0001, the 1-octet digest
+	//    type to 1 for SHA-256, and performing a SHA-256 hash computation
+	//    across a buffer containing the seven octets from the client-id option
+	//    and the FQDN (represented as specified in Section 3.5).
+	// 
+	//      chi.example.com.      A       192.0.2.2
+	//      chi.example.com.      DHCID   ( AAEBOSD+XR3Os/0LozeXVqcNc7FwCfQdW
+	//                                      L3b/NaiUDlW2No= )
+	// 
+	//    If the DHCID RR type is not supported, the RDATA would be encoded
+	//    [13] as:
+	// 
+	//      \# 35 ( 0001013920fe5d1dceb3fd0ba3379756a70d73b17009f41d58bddbfcd
+	//              6a2503956d8da )
+
+	rd = &DHCID{}
+	dhcid = &RR{"chi.example.com.", TYPE_DHCID, CLASS_IN, 100, rd}
+	rd.SetData(
+		1, // Identifier type
+		[]byte{ // DHCP client-identifier option data
+			0x01, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c,
+		},
+		"chi.example.com.",
+	)
+	t.Log(dhcid)
+	if g, e := string(strutil.Base64Encode(rd.Data)), "AAEBOSD+XR3Os/0LozeXVqcNc7FwCfQdWL3b/NaiUDlW2No="; g != e {
+		t.Errorf("\ngot: %q\nexp: %q", g, e)
+	}
+
+	// 3.6.3.  Example 3
+	// 
+	//    A DHCP server allocating the IPv4 address 192.0.2.3 to a client with
+	//    the Ethernet MAC address 01:02:03:04:05:06 using domain name
+	//    "client.example.com" uses the client's link-layer address to identify
+	//    the client.  The DHCID RDATA is composed by setting the two type
+	//    octets to zero, the 1-octet digest type to 1 for SHA-256, and
+	//    performing an SHA-256 hash computation across a buffer containing the
+	//    1-octet 'htype' value for Ethernet, 0x01, followed by the six octets
+	//    of the Ethernet MAC address, and the domain name (represented as
+	//    specified in Section 3.5).
+	// 
+	//      client.example.com.   A       192.0.2.3
+	//      client.example.com.   DHCID   ( AAABxLmlskllE0MVjd57zHcWmEH3pCQ6V
+	//                                      ytcKD//7es/deY= )
+	// 
+	//    If the DHCID RR type is not supported, the RDATA would be encoded
+	//    [13] as:
+	// 
+	//      \# 35 ( 000001c4b9a5b249651343158dde7bcc77169841f7a4243a572b5c283
+	//              fffedeb3f75e6 )
+
+	rd = &DHCID{}
+	dhcid = &RR{"client.example.com.", TYPE_DHCID, CLASS_IN, 100, rd}
+	rd.SetData(
+		0, // Identifier type
+		[]byte{0x01, // htype
+			0x01, 0x02, 0x03, 0x04, 0x05, 0x06, // MAC
+		},
+		"client.example.com.",
+	)
+	t.Log(dhcid)
+	if g, e := string(strutil.Base64Encode(rd.Data)), "AAABxLmlskllE0MVjd57zHcWmEH3pCQ6VytcKD//7es/deY="; g != e {
+		t.Errorf("\ngot: %q\nexp: %q", g, e)
+	}
 }
