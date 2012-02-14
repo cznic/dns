@@ -54,29 +54,29 @@ yystart1:
 	default:
 		goto yyrule2
 	case c == '\n':
-		goto yystate2
-	case c == '\x00':
 		goto yystate3
+	case c == '\x00':
+		goto yystate2
 	}
 
 yystate2:
 	if c, err = l.getc(); err != nil {
 		return
 	}
-	switch {
-	default:
-		goto yyrule2
-	case c == '\x00':
-		goto yystate3
-	case c == '\n':
-		goto yystate2
-	}
+	goto yyrule1
 
 yystate3:
 	if c, err = l.getc(); err != nil {
 		return
 	}
-	goto yyrule1
+	switch {
+	default:
+		goto yyrule2
+	case c == '\n':
+		goto yystate3
+	case c == '\x00':
+		goto yystate2
+	}
 
 	goto yystate4 // silence unused label error
 yystate4:
