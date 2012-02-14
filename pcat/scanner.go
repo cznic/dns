@@ -35,13 +35,13 @@ yystate0:
 	default:
 		panic(fmt.Errorf(`invalid start condition %d`, yyt))
 	case 0: // start condition: INITIAL
-		goto yystart8
-	case 1: // start condition: ID
-		goto yystart11
-	case 2: // start condition: QUERY
 		goto yystart1
+	case 1: // start condition: ID
+		goto yystart4
+	case 2: // start condition: QUERY
+		goto yystart6
 	case 3: // start condition: REPLY
-		goto yystart5
+		goto yystart10
 	}
 
 	goto yystate1 // silence unused label error
@@ -52,9 +52,11 @@ yystate1:
 yystart1:
 	switch {
 	default:
-		goto yyabort
+		goto yyrule2
 	case c == '\n':
 		goto yystate2
+	case c == '\x00':
+		goto yystate3
 	}
 
 yystate2:
@@ -63,54 +65,53 @@ yystate2:
 	}
 	switch {
 	default:
-		goto yyabort
-	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
+		goto yyrule2
+	case c == '\x00':
 		goto yystate3
+	case c == '\n':
+		goto yystate2
 	}
 
 yystate3:
 	if c, err = l.getc(); err != nil {
 		return
 	}
-	switch {
-	default:
-		goto yyabort
-	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
-		goto yystate4
-	}
+	goto yyrule1
 
+	goto yystate4 // silence unused label error
 yystate4:
 	if c, err = l.getc(); err != nil {
 		return
 	}
+yystart4:
 	switch {
 	default:
-		goto yyrule4
-	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
-		goto yystate3
+		goto yyabort
+	case c >= '0' && c <= '9':
+		goto yystate5
 	}
 
-	goto yystate5 // silence unused label error
 yystate5:
 	if c, err = l.getc(); err != nil {
 		return
 	}
-yystart5:
 	switch {
 	default:
-		goto yyabort
-	case c == '\n':
-		goto yystate6
+		goto yyrule3
+	case c >= '0' && c <= '9':
+		goto yystate5
 	}
 
+	goto yystate6 // silence unused label error
 yystate6:
 	if c, err = l.getc(); err != nil {
 		return
 	}
+yystart6:
 	switch {
 	default:
-		goto yyrule5
-	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
+		goto yyabort
+	case c == '\n':
 		goto yystate7
 	}
 
@@ -122,21 +123,17 @@ yystate7:
 	default:
 		goto yyabort
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
-		goto yystate6
+		goto yystate8
 	}
 
-	goto yystate8 // silence unused label error
 yystate8:
 	if c, err = l.getc(); err != nil {
 		return
 	}
-yystart8:
 	switch {
 	default:
-		goto yyrule2
-	case c == '\x00':
-		goto yystate10
-	case c == '\n':
+		goto yyabort
+	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
 		goto yystate9
 	}
 
@@ -146,29 +143,32 @@ yystate9:
 	}
 	switch {
 	default:
-		goto yyrule2
-	case c == '\x00':
-		goto yystate10
-	case c == '\n':
-		goto yystate9
+		goto yyrule4
+	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
+		goto yystate8
 	}
 
+	goto yystate10 // silence unused label error
 yystate10:
 	if c, err = l.getc(); err != nil {
 		return
 	}
-	goto yyrule1
+yystart10:
+	switch {
+	default:
+		goto yyabort
+	case c == '\n':
+		goto yystate11
+	}
 
-	goto yystate11 // silence unused label error
 yystate11:
 	if c, err = l.getc(); err != nil {
 		return
 	}
-yystart11:
 	switch {
 	default:
-		goto yyabort
-	case c >= '0' && c <= '9':
+		goto yyrule5
+	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
 		goto yystate12
 	}
 
@@ -178,9 +178,9 @@ yystate12:
 	}
 	switch {
 	default:
-		goto yyrule3
-	case c >= '0' && c <= '9':
-		goto yystate12
+		goto yyabort
+	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
+		goto yystate11
 	}
 
 yyrule1: // \n*\x00

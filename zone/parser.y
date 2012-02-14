@@ -229,6 +229,7 @@ type rrHead struct{
 %type <typ>
 	rrtype
 	rrtypetok
+	tTYPE_X
 
 %type <types>
 	rrtypes
@@ -253,7 +254,6 @@ type rrHead struct{
 	loc_s_h_v
 	loc_h_v
 	loc_v
-	tTYPE_X
 
 %%
 
@@ -1179,6 +1179,10 @@ rr2:
 	{
 		$$ = &rr.RR{"", rr.TYPE_X25, $1.class, $1.ttl, $2}
 	}
+|	rrHead tTYPE_X null_1
+	{
+		$$ = &rr.RR{"", $2, $1.class, $1.ttl, $3}
+	}
 
 
 rrHead:
@@ -1483,9 +1487,6 @@ rrtypetok:
 		$$ = rr.TYPE_X25
 	}
 |	tTYPE_X
-	{
-		$$ = rr.Type($1)
-	}
 
 
 rt:

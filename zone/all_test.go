@@ -160,5 +160,5 @@ func BenchmarkParser(b *testing.B) {
 	b.StopTimer()
 	d := t1.Sub(t0)
 	T := d.Seconds()
-	b.Logf("Parsed %d RRs (%d B) in %v, %.0f RRs/sec", n, fi.Size(), d, float64(n)/T)
+	b.Logf("Parsed %d RRs (%d B) in %v, %.0f RRs/sec", n, int64(b.N)*fi.Size(), d, float64(n)/T)
 }

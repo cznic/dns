@@ -180,7 +180,7 @@ srv-domain     {srv-label}"."{srv-label}"."{domain-name}
 any-domain     ({srv-label}"."{srv-label})?"."{domain-name}?
 letter         [a-zA-Z]
 let-or-digit   {letter}|{digit}
-label          {let-or-digit}(({let-or-digit}|"-")*{let-or-digit})?
+label          \*|{let-or-digit}(({let-or-digit}|"-")*{let-or-digit})?
 srv-label      _{label}
 
 float_lit	{D}"."{D}?{E}?|{D}{E}|"."{D}{E}?
@@ -273,6 +273,14 @@ E		[eE][-+]?[0-9]+
 <rrHead>HS
 	lval.class = rr.CLASS_HS
 	ret = tCLASS
+<rrHead>CLASS{digit}+
+	s := string(l.buf[5:])
+	n, err := strconv.ParseUint(s, 10, 16)
+	lval.class = rr.Class(n)
+	if err != nil {
+		l.Error(fmt.Sprintf("%s: %v", s, err))
+	}
+	ret = tCLASS
 
 
 	/* RR types */
@@ -338,17 +346,14 @@ E		[eE][-+]?[0-9]+
 <rrHead,type>WKS        ret = tWKS
 <rrHead,type>X25        ret = tX25
 
-<type>TYPE{digit}+
+<rrHead,type>TYPE{digit}+
 	s := string(l.buf[4:])
 	n, err := strconv.ParseUint(s, 10, 16)
-	lval.uint = uint(n)
+	lval.typ = rr.Type(n)
 	if err != nil {
 		l.Error(fmt.Sprintf("%s: %v", s, err))
 	}
 	ret = tTYPE_X
-	if _, ok := typex[int(n)]; ok {
-		ret = int(n)
-	}
 
 <ipv4,ipseckey>{ipv4}
 	ip := net.ParseIP(string(l.buf))
