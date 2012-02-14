@@ -509,13 +509,21 @@ ipseckey:
 |	ipseckey_0 tDOMAIN_NAME base64
 	{
 		x := $1.(*rr.IPSECKEY)
-		x.Gateway = $2
 		x.PublicKey = $3
-		$$ = x
-		if x.GatewayType != rr.GatewayDomain {
-	println($2)
-			yylex.Error("expected <domain-name> gateway")
+		switch x.GatewayType {
+		default:
+			yylex.Error("unexpected <domain-name> gateway")
+		case rr.GatewayIPV4:
+			ip := net.ParseIP($2)
+			if ip == nil {
+				ip = errIP
+				yylex.Error("expected IPv4 gateway")
+			}
+			x.Gateway = ip
+		case rr.GatewayDomain:
+			x.Gateway = $2
 		}
+		$$ = x
 	}
 
 key:

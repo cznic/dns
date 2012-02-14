@@ -180,7 +180,7 @@ srv-domain     {srv-label}"."{srv-label}"."{domain-name}
 any-domain     ({srv-label}"."{srv-label})?"."{domain-name}?
 letter         [a-zA-Z]
 let-or-digit   {letter}|{digit}
-label          {letter}(({let-or-digit}|"-")*{let-or-digit})?
+label          {let-or-digit}(({let-or-digit}|"-")*{let-or-digit})?
 srv-label      _{label}
 
 float_lit	{D}"."{D}?{E}?|{D}{E}|"."{D}{E}?

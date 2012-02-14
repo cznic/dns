@@ -34,14 +34,14 @@ yystate0:
 	switch yyt := sc; yyt {
 	default:
 		panic(fmt.Errorf(`invalid start condition %d`, yyt))
-	case 3: // start condition: REPLY
-		goto yystart5
 	case 0: // start condition: INITIAL
 		goto yystart8
 	case 1: // start condition: ID
 		goto yystart11
 	case 2: // start condition: QUERY
 		goto yystart1
+	case 3: // start condition: REPLY
+		goto yystart5
 	}
 
 	goto yystate1 // silence unused label error

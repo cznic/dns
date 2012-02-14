@@ -965,13 +965,21 @@ yydefault:
 	case 37:
 		{
 			x := yyS[yypt-2].rrData.(*rr.IPSECKEY)
-			x.Gateway = yyS[yypt-1].str
 			x.PublicKey = yyS[yypt-0].data
-			yyVAL.rrData = x
-			if x.GatewayType != rr.GatewayDomain {
-				println(yyS[yypt-1].str)
-				yylex.Error("expected <domain-name> gateway")
+			switch x.GatewayType {
+			default:
+				yylex.Error("unexpected <domain-name> gateway")
+			case rr.GatewayIPV4:
+				ip := net.ParseIP(yyS[yypt-1].str)
+				if ip == nil {
+					ip = errIP
+					yylex.Error("expected IPv4 gateway")
+				}
+				x.Gateway = ip
+			case rr.GatewayDomain:
+				x.Gateway = yyS[yypt-1].str
 			}
+			yyVAL.rrData = x
 		}
 	case 38:
 		{

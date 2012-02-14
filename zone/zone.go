@@ -14,9 +14,12 @@ import (
 	"github.com/cznic/dns/rr"
 	"github.com/cznic/fileutil"
 	"io"
+	"net"
 	"os"
 	"strings"
 )
+
+var errIP = net.ParseIP("0.0.0.0")
 
 var typex = map[int]struct{}{
 	tA:          struct{}{},

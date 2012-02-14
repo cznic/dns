@@ -135,6 +135,7 @@ func BenchmarkParser(b *testing.B) {
 	if err != nil {
 		b.Fatal(err)
 	}
+
 	b.SetBytes(fi.Size())
 	n := 0
 	t0 := time.Now()
@@ -159,5 +160,5 @@ func BenchmarkParser(b *testing.B) {
 	b.StopTimer()
 	d := t1.Sub(t0)
 	T := d.Seconds()
-	b.Logf("Parsed %d RRs in %v, %.0f RRs/sec", n, d, float64(n)/T)
+	b.Logf("Parsed %d RRs (%d B) in %v, %.0f RRs/sec", n, fi.Size(), d, float64(n)/T)
 }
