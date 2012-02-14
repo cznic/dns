@@ -350,10 +350,13 @@ E		[eE][-+]?[0-9]+
 	s := string(l.buf[4:])
 	n, err := strconv.ParseUint(s, 10, 16)
 	lval.typ = rr.Type(n)
+	ret = tTYPE_X
+	if tok, ok := typex[lval.typ]; ok {
+		ret = tok
+	}
 	if err != nil {
 		l.Error(fmt.Sprintf("%s: %v", s, err))
 	}
-	ret = tTYPE_X
 
 <ipv4,ipseckey>{ipv4}
 	ip := net.ParseIP(string(l.buf))

@@ -156,6 +156,8 @@ type rrHead struct{
 	base32ext
 	base64
 	hex
+	hex_with_space
+	hex_with_space_opt
 	wks_ports
 
 %type <int>
@@ -441,6 +443,19 @@ hex:
 	{
 		$$ = $2
 	}
+
+hex_with_space:
+	hex
+|	hex_with_space hex	      
+	{
+		$$ = append($1, $2...)
+	}
+
+hex_with_space_opt:
+	{
+		$$ = nil
+	}		 
+|	hex_with_space
 
 
 ipseckey_0:
@@ -1179,9 +1194,21 @@ rr2:
 	{
 		$$ = &rr.RR{"", rr.TYPE_X25, $1.class, $1.ttl, $2}
 	}
-|	rrHead tTYPE_X null_1
+|	rrHead tTYPE_X tBACKSLASH_HASH
 	{
-		$$ = &rr.RR{"", $2, $1.class, $1.ttl, $3}
+		yylex.begin(sc_NUM)
+	}
+	uint16
+	{
+		yylex.begin(sc_HEX)
+	}
+	hex_with_space_opt
+	{
+		rdata := rr.RDATA($7)
+		$$ = &rr.RR{"", $2, $1.class, $1.ttl, &rdata}
+		if len($7) != int($5) {
+			yylex.Error(fmt.Sprintf("mismatched rdata len: %d != %d", $5, len($7)))
+		}
 	}
 
 

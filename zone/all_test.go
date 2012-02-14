@@ -40,7 +40,7 @@ func TestLoad(t *testing.T) {
 					return false
 				}
 			default:
-				if !strings.HasPrefix(r.Name, "n"+rr.Types[r.Type]+".") {
+				if !strings.HasPrefix(r.Name, "n"+r.Type.String()+".") {
 					err2 = errors.New("fail")
 					t.Error("!!!", r)
 					return false
@@ -86,7 +86,7 @@ func TestLoad(t *testing.T) {
 					return false
 				}
 			default:
-				if !strings.HasPrefix(r.Name, "n"+rr.Types[r.Type]+".") {
+				if !strings.HasPrefix(r.Name, "n"+r.Type.String()+".") {
 					err2 = errors.New("fail")
 					t.Error("!!!", r)
 					return false

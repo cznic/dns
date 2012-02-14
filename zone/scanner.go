@@ -4660,10 +4660,13 @@ yyrule85: // TYPE{digit}+
 		s := string(l.buf[4:])
 		n, err := strconv.ParseUint(s, 10, 16)
 		lval.typ = rr.Type(n)
+		ret = tTYPE_X
+		if tok, ok := typex[lval.typ]; ok {
+			ret = tok
+		}
 		if err != nil {
 			l.Error(fmt.Sprintf("%s: %v", s, err))
 		}
-		ret = tTYPE_X
 		goto yystate0
 	}
 yyrule86: // {ipv4}

@@ -2401,7 +2401,11 @@ func (d *RDATA) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err e
 }
 
 func (d *RDATA) String() string {
-	return fmt.Sprintf("\\# %d %02x", len(*d), *d)
+	if n := len(*d); n != 0 {
+		return fmt.Sprintf("\\# %d %02x", len(*d), *d)
+	}
+
+	return "\\# 0"
 }
 
 // RR holds a zone resource record data.

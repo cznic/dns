@@ -160,5 +160,19 @@ nWKS.example.com. IN WKS 5.6.7.8 UDP DNS
 nWKS.example.com. IN WKS 9.10.11.12 TCP SMTP
 nX25.example.com. IN X25 "Linux \"rulez!\""
 
+
+;-----------
+; RFC3597/5.
+;-----------
+nTYPE731.example.com.   CLASS32     TYPE731         \# 6 abcd (
+                                         ef 01 23 45 )
+nTYPE62347.example.com.   HS          TYPE62347       \# 0
+
+; An implementation MAY also choose to represent some RRs of known type using the above generic representations
+;e.example.   IN          A               \# 4 0A000001
+
+nA.example.com.   CLASS1      TYPE1           10.0.0.2
+;-----------
+
 ;--------------
 nTXT.example.com. IN TXT "<EOF>"
