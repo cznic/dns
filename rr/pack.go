@@ -7,6 +7,7 @@
 package rr
 
 import (
+	"encoding/hex"
 	"fmt"
 	"github.com/cznic/dns"
 )
@@ -46,7 +47,7 @@ func (b Bytes) Unpack() (y RRs) {
 		rec := &RR{}
 		//n0 := pos
 		if err := rec.Decode(b, &pos, nil); err != nil {
-			panic(fmt.Errorf("dns.Unpack\n% x\n at %04x %q", b, pos, err))
+			panic(fmt.Errorf("rr.Unpack\n%s\n at %04x %q", hex.Dump(b), pos, err))
 		}
 
 		//fmt.Printf("%d->%d, .Unpack(%q)\n", n0, pos, rec)

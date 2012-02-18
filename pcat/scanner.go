@@ -34,14 +34,14 @@ yystate0:
 	switch yyt := sc; yyt {
 	default:
 		panic(fmt.Errorf(`invalid start condition %d`, yyt))
-	case 0: // start condition: INITIAL
-		goto yystart1
 	case 1: // start condition: ID
 		goto yystart4
 	case 2: // start condition: QUERY
 		goto yystart6
 	case 3: // start condition: REPLY
 		goto yystart10
+	case 0: // start condition: INITIAL
+		goto yystart1
 	}
 
 	goto yystate1 // silence unused label error
@@ -53,9 +53,9 @@ yystart1:
 	switch {
 	default:
 		goto yyrule2
-	case c == '\n':
-		goto yystate3
 	case c == '\x00':
+		goto yystate3
+	case c == '\n':
 		goto yystate2
 	}
 
@@ -63,20 +63,20 @@ yystate2:
 	if c, err = l.getc(); err != nil {
 		return
 	}
-	goto yyrule1
+	switch {
+	default:
+		goto yyrule2
+	case c == '\x00':
+		goto yystate3
+	case c == '\n':
+		goto yystate2
+	}
 
 yystate3:
 	if c, err = l.getc(); err != nil {
 		return
 	}
-	switch {
-	default:
-		goto yyrule2
-	case c == '\n':
-		goto yystate3
-	case c == '\x00':
-		goto yystate2
-	}
+	goto yyrule1
 
 	goto yystate4 // silence unused label error
 yystate4:
@@ -218,9 +218,9 @@ yyrule5: // \n{HEX}*
 		r.Reply, err = hex.DecodeString(string(l.buf[1:]))
 		return
 	}
-		panic("unreachable")
+	panic("unreachable")
 
-		goto yyabort // silence unused label error
+	goto yyabort // silence unused label error
 
 yyabort: // no lexem recognized
 	return nil, errors.New(fmt.Sprintf("Unexpected char %q", string(int(c))))

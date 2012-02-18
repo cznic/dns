@@ -133,6 +133,7 @@ const (
 	sc_FLOAT // 13
 	sc_ANY_DOMAIN // 14
 	sc_IPSSECKEY // 15
+	sc_DOMAIN2 // 16
 )
 
 
@@ -187,7 +188,7 @@ float_lit	{D}"."{D}?{E}?|{D}{E}|"."{D}{E}?
 D		[0-9]+
 E		[eE][-+]?[0-9]+
 
-%x rrHead domain num ipv4 ipv6 base32ext base64 type hex proto port xhex float anydomain ipseckey
+%x rrHead domain num ipv4 ipv6 base32ext base64 type hex proto port xhex float anydomain ipseckey domain2
 
 %%
 	if ret >= 0 {
@@ -377,8 +378,11 @@ E		[eE][-+]?[0-9]+
 <base32ext>[0-9A-V=]+
 	ret = tBASE32EXT
 
-<base64,ipseckey>[A-Za-z0-9+/=]+
+<base64,domain2,ipseckey>[A-Za-z0-9+/=]+
 	ret = tBASE64
+
+<domain2>{domain-name}
+	ret = tDOMAIN_NAME2
 
 <xhex>0x({hex}|\.)+
 	var err error

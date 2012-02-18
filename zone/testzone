@@ -25,6 +25,37 @@ nDS.example.com. IN DS 4660 86 1 000102030405060708090a0b0c0d0e0f10111213
 nGPOS.example.com.	IN	6	GPOS -32.6882 116.8652 10.0
 nHINFO.example.com. IN HINFO "x86_\"64" "Linux"
 
+; http://tools.ietf.org/html/rfc5205
+;7.  Examples (moded)
+;
+;   In the examples below, the public key field containing no whitespace
+;   is wrapped since it does not fit in a single line of this document.
+;
+;   Example of a node with HI and HIT but no RVS:
+
+nHIP.example.com.      IN  HIP ( 2 200100107B1A74DF365639CC39F1D578
+                                AwEAAbdxyhNuSutc5EMzxTs9LBPCIkOFH8cIvM4p
+9+LrV4e19WzK00+CI6zBCQTdtWsuxKbWIy87UOoJTwkUs7lBu+Upr1gsNrut79ryra+bSRGQ
+b1slImA8YVJyuIDsj7kwzG7jnERNqnWxZ48AWkskmdHaVDP4BcelrTI3rMXdXF5D )
+
+;   Example of a node with a HI, HIT, and one RVS:
+
+nHIP.example.com.      IN  HIP ( 2 200100107B1A74DF365639CC39F1D578
+                                AwEAAbdxyhNuSutc5EMzxTs9LBPCIkOFH8cIvM4p
+9+LrV4e19WzK00+CI6zBCQTdtWsuxKbWIy87UOoJTwkUs7lBu+Upr1gsNrut79ryra+bSRGQ
+b1slImA8YVJyuIDsj7kwzG7jnERNqnWxZ48AWkskmdHaVDP4BcelrTI3rMXdXF5D
+                                rvs.example.com. )
+
+;   Example of a node with a HI, HIT, and two RVSs:
+
+nHIP.example.com.      IN  HIP ( 2 200100107B1A74DF365639CC39F1D578
+                                AwEAAbdxyhNuSutc5EMzxTs9LBPCIkOFH8cIvM4p
+9+LrV4e19WzK00+CI6zBCQTdtWsuxKbWIy87UOoJTwkUs7lBu+Upr1gsNrut79ryra+bSRGQ
+b1slImA8YVJyuIDsj7kwzG7jnERNqnWxZ48AWkskmdHaVDP4BcelrTI3rMXdXF5D
+                                rvs1.example.com.
+                                rvs2.example.com. )
+
+
 nIPSECKEY.example.com. 7200 IN     IPSECKEY ( 10 0 1
                     .
                     AQNRU3mG7TVTO2BkR47usntb102uFJtugbo6BSGvgqt4AQ== )

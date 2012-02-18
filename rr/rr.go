@@ -4,6 +4,78 @@
 
 // blame: jnml, labs.nic.cz
 
+/*
+
+-- Types to do:
+AXFR
+DLV
+HIP
+IXFR
+MAILA
+MAILB
+TKEY
+TSIG
++check ALL "*"
+
+---- Supported RR types "diff" vs Miek G.'s dns lib
+
++AFSDB
++GPOS
++ISDN
++KEY
++MD
++MF
++NSAP
++NSAP_PTR
++NULL
++PX
++RP
++RT
++SIG
++X25
+
+-DLV
+-SPF
+-TA
+-TALINK (RFC?)
+-TKEY
+-TLSA (RFC? DANE WG?)
+-TSIG
+-URI (RFC4501)
+
+=A
+=AAAA
+=CERT
+=CNAME
+=DHCID
+=DNAME
+=DNSKEY
+=DS
+=HINFO
+=IPSECKEY
+=KX
+=LOC
+=MB
+=MG
+=MINFO
+=MR
+=MX
+=NAPTR
+=NS
+=NSEC
+=NSEC3
+=NSEC3PARAM
+=PTR
+=RRSIG
+=SOA
+=SRV
+=SSHFP
+=TXT
+=WKS
+=any/unknown (RFC3597)
+
+*/
+
 // Package rr supports DNS resource records (RFC 1035 chapter 3.2).
 package rr
 
@@ -275,6 +347,23 @@ func (c CNAME) String() string {
 	return c.Name
 }
 
+// DHCID represents the RDATA of an DHCID RR.
+//
+// Conflicts can arise if multiple DHCP clients wish to use the same DNS name
+// or a DHCP client attempts to use a name added for another purpose.  To
+// resolve such conflicts, [1] proposes storing client identifiers in the DNS
+// to unambiguously associate domain names with the DHCP clients using them.
+// In the interest of clarity, it is preferable for this DHCP information to
+// use a distinct RR type.  This memo defines a distinct RR for this purpose
+// for use by DHCP clients or servers: the "DHCID" RR.  In order to obscure
+// potentially sensitive client identifying information, the data stored is the
+// result of a one-way SHA-256 hash computation.  The hash includes information
+// from the DHCP client's message as well as the domain name itself, so that
+// the data stored in the DHCID RR will be dependent on both the client
+// identification used in the DHCP protocol interaction and the domain name.
+// This means that the DHCID RDATA will vary if a single client is associated
+// over time with more than one name.  This makes it difficult to 'track' a
+// client as it is associated with various domain names.
 type DHCID struct {
 	Data []byte
 }
@@ -282,7 +371,7 @@ type DHCID struct {
 // SetData computes and sets d.Data as per RFC4701/3.3-3.5.  SetData supports
 // only SHA-256 (digest type code 1).
 //
-// See also TestDHCID is all_test.go fo examples.
+// See also TestDHCID in all_test.go for examples.
 func (d *DHCID) SetData(identifierType uint16, identifier []byte, fqdn string) {
 	w := dns.NewWirebuf()
 	w.Buf = identifier
@@ -746,6 +835,140 @@ func (d *HINFO) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err e
 
 func (d *HINFO) String() string {
 	return fmt.Sprintf(`"%s" "%s"`, quote(d.Cpu), quote(d.Os))
+}
+
+// HIP represents the RDATA of a HIP RR. This RR allows a HIP node to store in
+// the DNS its Host Identity (HI, the public component of the node
+// public-private key pair), Host Identity Tag (HIT, a truncated hash of its
+// public key), and the Domain Names of its rendezvous servers (RVSs).
+type HIP struct {
+	// The PK algorithm field indicates the public key cryptographic
+	// algorithm and the implied public key field format.  This is an 8-bit
+	// unsigned integer.  This document reuses the values defined for the
+	// 'algorithm type' of the IPSECKEY RR [RFC4025].
+	PKAlgorithm IPSECKEYAlgorithm
+	// Host identity tag
+	HIT []byte
+	// Both of the public key types defined in this document (RSA and DSA)
+	// reuse the public key formats defined for the IPSECKEY RR [RFC4025].
+	//
+	// The DSA key format is defined in RFC 2536 [RFC2536].
+	//
+	// The RSA key format is defined in RFC 3110 [RFC3110] and the RSA key
+	// size limit (4096 bits) is relaxed in the IPSECKEY RR [RFC4025]
+	// specification.
+	PublicKey []byte
+	// The Rendezvous Servers field indicates one or more variable length
+	// wire-encoded domain names of rendezvous server(s), as described in
+	// Section 3.3 of RFC 1035 [RFC1035].  The wire-encoded format is self-
+	// describing, so the length is implicit.  The domain names MUST NOT be
+	// compressed.  The rendezvous server(s) are listed in order of
+	// preference (i.e., first rendezvous server(s) are preferred),
+	// defining an implicit order amongst rendezvous servers of a single
+	// RR.  When multiple HIP RRs are present at the same owner name, this
+	// implicit order of rendezvous servers within an RR MUST NOT be used
+	// to infer a preference order between rendezvous servers stored in
+	// different RRs.
+	RendezvousServers []string
+}
+
+// Implementation of dns.Wirer
+func (d *HIP) Encode(b *dns.Wirebuf) {
+	//  0                   1                   2                   3
+	//  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+	// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	// |  HIT length   | PK algorithm  |          PK length            |
+	// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	// |                                                               |
+	// ~                           HIT                                 ~
+	// |                                                               |
+	// +                     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	// |                     |                                         |
+	// +-+-+-+-+-+-+-+-+-+-+-+                                         +
+	// |                           Public Key                          |
+	// ~                                                               ~
+	// |                                                               |
+	// +                               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	// |                               |                               |
+	// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               +
+	// |                                                               |
+	// ~                       Rendezvous Servers                      ~
+	// |                                                               |
+	// +             +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	// |             |
+	// +-+-+-+-+-+-+-+
+	dns.Octet(len(d.HIT)).Encode(b)
+	dns.Octet(d.PKAlgorithm).Encode(b)
+	dns.Octets2(len(d.PublicKey)).Encode(b)
+	b.Buf = append(b.Buf, d.HIT...)
+	b.Buf = append(b.Buf, d.PublicKey...)
+	b.DisableCompression()
+	for _, v := range d.RendezvousServers {
+		dns.DomainName(v).Encode(b)
+	}
+	b.EnableCompression()
+
+}
+
+// Implementation of dns.Wirer
+func (d *HIP) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	p0 := &b[*pos]
+	var hitLength dns.Octet
+	if err = hitLength.Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if err = (*dns.Octet)(&d.PKAlgorithm).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	var pkLength dns.Octets2
+	if err = pkLength.Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if *pos+int(hitLength) > len(b)+1 {
+		return fmt.Errorf("(*HIP).Decode: buffer underflow")
+	}
+
+	d.HIT = make([]byte, int(hitLength))
+	copy(d.HIT, b[*pos:*pos+int(hitLength)])
+	*pos += int(hitLength)
+
+	if *pos+int(pkLength) > len(b)+1 {
+		return fmt.Errorf("(*HIP).Decode: buffer underflow")
+	}
+
+	d.PublicKey = make([]byte, int(pkLength))
+	copy(d.PublicKey, b[*pos:*pos+int(pkLength)])
+	*pos += int(pkLength)
+
+	d.RendezvousServers = nil
+	for *pos < len(b) {
+		var s dns.DomainName
+		if err = s.Decode(b, pos, sniffer); err != nil {
+			return
+		}
+
+		d.RendezvousServers = append(d.RendezvousServers, string(s))
+	}
+
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataHIP, d)
+	}
+	return
+}
+
+func (d *HIP) String() string {
+	a := []string{}
+	for _, v := range d.RendezvousServers {
+		a = append(a, v)
+	}
+	s := ""
+	if len(a) != 0 {
+		s = " " + strings.Join(a, " ")
+	}
+	return fmt.Sprintf("%d %x %s%s", d.PKAlgorithm, d.HIT, strutil.Base64Encode(d.PublicKey), s)
 }
 
 // IPSECKEYAlgorithm is the type of the IPSECKEY RData Algorithm field
@@ -2516,6 +2739,8 @@ func (rr *RR) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 		rr.RData = &GPOS{}
 	case TYPE_HINFO:
 		rr.RData = &HINFO{}
+	case TYPE_HIP:
+		rr.RData = &HIP{}
 	case TYPE_IPSECKEY:
 		rr.RData = &IPSECKEY{}
 	case TYPE_ISDN:
@@ -2663,6 +2888,20 @@ func (a *RR) Equal(b *RR) (equal bool) {
 	case *HINFO:
 		y := b.RData.(*HINFO)
 		return x.Cpu == y.Cpu && x.Os == y.Os
+	case *HIP:
+		y := b.RData.(*HIP)
+		if y.PKAlgorithm != y.PKAlgorithm ||
+			!bytes.Equal(x.HIT, y.HIT) ||
+			!bytes.Equal(x.PublicKey, y.PublicKey) ||
+			len(x.RendezvousServers) != len(y.RendezvousServers) {
+			return false
+		}
+		for i, v := range x.RendezvousServers {
+			if strings.ToLower(v) != strings.ToLower(y.RendezvousServers[i]) {
+				return false
+			}
+		}
+		return true
 	case *IPSECKEY:
 		y := b.RData.(*IPSECKEY)
 		if x.Precedence != y.Precedence ||
@@ -3707,7 +3946,7 @@ func (d *WKS) String() string {
 // subset of msg.QTYPEs.
 type Type uint16
 
-// Type codes
+// Type codes. Types marked with * next to reference are not supported.
 const (
 	_ Type = iota
 
@@ -3741,18 +3980,18 @@ const (
 	TYPE_AAAA       // 28 IP6 Address                                 [RFC3596]
 	TYPE_LOC        // 29 Location Information                        [RFC1876]
 	TYPE_NXT        // 30 Next Domain - OBSOLETE                      [RFC3755][RFC2535]
-	TYPE_EID        // 31 Endpoint Identifier                         [Patton]           NOT supported by this package
-	TYPE_NIMLOC     // 32 Nimrod Locator                              [Patton]           NOT supported by this package
+	TYPE_EID        // 31 Endpoint Identifier                         [Patton]*
+	TYPE_NIMLOC     // 32 Nimrod Locator                              [Patton]*
 	TYPE_SRV        // 33 Server Selection                            [RFC2782]
-	TYPE_ATMA       // 34 ATM Address                                 [ATMDOC]           NOT supported by this package
+	TYPE_ATMA       // 34 ATM Address                                 [ATMDOC]*
 	TYPE_NAPTR      // 35 Naming Authority Pointer                    [RFC2915][RFC2168][RFC3403]
 	TYPE_KX         // 36 Key Exchanger                               [RFC2230]
 	TYPE_CERT       // 37 CERT                                        [RFC4398]
-	TYPE_A6         // 38 A6 (Experimental)                           [RFC3226][RFC2874] NOT supported by this package
+	TYPE_A6         // 38 A6 (Experimental)                           [RFC3226][RFC2874]*
 	TYPE_DNAME      // 39 DNAME                                       [RFC2672]
-	TYPE_SINK       // 40 SINK                                        [Eastlake]         NOT supported by this package
+	TYPE_SINK       // 40 SINK                                        [Eastlake]*
 	TYPE_OPT        // 41 OPT                                         [RFC2671]
-	TYPE_APL        // 42 APL (Experimental)                          [RFC3123]          NOT supported by this package
+	TYPE_APL        // 42 APL (Experimental)                          [RFC3123]*
 	TYPE_DS         // 43 Delegation Signer                           [RFC4034][RFC3658]
 	TYPE_SSHFP      // 44 SSH Key Fingerprint                         [RFC4255]
 	TYPE_IPSECKEY   // 45 IPSECKEY                                    [RFC4025]
@@ -3768,20 +4007,20 @@ const (
 	_ Type = iota + 54
 
 	TYPE_HIP    // 55 Host Identity Protocol                      [RFC5205]
-	TYPE_NINFO  // 56 NINFO                                       [Reid]                 NOT supported by this package
-	TYPE_RKEY   // 57 RKEY                                        [Reid]                 NOT supported by this package
-	TYPE_TALINK // 58 Trust Anchor LINK                           [Wijngaards]           NOT supported by this package
-	TYPE_CDS    // 59 Child DS                                    [Barwood]              NOT supported by this package
+	TYPE_NINFO  // 56 NINFO                                       [Reid]*
+	TYPE_RKEY   // 57 RKEY                                        [Reid]*
+	TYPE_TALINK // 58 Trust Anchor LINK                           [Wijngaards]*
+	TYPE_CDS    // 59 Child DS                                    [Barwood]*
 )
 
 const (
 	_ Type = iota + 98
 
 	TYPE_SPF    //  99                                             [RFC4408]
-	TYPE_UINFO  // 100                                             [IANA-Reserved]       NOT supported by this package
-	TYPE_UID    // 101                                             [IANA-Reserved]       NOT supported by this package
-	TYPE_GID    // 102                                             [IANA-Reserved]       NOT supported by this package
-	TYPE_UNSPEC // 103                                             [IANA-Reserved]       NOT supported by this package
+	TYPE_UINFO  // 100                                             [IANA-Reserved]*
+	TYPE_UID    // 101                                             [IANA-Reserved]*
+	TYPE_GID    // 102                                             [IANA-Reserved]*
+	TYPE_UNSPEC // 103                                             [IANA-Reserved]*
 )
 
 const (
@@ -3798,14 +4037,14 @@ const (
 const (
 	_ Type = iota + 255
 
-	TYPE_URI // 256 URI                                        [Faltstrom]               NOT supported by this package
-	TYPE_CAA // 257 Certification Authority Authorization      [Hallam-Baker]            NOT supported by this package
+	TYPE_URI // 256 URI                                        [Faltstrom]*
+	TYPE_CAA // 257 Certification Authority Authorization      [Hallam-Baker]*
 )
 
 const (
 	_ Type = iota + 0x7FFF
 
-	TYPE_TA  // 32768   DNSSEC Trust Authorities               [Weiler]                  NOT supported by this package
+	TYPE_TA  // 32768   DNSSEC Trust Authorities               [Weiler]*
 	TYPE_DLV // 32769   DNSSEC Lookaside Validation            [RFC4431]
 )
 

@@ -133,6 +133,7 @@ type rrHead struct{
 	tBASE32EXT
 	tBASE64
 	tDOMAIN_NAME
+	tDOMAIN_NAME2
 	tSRV_DOMAIN
 	tQSTR
 
@@ -155,6 +156,7 @@ type rrHead struct{
 %type <data>
 	base32ext
 	base64
+	base64_2
 	hex
 	hex_with_space
 	hex_with_space_opt
@@ -179,6 +181,7 @@ type rrHead struct{
 	ds
 	gpos
 	hinfo
+	hip
 	ipseckey
 	ipseckey_0
 	isdn
@@ -225,8 +228,9 @@ type rrHead struct{
 
 %type <str>
 	base64str
+	base64str_2
 
-%type	<strs>	txt2
+%type	<strs>	txt2 hip_1
 
 %type <typ>
 	rrtype
@@ -344,6 +348,32 @@ base64str:
 		$$ = $2
 	}
 |	base64str tBASE64
+	{
+		$$ += $2
+	}
+
+
+base64_2:
+	base64str_2
+	{
+		yylex.begin(sc_INITIAL)
+		if data, err := strutil.Base64Decode([]byte($1)); err != nil {
+			yylex.Error(err.Error())
+		} else {
+			$$ = data
+		}
+	}
+
+
+base64str_2:
+	{
+		yylex.begin(sc_DOMAIN2)
+	}
+	tBASE64
+	{
+		$$ = $2
+	}
+|	base64str_2 tBASE64
 	{
 		$$ += $2
 	}
@@ -1178,6 +1208,10 @@ rr2:
 	{
 		$$ = &rr.RR{"", rr.TYPE_HINFO, $1.class, $1.ttl, $2}
 	}
+|	rrHead hip
+	{
+		$$ = &rr.RR{"", rr.TYPE_HIP, $1.class, $1.ttl, $2}
+	}
 |	rrHead isdn
 	{
 		$$ = &rr.RR{"", rr.TYPE_ISDN, $1.class, $1.ttl, $2}
@@ -1620,6 +1654,30 @@ hinfo:
 	tHINFO tQSTR tQSTR
 	{
 		$$ = &rr.HINFO{$2, $3}
+	}
+
+
+hip:
+	tHIP
+	{
+		yylex.begin(sc_NUM)
+	}
+	uint8 hex base64_2
+	{
+		yylex.begin(sc_DOMAIN2)
+	}
+	hip_1
+	{
+		$$ = &rr.HIP{rr.IPSECKEYAlgorithm($3), $4, $5, $7}
+	}
+
+hip_1:
+	{
+		$$ = nil
+	}
+|	hip_1 tDOMAIN_NAME2
+	{
+		$$ = append($1, $2)
 	}
 
 
