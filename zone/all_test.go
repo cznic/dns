@@ -18,7 +18,7 @@ import (
 )
 
 var (
-	optZone = flag.String("zone", "", "text zone file for the parser benchmark")
+	optZone = flag.String("zone", "testzone", "text zone file for the parser benchmark")
 	optKeep = flag.Bool("keep", false, "keep generated test files")
 )
 

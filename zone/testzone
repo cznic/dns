@@ -170,6 +170,7 @@ nDNSKEY.example.com. 86400 IN DNSKEY 256 3 5 ( AQPSKmynfzW4kyBv015MUG2DeIQ3
                                        Mv1LyBUgia7za6ZEzOJBOztyvhjL
                                        742iU/TpPSEDhm2SNKLijfUppn1U
                                        aNvv4w==  )
+
 nTXT.example.com. IN TXT;
 nTXT.example.com. IN TXT ;
 nTXT.example.com. IN TXT

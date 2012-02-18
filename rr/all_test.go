@@ -11,12 +11,14 @@ import (
 	"encoding/hex"
 	"flag"
 	"fmt"
+	"github.com/cznic/dns"
 	"github.com/cznic/strutil"
 	"math/rand"
 	"net"
 	"strconv"
 	"strings"
 	"testing"
+	"time"
 )
 
 var optDev = flag.Bool("dev", false, "enable dev helpers")
@@ -330,6 +332,26 @@ func Test0(t *testing.T) {
 		&RR{"nSSHFP.example.com.", TYPE_SSHFP, CLASS_IN, -1,
 			&SSHFP{SSHFPAlgorithmDSA, SSHFPTypeSHA1,
 				[]byte{1, 2, 4, 8, 16, 32, 64, 128}},
+		},
+		&RR{"nTSIG.example.com.", TYPE_TSIG, CLASS_IN, -1,
+			&TSIG{"SAMPLE-ALG.EXAMPLE.",
+				time.Now(),
+				time.Second * 300,
+				[]byte{1, 2, 3, 4, 5, 6},
+				12345,
+				0,
+				nil,
+			},
+		},
+		&RR{"nTSIG.example.com.", TYPE_TSIG, CLASS_IN, -1,
+			&TSIG{"SAMPLE-ALG2.EXAMPLE.",
+				time.Now().Add(-time.Hour),
+				time.Second * 431,
+				[]byte{10, 20, 30, 40, 50, 60},
+				54321,
+				16,
+				[]byte{11, 22, 33, 0xAA, 0xBB, 0xFF},
+			},
 		},
 		&RR{"nTXT.example.com.", TYPE_TXT, CLASS_IN, -1,
 			&TXT{[]string{"the quick \" brown fox"}}},
@@ -987,5 +1009,54 @@ func TestDHCID(t *testing.T) {
 	t.Log(dhcid)
 	if g, e := string(strutil.Base64Encode(rd.Data)), "AAABxLmlskllE0MVjd57zHcWmEH3pCQ6VytcKD//7es/deY="; g != e {
 		t.Errorf("\ngot: %q\nexp: %q", g, e)
+	}
+}
+
+func TestTSIG(t *testing.T) {
+	// http://tools.ietf.org/html/rfc2845 3.2
+	//
+	// Field Name    Value       Wire Format         Meaning
+	// ----------------------------------------------------------------------
+	// Time Signed   853804800   00 00 32 e4 07 00   Tue Jan 21 00:00:00 1997
+	// Fudge         300         01 2C               5 minutes
+
+	const (
+		mac   = "MAC"
+		other = "OTHER"
+	)
+	ts := time.Date(1997, 1, 21, 0, 0, 0, 0, time.UTC)
+	fudge := time.Second * 300
+	tsig := &TSIG{"X.", ts, fudge, []byte(mac), 0x1234, 0x11, []byte(other)}
+	w := dns.NewWirebuf()
+	tsig.Encode(w)
+	t.Logf("\n%s", hex.Dump(w.Buf))
+	if g, e := len(w.Buf), 27; g != e {
+		t.Fatalf("%d != %d", g, e)
+	}
+
+	if g, e := w.Buf, []byte{
+		0x01, 'X', 0x00,
+		0x00, 0x00, 0x32, 0xe4, 0x07, 0x00,
+		0x01, 0x2c,
+		0x00, 0x03, 'M', 'A', 'C',
+		0x12, 0x34,
+		0x00, 0x11,
+		0x00, 0x05, 'O', 'T', 'H', 'E', 'R',
+	}; !bytes.Equal(g, e) {
+		t.Errorf("\n%s\n!=\n%s", hex.Dump(g), hex.Dump(e))
+	}
+
+	tsig2 := &TSIG{}
+	p := 0
+	if err := tsig2.Decode(w.Buf, &p, nil); err != nil {
+		t.Fatal(err)
+	}
+
+	if g, e := p, 27; g != e {
+		t.Fatalf("%d != %d", g, e)
+	}
+
+	if g, e := tsig2.String(), tsig.String(); g != e {
+		t.Errorf("\n%v\n!=\n%v", g, e)
 	}
 }

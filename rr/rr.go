@@ -13,7 +13,6 @@ IXFR
 MAILA
 MAILB
 TKEY
-TSIG
 +check ALL "*"
 
 ---- Supported RR types "diff" vs Miek G.'s dns lib
@@ -35,12 +34,10 @@ TSIG
 +X25
 
 -DLV
--SPF
 -TA
 -TALINK (RFC?)
 -TKEY
 -TLSA (RFC? DANE WG?)
--TSIG
 -URI (RFC4501)
 
 =A
@@ -68,8 +65,10 @@ TSIG
 =PTR
 =RRSIG
 =SOA
+=SPF
 =SRV
 =SSHFP
+=TSIG
 =TXT
 =WKS
 =any/unknown (RFC3597)
@@ -92,6 +91,7 @@ import (
 	"net"
 	"strconv"
 	"strings"
+	"time"
 )
 
 const asserts = false
@@ -650,7 +650,7 @@ func (d *DS) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err erro
 
 	end := *pos + n
 	if end > len(b) {
-		return fmt.Errorf("DS.Decode - buffer underflow")
+		return fmt.Errorf("(*rr.DS).Decode() - buffer underflow")
 	}
 	d.Digest = append([]byte{}, b[*pos:end]...)
 	*pos = end
@@ -685,7 +685,7 @@ func (d ip4) Encode(b *dns.Wirebuf) {
 func (d *ip4) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p := *pos
 	if p+4 > len(b) {
-		return fmt.Errorf("ip4.Decode() - buffer underflow")
+		return fmt.Errorf("(*rr.ip4).Decode() - buffer underflow")
 	}
 
 	p0 := &b[p]
@@ -714,7 +714,7 @@ func (d ip6) Encode(b *dns.Wirebuf) {
 func (d *ip6) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p := *pos
 	if p+16 > len(b) {
-		return fmt.Errorf("ip6.Decode() - buffer underflow")
+		return fmt.Errorf("(*rr.ip6).Decode() - buffer underflow")
 	}
 
 	p0 := &b[p]
@@ -928,7 +928,7 @@ func (d *HIP) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 	}
 
 	if *pos+int(hitLength) > len(b)+1 {
-		return fmt.Errorf("(*HIP).Decode: buffer underflow")
+		return fmt.Errorf("(*rr.HIP).Decode() - buffer underflow")
 	}
 
 	d.HIT = make([]byte, int(hitLength))
@@ -936,7 +936,7 @@ func (d *HIP) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 	*pos += int(hitLength)
 
 	if *pos+int(pkLength) > len(b)+1 {
-		return fmt.Errorf("(*HIP).Decode: buffer underflow")
+		return fmt.Errorf("(*rr.HIP).Decode() - buffer underflow")
 	}
 
 	d.PublicKey = make([]byte, int(pkLength))
@@ -2261,7 +2261,7 @@ func (d *NSEC3) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err e
 
 	in := int(n)
 	if *pos+in > len(b) {
-		return fmt.Errorf("rr.*NSEC3.Decode - buffer underflow")
+		return fmt.Errorf("(*rr.NSEC3).Decode() - buffer underflow")
 	}
 
 	d.NextHashedOwnerName = append([]byte{}, b[*pos:*pos+in]...)
@@ -2338,7 +2338,7 @@ func (d *NSEC3PARAM) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (
 	p := *pos
 	next := p + int(n)
 	if next > len(b) {
-		return fmt.Errorf("NSEC3PARAM.Decode() - buffer underflow")
+		return fmt.Errorf("(*rr.NSEC3PARAM).Decode() - buffer underflow")
 	}
 	d.Salt = append([]byte{}, b[p:next]...)
 	*pos = next
@@ -2423,7 +2423,7 @@ func (d *OPT_DATA) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (er
 	p := *pos
 	next := p + int(n)
 	if next > len(b) {
-		return fmt.Errorf("OPT_DATA.Decode() - buffer underflow")
+		return fmt.Errorf("(*rr.OPT_DATA).Decode() - buffer underflow")
 	}
 	d.Data = b[p:next]
 	*pos = next
@@ -2688,7 +2688,7 @@ func (rr *RR) Encode(b *dns.Wirebuf) {
 // Implementation of dns.Wirer
 func (rr *RR) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	if *pos >= len(b) {
-		return fmt.Errorf("rr.Decode buffer underflow, len(b) %d(0x%x), pos %d(0x%x)", len(b), len(b), *pos, *pos)
+		return fmt.Errorf("(*rr.RR).Decode() - buffer underflow, len(b) %d(0x%x), pos %d(0x%x)", len(b), len(b), *pos, *pos)
 	}
 
 	p0 := &b[*pos]
@@ -2807,6 +2807,8 @@ func (rr *RR) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 		rr.RData = &SRV{}
 	case TYPE_SSHFP:
 		rr.RData = &SSHFP{}
+	case TYPE_TSIG:
+		rr.RData = &TSIG{}
 	case TYPE_TXT:
 		rr.RData = &TXT{}
 	case TYPE_WKS:
@@ -3113,6 +3115,15 @@ func (a *RR) Equal(b *RR) (equal bool) {
 		return x.Algorithm == y.Algorithm &&
 			x.Type == y.Type &&
 			bytes.Equal(x.Fingerprint, y.Fingerprint)
+	case *TSIG:
+		y := b.RData.(*TSIG)
+		return strings.ToLower(x.AlgorithmName) == strings.ToLower(y.AlgorithmName) &&
+			x.TimeSigned.Unix() == y.TimeSigned.Unix() &&
+			x.Fudge == y.Fudge &&
+			bytes.Equal(x.MAC, y.MAC) &&
+			x.OriginalID == y.OriginalID &&
+			x.Error == y.Error &&
+			bytes.Equal(x.OtherData, y.OtherData)
 	case *TXT:
 		y := b.RData.(*TXT)
 		if len(x.S) != len(y.S) {
@@ -3875,6 +3886,162 @@ func (r *SSHFP) String() string {
 		r.Type,
 		r.Fingerprint,
 	)
+}
+
+// TSIGRCODE is the type of the TSIG Error field. Values of TSIGRCODE <= 15
+// have the same meaning as the same numbered values of msg.RCODE.
+type TSIGRCODE uint16
+
+func (t TSIGRCODE) String() (s string) {
+	if s = TSIGRCODEs[t]; s != "" {
+		return
+	}
+
+	return fmt.Sprintf("TSIGRCODE%d", t)
+}
+
+// Values of TSIGRCODE
+const (
+	TSIG_BADSIG TSIGRCODE = iota + 16
+	TSIG_BADKEY
+	TSIG_BADTIME
+)
+
+// Text values of TSIGRCODE
+var TSIGRCODEs = map[TSIGRCODE]string{
+	// 0               No error condition
+	0: "RC_NO_ERROR RCODE",
+	// 1               Format error - The name server was
+	//                 unable to interpret the query.
+	1: "RC_FORMAT_ERROR",
+	// 2               Server failure - The name server was
+	//                 unable to process this query due to a
+	//                 problem with the name server.
+	2: "RC_SERVER_FAILURE",
+	// 3               Name Error - Meaningful only for
+	//                 responses from an authoritative name
+	//                 server, this code signifies that the
+	//                 domain name referenced in the query does
+	//                 not exist.
+	3: "RC_NAME_ERROR",
+	// 4               Not Implemented - The name server does
+	//                 not support the requested kind of query.
+	4: "RC_NOT_IMPLEMENETD",
+	// 5               Refused - The name server refuses to
+	//                 perform the specified operation for
+	//                 policy reasons.  For example, a name
+	//                 server may not wish to provide the
+	//                 information to the particular requester,
+	//                 or a name server may not wish to perform
+	//                 a particular operation (e.g., zone
+	//                 transfer) for particular data.
+	5: "RC_REFUSED",
+	// 6-15            Reserved for future use.
+	TSIG_BADSIG:  "BADSIG",
+	TSIG_BADKEY:  "BADKEY",
+	TSIG_BADTIME: "BADTIME",
+}
+
+// TSIG represents TSIG RR RDATA. TSIG RRs are dynamically computed to cover a
+// particular DNS transaction and are not DNS RRs in the usual sense.
+type TSIG struct {
+	AlgorithmName string // Name of the algorithm in domain name syntax.
+	TimeSigned    time.Time
+	Fudge         time.Duration // Permitted error in TimeSigned
+	MAC           []byte        // Defined by Algorithm Name.
+	OriginalID    uint16        // Original message ID.
+	Error         TSIGRCODE     // Expanded RCODE covering TSIG processing.
+	OtherData     []byte        // Empty unless Error == BADTIME.
+}
+
+// Implementation of dns.Wirer
+func (d *TSIG) Encode(b *dns.Wirebuf) {
+	dns.DomainName(d.AlgorithmName).Encode(b)
+	secs := d.TimeSigned.UTC().Unix()
+	for i := 0; i < 6; i++ {
+		dns.Octet(secs >> 40).Encode(b)
+		secs <<= 8
+	}
+	dns.Octets2(d.Fudge / time.Second).Encode(b)
+	dns.Octets2(len(d.MAC)).Encode(b)
+	b.Buf = append(b.Buf, d.MAC...)
+	dns.Octets2(d.OriginalID).Encode(b)
+	dns.Octets2(d.Error).Encode(b)
+	dns.Octets2(len(d.OtherData)).Encode(b)
+	b.Buf = append(b.Buf, d.OtherData...)
+}
+
+// Implementation of dns.Wirer
+func (d *TSIG) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	p0 := &b[*pos]
+	if err = (*dns.DomainName)(&d.AlgorithmName).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	var ts int64
+	var bt dns.Octet
+	for i := 0; i < 6; i++ {
+		if err = bt.Decode(b, pos, sniffer); err != nil {
+			return
+		}
+
+		ts = ts<<8 | int64(bt)
+	}
+	d.TimeSigned = time.Unix(ts, 0)
+
+	var u16 dns.Octets2
+	if err = u16.Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	d.Fudge = time.Duration(u16) * time.Second
+
+	if err = u16.Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	n := int(u16)
+	if *pos+n > len(b)+1 {
+		return fmt.Errorf("(*rr.TSIG).Decode() - buffer underflow")
+	}
+
+	d.MAC = make([]byte, n)
+	copy(d.MAC, b[*pos:])
+	*pos += n
+
+	if err = u16.Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	d.OriginalID = uint16(u16)
+
+	if err = u16.Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	d.Error = TSIGRCODE(u16)
+
+	if err = u16.Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	n = int(u16)
+	if *pos+n > len(b)+1 {
+		return fmt.Errorf("(*rr.TSIG).Decode() - buffer underflow")
+	}
+
+	d.OtherData = make([]byte, n)
+	copy(d.OtherData, b[*pos:])
+	*pos += n
+
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataTSIG, d)
+	}
+	return
+}
+
+func (d *TSIG) String() string {
+	return fmt.Sprintf("%s %s %s %x %d %s %x", d.AlgorithmName, d.TimeSigned.UTC().Add(time.Duration(-d.TimeSigned.Nanosecond())), d.Fudge, d.MAC, d.OriginalID, d.Error, d.OtherData)
 }
 
 // TXT holds the TXT RData
