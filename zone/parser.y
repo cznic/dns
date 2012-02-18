@@ -211,6 +211,7 @@ type rrHead struct{
 	rt
 	sig
 	soa
+	spf
 	srv
 	sshfp
 	txt
@@ -219,9 +220,7 @@ type rrHead struct{
 
 %type <rr>
 	rr
-	srv_rr
 	rr2
-	srv_rr2
 
 %type <rrh>
 	rrHead
@@ -620,17 +619,6 @@ line:
 			goto ret0
 		}
 	}
-|	tSRV_DOMAIN
-	{
-		yylex.begin(sc_RRHEAD)
-	}
-	srv_rr
-	{
-		$3.Name = $1
-		if !yylex.rrHandler($3) {
-			goto ret0
-		}
-	}
 |	tBLANK_START rr
 	{
 		if !yylex.rrHandler($2) {
@@ -886,7 +874,7 @@ naptr:
 	}
 	uint16 uint16 tQSTR tQSTR tQSTR
 	{
-		yylex.begin(sc_ANY_DOMAIN)
+		yylex.begin(sc_DOMAIN)
 	}
 	tDOMAIN_NAME
 	{
@@ -1027,22 +1015,6 @@ rp:
 		$$ = &rr.RP{$3, $4}
 	}
 
-
-srv_rr:
-	{
-		yylex.begin(sc_RRHEAD)
-	}
-	srv_rr2
-	{
-		$$ = $2
-	}
-
-
-srv_rr2:
-	rrHead srv
-	{
-		$$ = &rr.RR{"", rr.TYPE_SRV, $1.class, $1.ttl, $2}
-	}
 
 rr:
 	{
@@ -1195,6 +1167,14 @@ rr2:
 |	rrHead soa
 	{
 		$$ = &rr.RR{"", rr.TYPE_SOA, $1.class, $1.ttl, $2}
+	}
+|	rrHead spf
+	{
+		$$ = &rr.RR{"", rr.TYPE_SPF, $1.class, $1.ttl, $2}
+	}
+|	rrHead srv
+	{
+		$$ = &rr.RR{"", rr.TYPE_SRV, $1.class, $1.ttl, $2}
 	}
 |	rrHead sshfp
 	{
@@ -1594,6 +1574,12 @@ soa:
 		$$ = &rr.SOA{$3, $4, uint32($6), uint32($7), uint32($8), uint32($9), uint32($10)}
 	}
 
+
+spf:
+	tSPF txt2
+	{
+		$$ = &rr.SPF{$2}
+	}
 
 srv:
 	tSRV

@@ -290,6 +290,7 @@ const (
 	SniffRDataRRSIG                        // RRSIG resource record data
 	SniffRDataSIG                          // SIG resource record data
 	SniffRDataSOA                          // SOA resource record data
+	SniffRDataSPF                          // SPF resource record data
 	SniffRDataSRV                          // SRV resource record data
 	SniffRDataSSHFP                        // SSHFP resource record data
 	SniffRDataTXT                          // TXT resource record data

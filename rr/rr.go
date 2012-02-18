@@ -9,7 +9,6 @@
 -- Types to do:
 AXFR
 DLV
-HIP
 IXFR
 MAILA
 MAILB
@@ -21,6 +20,7 @@ TSIG
 
 +AFSDB
 +GPOS
++HIP
 +ISDN
 +KEY
 +MD
@@ -2801,6 +2801,8 @@ func (rr *RR) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 		rr.RData = &SIG{}
 	case TYPE_SOA:
 		rr.RData = &SOA{}
+	case TYPE_SPF:
+		rr.RData = &SPF{}
 	case TYPE_SRV:
 		rr.RData = &SRV{}
 	case TYPE_SSHFP:
@@ -3088,6 +3090,18 @@ func (a *RR) Equal(b *RR) (equal bool) {
 			x.Retry == y.Retry &&
 			x.Expire == y.Expire &&
 			x.Minimum == y.Minimum
+	case *SPF:
+		y := b.RData.(*SPF)
+		if len(x.S) != len(y.S) {
+			return false
+		}
+		for i, s := range x.S {
+			if s != y.S[i] {
+				return false
+			}
+		}
+
+		return true
 	case *SRV:
 		y := b.RData.(*SRV)
 		return x.Priority == y.Priority &&
@@ -3620,6 +3634,65 @@ func (d *SOA) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 
 func (d *SOA) String() string {
 	return fmt.Sprintf("%s %s %d %d %d %d %d", d.MName, d.RName, d.Serial, d.Refresh, d.Retry, d.Expire, d.Minimum)
+}
+
+// SPF represents SPF RR RDATA. The format of this type is identical to the TXT
+// RR [RFC1035].  For either type, the character content of the record is
+// encoded as [US-ASCII].
+//
+// It is recognized that the current practice (using a TXT record) is not
+// optimal, but it is necessary because there are a number of DNS server and
+// resolver implementations in common use that cannot handle the new RR type.
+// The two-record-type scheme provides a forward path to the better solution of
+// using an RR type reserved for this purpose.
+//
+// An SPF-compliant domain name SHOULD have SPF records of both RR types.  A
+// compliant domain name MUST have a record of at least one type.  If a domain
+// has records of both types, they MUST have identical content.  For example,
+// instead of publishing just one record as in Section 3.1 above (RFC4408), it
+// is better to publish:
+//
+//    example.com. IN TXT "v=spf1 +mx a:colo.example.com/28 -all"
+//    example.com. IN SPF "v=spf1 +mx a:colo.example.com/28 -all"
+//
+// Example RRs in this document are shown with the TXT record type; however,
+// they could be published with the SPF type or with both types.
+type SPF struct {
+	S []string
+}
+
+// Implementation of dns.Wirer
+func (t *SPF) Encode(b *dns.Wirebuf) {
+	for _, s := range t.S {
+		dns.CharString(s).Encode(b)
+	}
+}
+
+// Implementation of dns.Wirer
+func (t *SPF) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	p0 := &b[*pos]
+	s := []string{}
+	for *pos < len(b) {
+		var part dns.CharString
+		if err = part.Decode(b, pos, sniffer); err != nil {
+			return
+		}
+
+		s = append(s, string(part))
+	}
+	t.S = s
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataSPF, t)
+	}
+	return
+}
+
+func (t *SPF) String() string {
+	a := []string{}
+	for _, s := range t.S {
+		a = append(a, fmt.Sprintf(`"%s"`, quote(s)))
+	}
+	return strings.Join(a, " ")
 }
 
 type SRV struct {

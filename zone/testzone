@@ -144,6 +144,18 @@ nRRSIG.example.com. IN RRSIG A 3 2 3 20101231205012 20001231235959 4660 signer.e
 nRT.example.com. IN RT 12345 x.example.com.
 nSIG.example.com. IN SIG A 3 2 3 20101231205012 20001231235959 4660 signer.example.com. AAZAAQAAAAM=
 nSOA.example.com. IN SOA mname.example.com. rname.example.com. 305419896 1193046 624485 4913 38930
+
+;-----------------------------------------------------------------
+; RFC4408
+nSPF.example.com. IN SPF "v=spf1 +mx a:colo.example.com/28 -all"
+nSPF.example.com.        IN SPF  ( "v=spf1 "
+                              "-include:ip4._spf.%{d} "
+                              "-include:ptr._spf.%{d} "
+                              "+all" )
+nSPF.ip4._spf.example.com. IN SPF  "v=spf1 -ip4:192.0.2.0/24 +all"
+nSPF.ptr._spf.example.com. IN SPF  "v=spf1 -ptr +all"
+;-----------------------------------------------------------------
+
 _sip._tcp.nSRV.example.com. 86400 IN SRV 10 60 5060 bigbox.example.com.
 _sip._tcp.nSRV.example.com. 86400 IN SRV 10 20 5060 smallbox1.example.com.
 _sip._tcp.nSRV.example.com. 86400 IN SRV 10 10 5060 smallbox2.example.com.
