@@ -706,7 +706,7 @@ yystate50:
 
 yystate51:
 	c = l.getc(c)
-	goto yyrule83
+	goto yyrule32
 
 yystate52:
 	c = l.getc(c)
@@ -739,7 +739,7 @@ yystate54:
 
 yystate55:
 	c = l.getc(c)
-	goto yyrule32
+	goto yyrule33
 
 yystate56:
 	c = l.getc(c)
@@ -770,11 +770,11 @@ yystate58:
 
 yystate59:
 	c = l.getc(c)
-	goto yyrule33
+	goto yyrule34
 
 yystate60:
 	c = l.getc(c)
-	goto yyrule34
+	goto yyrule35
 
 yystate61:
 	c = l.getc(c)
@@ -796,7 +796,7 @@ yystate62:
 
 yystate63:
 	c = l.getc(c)
-	goto yyrule35
+	goto yyrule36
 
 yystate64:
 	c = l.getc(c)
@@ -820,7 +820,7 @@ yystate65:
 
 yystate66:
 	c = l.getc(c)
-	goto yyrule36
+	goto yyrule37
 
 yystate67:
 	c = l.getc(c)
@@ -842,7 +842,7 @@ yystate68:
 
 yystate69:
 	c = l.getc(c)
-	goto yyrule37
+	goto yyrule38
 
 yystate70:
 	c = l.getc(c)
@@ -886,11 +886,11 @@ yystate73:
 
 yystate74:
 	c = l.getc(c)
-	goto yyrule38
+	goto yyrule39
 
 yystate75:
 	c = l.getc(c)
-	goto yyrule39
+	goto yyrule40
 
 yystate76:
 	c = l.getc(c)
@@ -969,7 +969,7 @@ yystate84:
 
 yystate85:
 	c = l.getc(c)
-	goto yyrule40
+	goto yyrule41
 
 yystate86:
 	c = l.getc(c)
@@ -991,7 +991,7 @@ yystate87:
 
 yystate88:
 	c = l.getc(c)
-	goto yyrule41
+	goto yyrule42
 
 yystate89:
 	c = l.getc(c)
@@ -1015,11 +1015,11 @@ yystate90:
 
 yystate91:
 	c = l.getc(c)
-	goto yyrule42
+	goto yyrule43
 
 yystate92:
 	c = l.getc(c)
-	goto yyrule43
+	goto yyrule44
 
 yystate93:
 	c = l.getc(c)
@@ -1041,7 +1041,7 @@ yystate94:
 
 yystate95:
 	c = l.getc(c)
-	goto yyrule44
+	goto yyrule45
 
 yystate96:
 	c = l.getc(c)
@@ -1066,19 +1066,19 @@ yystate96:
 
 yystate97:
 	c = l.getc(c)
-	goto yyrule45
+	goto yyrule46
 
 yystate98:
 	c = l.getc(c)
-	goto yyrule46
+	goto yyrule47
 
 yystate99:
 	c = l.getc(c)
-	goto yyrule47
+	goto yyrule48
 
 yystate100:
 	c = l.getc(c)
-	goto yyrule48
+	goto yyrule49
 
 yystate101:
 	c = l.getc(c)
@@ -1109,15 +1109,15 @@ yystate103:
 
 yystate104:
 	c = l.getc(c)
-	goto yyrule49
+	goto yyrule50
 
 yystate105:
 	c = l.getc(c)
-	goto yyrule50
+	goto yyrule51
 
 yystate106:
 	c = l.getc(c)
-	goto yyrule51
+	goto yyrule52
 
 yystate107:
 	c = l.getc(c)
@@ -1165,7 +1165,7 @@ yystate110:
 
 yystate111:
 	c = l.getc(c)
-	goto yyrule52
+	goto yyrule53
 
 yystate112:
 	c = l.getc(c)
@@ -1207,7 +1207,7 @@ yystate115:
 
 yystate116:
 	c = l.getc(c)
-	goto yyrule53
+	goto yyrule54
 
 yystate117:
 	c = l.getc(c)
@@ -1229,13 +1229,13 @@ yystate118:
 
 yystate119:
 	c = l.getc(c)
-	goto yyrule54
+	goto yyrule55
 
 yystate120:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule55
+		goto yyrule56
 	case c == 'A':
 		goto yystate121
 	case c == 'E':
@@ -1255,7 +1255,7 @@ yystate122:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule56
+		goto yyrule57
 	case c == '-':
 		goto yystate123
 	}
@@ -1289,7 +1289,7 @@ yystate125:
 
 yystate126:
 	c = l.getc(c)
-	goto yyrule57
+	goto yyrule58
 
 yystate127:
 	c = l.getc(c)
@@ -1304,7 +1304,7 @@ yystate128:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule58
+		goto yyrule59
 	case c == '3':
 		goto yystate129
 	}
@@ -1313,7 +1313,7 @@ yystate129:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule59
+		goto yyrule60
 	case c == 'P':
 		goto yystate130
 	}
@@ -1356,7 +1356,7 @@ yystate133:
 
 yystate134:
 	c = l.getc(c)
-	goto yyrule60
+	goto yyrule61
 
 yystate135:
 	c = l.getc(c)
@@ -1378,7 +1378,7 @@ yystate136:
 
 yystate137:
 	c = l.getc(c)
-	goto yyrule61
+	goto yyrule62
 
 yystate138:
 	c = l.getc(c)
@@ -1391,7 +1391,7 @@ yystate138:
 
 yystate139:
 	c = l.getc(c)
-	goto yyrule62
+	goto yyrule63
 
 yystate140:
 	c = l.getc(c)
@@ -1415,11 +1415,11 @@ yystate141:
 
 yystate142:
 	c = l.getc(c)
-	goto yyrule63
+	goto yyrule64
 
 yystate143:
 	c = l.getc(c)
-	goto yyrule64
+	goto yyrule65
 
 yystate144:
 	c = l.getc(c)
@@ -1456,11 +1456,11 @@ yystate146:
 
 yystate147:
 	c = l.getc(c)
-	goto yyrule65
+	goto yyrule66
 
 yystate148:
 	c = l.getc(c)
-	goto yyrule66
+	goto yyrule67
 
 yystate149:
 	c = l.getc(c)
@@ -1491,11 +1491,11 @@ yystate151:
 
 yystate152:
 	c = l.getc(c)
-	goto yyrule67
+	goto yyrule68
 
 yystate153:
 	c = l.getc(c)
-	goto yyrule68
+	goto yyrule69
 
 yystate154:
 	c = l.getc(c)
@@ -1525,7 +1525,7 @@ yystate155:
 
 yystate156:
 	c = l.getc(c)
-	goto yyrule69
+	goto yyrule70
 
 yystate157:
 	c = l.getc(c)
@@ -1538,7 +1538,7 @@ yystate157:
 
 yystate158:
 	c = l.getc(c)
-	goto yyrule70
+	goto yyrule71
 
 yystate159:
 	c = l.getc(c)
@@ -1551,7 +1551,7 @@ yystate159:
 
 yystate160:
 	c = l.getc(c)
-	goto yyrule71
+	goto yyrule72
 
 yystate161:
 	c = l.getc(c)
@@ -1564,7 +1564,7 @@ yystate161:
 
 yystate162:
 	c = l.getc(c)
-	goto yyrule72
+	goto yyrule73
 
 yystate163:
 	c = l.getc(c)
@@ -1595,7 +1595,7 @@ yystate165:
 
 yystate166:
 	c = l.getc(c)
-	goto yyrule73
+	goto yyrule74
 
 yystate167:
 	c = l.getc(c)
@@ -1618,7 +1618,7 @@ yystate168:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyabort
+		goto yyrule75
 	case c == 'L':
 		goto yystate169
 	}
@@ -1652,7 +1652,7 @@ yystate171:
 
 yystate172:
 	c = l.getc(c)
-	goto yyrule74
+	goto yyrule76
 
 yystate173:
 	c = l.getc(c)
@@ -1674,7 +1674,7 @@ yystate174:
 
 yystate175:
 	c = l.getc(c)
-	goto yyrule75
+	goto yyrule77
 
 yystate176:
 	c = l.getc(c)
@@ -1696,7 +1696,7 @@ yystate177:
 
 yystate178:
 	c = l.getc(c)
-	goto yyrule76
+	goto yyrule78
 
 yystate179:
 	c = l.getc(c)
@@ -1709,7 +1709,7 @@ yystate179:
 
 yystate180:
 	c = l.getc(c)
-	goto yyrule77
+	goto yyrule79
 
 yystate181:
 	c = l.getc(c)
@@ -1742,7 +1742,7 @@ yystate184:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule84
+		goto yyrule85
 	case c >= '0' && c <= '9':
 		goto yystate184
 	}
@@ -1771,7 +1771,7 @@ yystate186:
 
 yystate187:
 	c = l.getc(c)
-	goto yyrule78
+	goto yyrule80
 
 yystate188:
 	c = l.getc(c)
@@ -1793,7 +1793,7 @@ yystate189:
 
 yystate190:
 	c = l.getc(c)
-	goto yyrule79
+	goto yyrule81
 
 yystate191:
 	c = l.getc(c)
@@ -1833,7 +1833,7 @@ yystate194:
 
 yystate195:
 	c = l.getc(c)
-	goto yyrule80
+	goto yyrule82
 
 yystate196:
 	c = l.getc(c)
@@ -1855,7 +1855,7 @@ yystate197:
 
 yystate198:
 	c = l.getc(c)
-	goto yyrule81
+	goto yyrule83
 
 yystate199:
 	c = l.getc(c)
@@ -1877,7 +1877,7 @@ yystate200:
 
 yystate201:
 	c = l.getc(c)
-	goto yyrule82
+	goto yyrule84
 
 	goto yystate202 // silence unused label error
 yystate202:
@@ -2083,7 +2083,7 @@ yystate217:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule85
+		goto yyrule86
 	case c >= '0' && c <= '9':
 		goto yystate218
 	}
@@ -2092,14 +2092,14 @@ yystate218:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule85
+		goto yyrule86
 	case c >= '0' && c <= '9':
 		goto yystate219
 	}
 
 yystate219:
 	c = l.getc(c)
-	goto yyrule85
+	goto yyrule86
 
 yystate220:
 	c = l.getc(c)
@@ -2192,7 +2192,7 @@ yystate227:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule86
+		goto yyrule87
 	case c == ':':
 		goto yystate231
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
@@ -2203,7 +2203,7 @@ yystate228:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule86
+		goto yyrule87
 	case c == ':':
 		goto yystate231
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
@@ -2214,7 +2214,7 @@ yystate229:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule86
+		goto yyrule87
 	case c == ':':
 		goto yystate231
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
@@ -2225,7 +2225,7 @@ yystate230:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule86
+		goto yyrule87
 	case c == ':':
 		goto yystate231
 	}
@@ -2245,7 +2245,7 @@ yystate232:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule86
+		goto yyrule87
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
 		goto yystate233
 	}
@@ -2254,7 +2254,7 @@ yystate233:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule86
+		goto yyrule87
 	case c == ':':
 		goto yystate237
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
@@ -2265,7 +2265,7 @@ yystate234:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule86
+		goto yyrule87
 	case c == ':':
 		goto yystate237
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
@@ -2276,7 +2276,7 @@ yystate235:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule86
+		goto yyrule87
 	case c == ':':
 		goto yystate237
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
@@ -2287,7 +2287,7 @@ yystate236:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule86
+		goto yyrule87
 	case c == ':':
 		goto yystate237
 	}
@@ -2339,7 +2339,7 @@ yystate240:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule87
+		goto yyrule88
 	case c >= '0' && c <= '9' || c == '=' || c >= 'A' && c <= 'V':
 		goto yystate240
 	}
@@ -2373,7 +2373,7 @@ yystate242:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule88
+		goto yyrule89
 	case c == '+' || c >= '/' && c <= '9' || c == '=' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z':
 		goto yystate242
 	}
@@ -2499,13 +2499,13 @@ yystart247:
 
 yystate248:
 	c = l.getc(c)
-	goto yyrule92
+	goto yyrule93
 
 yystate249:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule91
+		goto yyrule92
 	case c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
 		goto yystate249
 	}
@@ -2557,7 +2557,7 @@ yystate252:
 
 yystate253:
 	c = l.getc(c)
-	goto yyrule94
+	goto yyrule95
 
 yystate254:
 	c = l.getc(c)
@@ -2579,7 +2579,7 @@ yystate255:
 
 yystate256:
 	c = l.getc(c)
-	goto yyrule93
+	goto yyrule94
 
 	goto yystate257 // silence unused label error
 yystate257:
@@ -2628,7 +2628,7 @@ yystate259:
 
 yystate260:
 	c = l.getc(c)
-	goto yyrule96
+	goto yyrule97
 
 yystate261:
 	c = l.getc(c)
@@ -2659,7 +2659,7 @@ yystate263:
 
 yystate264:
 	c = l.getc(c)
-	goto yyrule95
+	goto yyrule96
 
 	goto yystate265 // silence unused label error
 yystate265:
@@ -2708,7 +2708,7 @@ yystate268:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule90
+		goto yyrule91
 	case c == '.' || c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f':
 		goto yystate268
 	}
@@ -2766,7 +2766,7 @@ yystate272:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule97
+		goto yyrule98
 	case c == 'E' || c == 'e':
 		goto yystate273
 	case c >= '0' && c <= '9':
@@ -2797,7 +2797,7 @@ yystate275:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule97
+		goto yyrule98
 	case c >= '0' && c <= '9':
 		goto yystate275
 	}
@@ -3219,7 +3219,7 @@ yystate300:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule89
+		goto yyrule90
 	case c == '.':
 		goto yystate301
 	}
@@ -3228,7 +3228,7 @@ yystate301:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule89
+		goto yyrule90
 	case c == '*':
 		goto yystate300
 	case c == '_':
@@ -3241,7 +3241,7 @@ yystate302:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule89
+		goto yyrule90
 	case c == '-':
 		goto yystate303
 	case c == '.':
@@ -3272,13 +3272,13 @@ yystate304:
 
 yystate305:
 	c = l.getc(c)
-	goto yyrule89
+	goto yyrule90
 
 yystate306:
 	c = l.getc(c)
 	switch {
 	default:
-		goto yyrule88
+		goto yyrule89
 	case c == '+' || c == '/' || c == '=':
 		goto yystate242
 	case c == '-':
@@ -4208,267 +4208,272 @@ yyrule31: // DHCID
 		ret = tDHCID
 		goto yystate0
 	}
-yyrule32: // DNAME
-	{
-		ret = tDNAME
-		goto yystate0
-	}
-yyrule33: // DNSKEY
-	{
-		ret = tDNSKEY
-		goto yystate0
-	}
-yyrule34: // DS
-	{
-		ret = tDS
-		goto yystate0
-	}
-yyrule35: // EID
-	{
-		ret = tEID
-		goto yystate0
-	}
-yyrule36: // GID
-	{
-		ret = tGID
-		goto yystate0
-	}
-yyrule37: // GPOS
-	{
-		ret = tGPOS
-		goto yystate0
-	}
-yyrule38: // HINFO
-	{
-		ret = tHINFO
-		goto yystate0
-	}
-yyrule39: // HIP
-	{
-		ret = tHIP
-		goto yystate0
-	}
-yyrule40: // IPSECKEY
-	{
-		ret = tIPSECKEY
-		goto yystate0
-	}
-yyrule41: // ISDN
-	{
-		ret = tISDN
-		goto yystate0
-	}
-yyrule42: // KEY
-	{
-		ret = tKEY
-		goto yystate0
-	}
-yyrule43: // KX
-	{
-		ret = tKX
-		goto yystate0
-	}
-yyrule44: // LOC
-	{
-		ret = tLOC
-		goto yystate0
-	}
-yyrule45: // MB
-	{
-		ret = tMB
-		goto yystate0
-	}
-yyrule46: // MD
-	{
-		ret = tMD
-		goto yystate0
-	}
-yyrule47: // MF
-	{
-		ret = tMF
-		goto yystate0
-	}
-yyrule48: // MG
-	{
-		ret = tMG
-		goto yystate0
-	}
-yyrule49: // MINFO
-	{
-		ret = tMINFO
-		goto yystate0
-	}
-yyrule50: // MR
-	{
-		ret = tMR
-		goto yystate0
-	}
-yyrule51: // MX
-	{
-		ret = tMX
-		goto yystate0
-	}
-yyrule52: // NAPTR
-	{
-		ret = tNAPTR
-		goto yystate0
-	}
-yyrule53: // NIMLOC
-	{
-		ret = tNIMLOC
-		goto yystate0
-	}
-yyrule54: // NINFO
-	{
-		ret = tNINFO
-		goto yystate0
-	}
-yyrule55: // NS
-	{
-		ret = tNS
-		goto yystate0
-	}
-yyrule56: // NSAP
-	{
-		ret = tNSAP
-		goto yystate0
-	}
-yyrule57: // NSAP-PTR
-	{
-		ret = tNSAP_PTR
-		goto yystate0
-	}
-yyrule58: // NSEC
-	{
-		ret = tNSEC
-		goto yystate0
-	}
-yyrule59: // NSEC3
-	{
-		ret = tNSEC3
-		goto yystate0
-	}
-yyrule60: // NSEC3PARAM
-	{
-		ret = tNSEC3PARAM
-		goto yystate0
-	}
-yyrule61: // NULL
-	{
-		ret = tNULL
-		goto yystate0
-	}
-yyrule62: // NXT
-	{
-		ret = tNXT
-		goto yystate0
-	}
-yyrule63: // PTR
-	{
-		ret = tPTR
-		goto yystate0
-	}
-yyrule64: // PX
-	{
-		ret = tPX
-		goto yystate0
-	}
-yyrule65: // RKEY
-	{
-		ret = tRKEY
-		goto yystate0
-	}
-yyrule66: // RP
-	{
-		ret = tRP
-		goto yystate0
-	}
-yyrule67: // RRSIG
-	{
-		ret = tRRSIG
-		goto yystate0
-	}
-yyrule68: // RT
-	{
-		ret = tRT
-		goto yystate0
-	}
-yyrule69: // SIG
-	{
-		ret = tSIG
-		goto yystate0
-	}
-yyrule70: // SOA
-	{
-		ret = tSOA
-		goto yystate0
-	}
-yyrule71: // SPF
-	{
-		ret = tSPF
-		goto yystate0
-	}
-yyrule72: // SRV
-	{
-		ret = tSRV
-		goto yystate0
-	}
-yyrule73: // SSHFP
-	{
-		ret = tSSHFP
-		goto yystate0
-	}
-yyrule74: // TALINK
-	{
-		ret = tTALINK
-		goto yystate0
-	}
-yyrule75: // TKEY
-	{
-		ret = tTKEY
-		goto yystate0
-	}
-yyrule76: // TSIG
-	{
-		ret = tTSIG
-		goto yystate0
-	}
-yyrule77: // TXT
-	{
-		ret = tTXT
-		goto yystate0
-	}
-yyrule78: // UID
-	{
-		ret = tUID
-		goto yystate0
-	}
-yyrule79: // UINFO
-	{
-		ret = tUINFO
-		goto yystate0
-	}
-yyrule80: // UNSPEC
-	{
-		ret = tUNSPEC
-		goto yystate0
-	}
-yyrule81: // WKS
-	{
-		ret = tWKS
-		goto yystate0
-	}
-yyrule82: // X25
-	{
-		ret = tX25
-		goto yystate0
-	}
-yyrule83: // DLV
+yyrule32: // DLV
 	{
 		ret = tDLV
 		goto yystate0
 	}
-yyrule84: // TYPE{digit}+
+yyrule33: // DNAME
+	{
+		ret = tDNAME
+		goto yystate0
+	}
+yyrule34: // DNSKEY
+	{
+		ret = tDNSKEY
+		goto yystate0
+	}
+yyrule35: // DS
+	{
+		ret = tDS
+		goto yystate0
+	}
+yyrule36: // EID
+	{
+		ret = tEID
+		goto yystate0
+	}
+yyrule37: // GID
+	{
+		ret = tGID
+		goto yystate0
+	}
+yyrule38: // GPOS
+	{
+		ret = tGPOS
+		goto yystate0
+	}
+yyrule39: // HINFO
+	{
+		ret = tHINFO
+		goto yystate0
+	}
+yyrule40: // HIP
+	{
+		ret = tHIP
+		goto yystate0
+	}
+yyrule41: // IPSECKEY
+	{
+		ret = tIPSECKEY
+		goto yystate0
+	}
+yyrule42: // ISDN
+	{
+		ret = tISDN
+		goto yystate0
+	}
+yyrule43: // KEY
+	{
+		ret = tKEY
+		goto yystate0
+	}
+yyrule44: // KX
+	{
+		ret = tKX
+		goto yystate0
+	}
+yyrule45: // LOC
+	{
+		ret = tLOC
+		goto yystate0
+	}
+yyrule46: // MB
+	{
+		ret = tMB
+		goto yystate0
+	}
+yyrule47: // MD
+	{
+		ret = tMD
+		goto yystate0
+	}
+yyrule48: // MF
+	{
+		ret = tMF
+		goto yystate0
+	}
+yyrule49: // MG
+	{
+		ret = tMG
+		goto yystate0
+	}
+yyrule50: // MINFO
+	{
+		ret = tMINFO
+		goto yystate0
+	}
+yyrule51: // MR
+	{
+		ret = tMR
+		goto yystate0
+	}
+yyrule52: // MX
+	{
+		ret = tMX
+		goto yystate0
+	}
+yyrule53: // NAPTR
+	{
+		ret = tNAPTR
+		goto yystate0
+	}
+yyrule54: // NIMLOC
+	{
+		ret = tNIMLOC
+		goto yystate0
+	}
+yyrule55: // NINFO
+	{
+		ret = tNINFO
+		goto yystate0
+	}
+yyrule56: // NS
+	{
+		ret = tNS
+		goto yystate0
+	}
+yyrule57: // NSAP
+	{
+		ret = tNSAP
+		goto yystate0
+	}
+yyrule58: // NSAP-PTR
+	{
+		ret = tNSAP_PTR
+		goto yystate0
+	}
+yyrule59: // NSEC
+	{
+		ret = tNSEC
+		goto yystate0
+	}
+yyrule60: // NSEC3
+	{
+		ret = tNSEC3
+		goto yystate0
+	}
+yyrule61: // NSEC3PARAM
+	{
+		ret = tNSEC3PARAM
+		goto yystate0
+	}
+yyrule62: // NULL
+	{
+		ret = tNULL
+		goto yystate0
+	}
+yyrule63: // NXT
+	{
+		ret = tNXT
+		goto yystate0
+	}
+yyrule64: // PTR
+	{
+		ret = tPTR
+		goto yystate0
+	}
+yyrule65: // PX
+	{
+		ret = tPX
+		goto yystate0
+	}
+yyrule66: // RKEY
+	{
+		ret = tRKEY
+		goto yystate0
+	}
+yyrule67: // RP
+	{
+		ret = tRP
+		goto yystate0
+	}
+yyrule68: // RRSIG
+	{
+		ret = tRRSIG
+		goto yystate0
+	}
+yyrule69: // RT
+	{
+		ret = tRT
+		goto yystate0
+	}
+yyrule70: // SIG
+	{
+		ret = tSIG
+		goto yystate0
+	}
+yyrule71: // SOA
+	{
+		ret = tSOA
+		goto yystate0
+	}
+yyrule72: // SPF
+	{
+		ret = tSPF
+		goto yystate0
+	}
+yyrule73: // SRV
+	{
+		ret = tSRV
+		goto yystate0
+	}
+yyrule74: // SSHFP
+	{
+		ret = tSSHFP
+		goto yystate0
+	}
+yyrule75: // TA
+	{
+		ret = tTA
+		goto yystate0
+	}
+yyrule76: // TALINK
+	{
+		ret = tTALINK
+		goto yystate0
+	}
+yyrule77: // TKEY
+	{
+		ret = tTKEY
+		goto yystate0
+	}
+yyrule78: // TSIG
+	{
+		ret = tTSIG
+		goto yystate0
+	}
+yyrule79: // TXT
+	{
+		ret = tTXT
+		goto yystate0
+	}
+yyrule80: // UID
+	{
+		ret = tUID
+		goto yystate0
+	}
+yyrule81: // UINFO
+	{
+		ret = tUINFO
+		goto yystate0
+	}
+yyrule82: // UNSPEC
+	{
+		ret = tUNSPEC
+		goto yystate0
+	}
+yyrule83: // WKS
+	{
+		ret = tWKS
+		goto yystate0
+	}
+yyrule84: // X25
+	{
+		ret = tX25
+		goto yystate0
+	}
+yyrule85: // TYPE{digit}+
 	{
 
 		s := string(l.buf[4:])
@@ -4483,7 +4488,7 @@ yyrule84: // TYPE{digit}+
 		}
 		goto yystate0
 	}
-yyrule85: // {ipv4}
+yyrule86: // {ipv4}
 	{
 
 		ip := net.ParseIP(string(l.buf))
@@ -4493,7 +4498,7 @@ yyrule85: // {ipv4}
 		lval.ip = ip
 		return tIPV4
 	}
-yyrule86: // {ipv6}
+yyrule87: // {ipv6}
 	{
 
 		ip := net.ParseIP(string(l.buf))
@@ -4503,25 +4508,25 @@ yyrule86: // {ipv6}
 		lval.ip = ip
 		return tIPV6
 	}
-yyrule87: // [0-9A-V=]+
+yyrule88: // [0-9A-V=]+
 	{
 
 		ret = tBASE32EXT
 		goto yystate0
 	}
-yyrule88: // [A-Za-z0-9+/=]+
+yyrule89: // [A-Za-z0-9+/=]+
 	{
 
 		ret = tBASE64
 		goto yystate0
 	}
-yyrule89: // {domain-name}
+yyrule90: // {domain-name}
 	{
 
 		ret = tDOMAIN_NAME2
 		goto yystate0
 	}
-yyrule90: // 0x({hex}|\.)+
+yyrule91: // 0x({hex}|\.)+
 	{
 
 		var err error
@@ -4534,7 +4539,7 @@ yyrule90: // 0x({hex}|\.)+
 		ret = t0xHEX
 		goto yystate0
 	}
-yyrule91: // [0-9a-fA-F]+
+yyrule92: // [0-9a-fA-F]+
 	{
 
 		var err error
@@ -4545,34 +4550,34 @@ yyrule91: // [0-9a-fA-F]+
 		ret = tHEX
 		goto yystate0
 	}
-yyrule92: // -
+yyrule93: // -
 	{
 
 		lval.data = nil
 		ret = tHEX
 		goto yystate0
 	}
-yyrule93: // UDP
+yyrule94: // UDP
 	{
 		lval.int, ret = int(rr.UDP_Protocol), tUDP_PROTO
 		goto yystate0
 	}
-yyrule94: // TCP
+yyrule95: // TCP
 	{
 		lval.int, ret = int(rr.TCP_Protocol), tTCP_PROTO
 		goto yystate0
 	}
-yyrule95: // SMTP
+yyrule96: // SMTP
 	{
 		lval.int, ret = int(rr.SMTP_Port), tSMTP_PORT
 		goto yystate0
 	}
-yyrule96: // DNS
+yyrule97: // DNS
 	{
 		lval.int, ret = int(rr.DNS_Port), tDNS_PORT
 		goto yystate0
 	}
-yyrule97: // [-+]?{float_lit}
+yyrule98: // [-+]?{float_lit}
 	{
 
 		if _, err = fmt.Sscanf(string(l.buf), "%f", &lval.float); err != nil {

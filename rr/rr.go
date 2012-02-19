@@ -5,6 +5,99 @@
 // blame: jnml, labs.nic.cz
 
 /*
+IANA checklist: http://www.iana.org/assignments/dns-parameters (last updated 2012-01-31)
+
+Registry:
+TYPE         Value and meaning                              Reference
+-----------  ---------------------------------------------  ---------
+//A            1 a host address                               [RFC1035] done
+//NS           2 an authoritative name server                 [RFC1035] done
+//MD           3 a mail destination (OBSOLETE - use MX)       [RFC1035] done
+//MF           4 a mail forwarder (OBSOLETE - use MX)         [RFC1035] done
+//CNAME        5 the canonical name for an alias              [RFC1035] done
+//SOA          6 marks the start of a zone of authority       [RFC1035] done
+//MB           7 a mailbox domain name (EXPERIMENTAL)         [RFC1035] done
+//MG           8 a mail group member (EXPERIMENTAL)           [RFC1035] done
+//MR           9 a mail rename domain name (EXPERIMENTAL)     [RFC1035] done
+//NULL         10 a null RR (EXPERIMENTAL)                    [RFC1035] done
+//WKS          11 a well known service description            [RFC1035] done
+//PTR          12 a domain name pointer                       [RFC1035] done
+//HINFO        13 host information                            [RFC1035] done
+//MINFO        14 mailbox or mail list information            [RFC1035] done
+//MX           15 mail exchange                               [RFC1035] done
+//TXT          16 text strings                                [RFC1035] done
+//RP           17 for Responsible Person                      [RFC1183] done
+//AFSDB        18 for AFS Data Base location                  [RFC1183][RFC5864] done
+//X25          19 for X.25 PSDN address                       [RFC1183] done
+//ISDN         20 for ISDN address                            [RFC1183] done
+//RT           21 for Route Through                           [RFC1183] done
+//NSAP         22 for NSAP address, NSAP style A record       [RFC1706] done
+//NSAP-PTR     23 for domain name pointer, NSAP style         [RFC1348][RFC1637][RFC1706] done
+//SIG          24 for security signature                      [RFC4034][RFC3755][RFC2535][RFC2536][RFC2537][RFC2931][RFC3110][RFC3008] done
+//KEY          25 for security key                            [RFC4034][RFC3755][RFC2535][RFC2536][RFC2537][RFC2539][RFC3008][RFC3110] done
+//PX           26 X.400 mail mapping information              [RFC2163] done
+//GPOS         27 Geographical Position                       [RFC1712] done
+//AAAA         28 IP6 Address                                 [RFC3596] done
+//LOC          29 Location Information                        [RFC1876] done
+NXT          30 Next Domain (OBSOLETE)                      [RFC3755][RFC2535]
+EID          31 Endpoint Identifier                         [Patton][Patton1995]
+NIMLOC       32 Nimrod Locator                              [Patton][Patton1995]
+//SRV          33 Server Selection                            [RFC2782] done
+ATMA         34 ATM Address                                 [ATMDOC]
+//NAPTR        35 Naming Authority Pointer                    [RFC2915][RFC2168][RFC3403] done
+//KX           36 Key Exchanger                               [RFC2230] done
+//CERT         37 CERT                                        [RFC4398] done
+A6           38 A6 (OBSOLETE - use AAAA)                    [RFC3226][RFC2874][RFC-jiang-a6-to-historic-00.txt]
+//DNAME        39 DNAME                                       [RFC2672] done
+SINK         40 SINK                                        [Eastlake][Eastlake2002]
+//OPT          41 OPT                                         [RFC2671][RFC3225] done
+APL          42 APL                                         [RFC3123]
+//DS           43 Delegation Signer                           [RFC4034][RFC3658] done
+//SSHFP        44 SSH Key Fingerprint                         [RFC4255] done
+//IPSECKEY     45 IPSECKEY                                    [RFC4025] done
+//RRSIG        46 RRSIG                                       [RFC4034][RFC3755] done
+//NSEC         47 NSEC                                        [RFC4034][RFC3755] done
+//DNSKEY       48 DNSKEY                                      [RFC4034][RFC3755] done
+//DHCID        49 DHCID                                       [RFC4701] done
+//NSEC3        50 NSEC3                                       [RFC5155] done
+//NSEC3PARAM   51 NSEC3PARAM                                  [RFC5155] done
+Unassigned   52-54
+//HIP          55 Host Identity Protocol                      [RFC5205] done
+NINFO        56 NINFO                                       [Reid]
+RKEY         57 RKEY                                        [Reid]
+TALINK       58 Trust Anchor LINK                           [Wijngaards]
+CDS          59 Child DS                                    [Barwood]
+Unassigned   60-98
+//SPF          99                                             [RFC4408] done
+UINFO        100                                            [IANA-Reserved]
+UID          101                                            [IANA-Reserved]
+GID          102                                            [IANA-Reserved]
+UNSPEC       103                                            [IANA-Reserved]
+Unassigned   104-248
+//TKEY         249 Transaction Key                            [RFC2930] only a QTYPE, done
+//TSIG         250 Transaction Signature                      [RFC2845] only a QTYPE, done
+//IXFR         251 incremental transfer                       [RFC1995] only a QTYPE, done
+//AXFR         252 transfer of an entire zone                 [RFC1035][RFC5936] only a QTYPE, done
+//MAILB        253 mailbox-related RRs (MB, MG or MR)         [RFC1035] only a QTYPE, done
+//MAILA        254 mail agent RRs (OBSOLETE - see MX)         [RFC1035] only a QTYPE, done
+//*            255 A request for all records                  [RFC1035] only a QTYPE, done
+URI          256 URI                                        [Faltstrom]
+//CAA          257 Certification Authority Authorization      [Hallam-Baker]
+Unassigned   258-32767
+//TA           32768   DNSSEC Trust Authorities               [Weiler] done
+//DLV          32769   DNSSEC Lookaside Validation            [RFC4431] done
+Unassigned   32770-65279  
+Private use  65280-65534
+Reserved     65535 
+
+Note: In [RFC1002], two types are defined.  It is not clear that these
+are in use, though if so their assignment does conflict with those above.
+	NB	32	NetBIOS general Name Service
+	NBSTAT	33	NetBIOS NODE STATUS
+
+*/
+
+/*
 
 -- Types to do:
 +check ALL "*"
@@ -18,7 +111,7 @@
 +MD
 +MF
 +NSAP
-+NSAP_PTR
++NSAP-PTR
 +NULL
 +PX
 +RP
@@ -26,7 +119,6 @@
 +SIG
 +X25
 
--TA
 -TALINK (RFC?)
 -TLSA (RFC? DANE WG?)
 -URI (RFC4501)
@@ -61,6 +153,7 @@
 =SPF
 =SRV
 =SSHFP
+=TA
 =TKEY
 =TSIG
 =TXT
@@ -519,7 +612,7 @@ func (c *Class) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err e
 	return
 }
 
-// DLC represents DLV RR RDATA [RFC4431]. The DLV resource record has exactly
+// DLV represents DLV RR RDATA [RFC4431]. The DLV resource record has exactly
 // the same wire and presentation formats as the DS resource record, defined in
 // RFC 4034, Section 5.  It uses the same IANA-assigned values in the algorithm
 // and digest type fields as the DS record.  (Those IANA registries are known
@@ -2877,6 +2970,8 @@ func (rr *RR) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 		rr.RData = &SRV{}
 	case TYPE_SSHFP:
 		rr.RData = &SSHFP{}
+	case TYPE_TA:
+		rr.RData = &TA{}
 	case TYPE_TKEY:
 		rr.RData = &TKEY{}
 	case TYPE_TSIG:
@@ -3193,6 +3288,12 @@ func (a *RR) Equal(b *RR) (equal bool) {
 		return x.Algorithm == y.Algorithm &&
 			x.Type == y.Type &&
 			bytes.Equal(x.Fingerprint, y.Fingerprint)
+	case *TA:
+		y := b.RData.(*TA)
+		return x.KeyTag == y.KeyTag &&
+			x.Algorithm == y.Algorithm &&
+			x.DigestType == y.DigestType &&
+			bytes.Equal(x.Digest, y.Digest)
 	case *TKEY:
 		y := b.RData.(*TKEY)
 		return strings.ToLower(x.Algorithm) == strings.ToLower(y.Algorithm) &&
@@ -3973,6 +4074,94 @@ func (rd *SSHFP) String() string {
 		rd.Type,
 		rd.Fingerprint,
 	)
+}
+
+/*
+TA represent TA RR RDATA.
+
+From: http://tools.ietf.org/html/draft-lewis-dns-undocumented-types-01
+
+ 2.10 TA (32768)
+
+ TA stands for "Trust Anchor" and, as far as can be determined, not defined in
+ an IETF document.  (The ATMA record is also not mentioned in an IETF
+ document.)  The record is described in a document named INI1999-19.pdf on the
+ www.watson.org web site.
+
+ In that document, the RDATA is described as
+
+ "The fields in the TA record contain exactly the same data as the DS record
+ and use the same IANA-assigned values in the algorithm and digest type fields
+ as the DS record."
+
+ The following appears on the IANA webpage for DNS Parameters:
+
+ Deploying DNSSEC Without a Signed Rott[sic].  TR 1999-19,
+  Information Networking Institute, Carnegie Mellon U, April 2004.
+  http://cameo.library.cmu.edu/
+  http://www.watson.org/~weiler/INI1999-19.pdf
+
+ The DS record is defined in RFC4034.
+*/
+type TA struct {
+	// The key tag is calculated as specified in RFC 2535
+	KeyTag uint16
+	// Algorithm MUST be allowed to sign DNS data
+	Algorithm AlgorithmType
+	// The digest type is an identifier for the digest algorithm used
+	DigestType HashAlgorithm
+	// The digest is calculated over the
+	// canonical name of the delegated domain name followed by the whole
+	// RDATA of the KEY record (all four fields)
+	Digest []byte
+}
+
+// Implementation of dns.Wirer
+func (rd *TA) Encode(b *dns.Wirebuf) {
+	dns.Octets2(rd.KeyTag).Encode(b)
+	dns.Octet(rd.Algorithm).Encode(b)
+	dns.Octet(rd.DigestType).Encode(b)
+	b.Buf = append(b.Buf, rd.Digest...)
+}
+
+// Implementation of dns.Wirer
+func (rd *TA) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	p0 := &b[*pos]
+	if err = (*dns.Octets2)(&rd.KeyTag).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+	if err = (*dns.Octet)(&rd.Algorithm).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+	if err = (*dns.Octet)(&rd.DigestType).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+	var n int
+	switch rd.DigestType {
+	case HashAlgorithmSHA1:
+		n = 20
+	default:
+		return fmt.Errorf("unsupported digest type %d", rd.DigestType)
+	}
+
+	end := *pos + n
+	if end > len(b) {
+		return fmt.Errorf("(*rr.TA).Decode() - buffer underflow")
+	}
+	rd.Digest = append([]byte{}, b[*pos:end]...)
+	*pos = end
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataTA, rd)
+	}
+	return
+}
+
+func (rd *TA) String() string {
+	if asserts && len(rd.Digest) == 0 {
+		panic("internal error")
+	}
+
+	return fmt.Sprintf("%d %d %d %s", rd.KeyTag, rd.Algorithm, rd.DigestType, hex.EncodeToString(rd.Digest))
 }
 
 // TKEYMode type is the type of the TKEY Mode field.

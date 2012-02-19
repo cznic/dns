@@ -106,6 +106,7 @@ type rrHead struct{
 	tSPF
 	tSRV
 	tSSHFP
+	tTA
 	tTALINK
 	tTCP_PROTO
 	tTKEY
@@ -217,6 +218,7 @@ type rrHead struct{
 	spf
 	srv
 	sshfp
+	ta
 	txt
 	wks
 	x25
@@ -1218,6 +1220,10 @@ rr2:
 	{
 		$$ = &rr.RR{"", rr.TYPE_ISDN, $1.class, $1.ttl, $2}
 	}
+|	rrHead ta
+	{
+		$$ = &rr.RR{"", rr.TYPE_TA, $1.class, $1.ttl, $2}
+	}
 |	rrHead txt
 	{
 		$$ = &rr.RR{"", rr.TYPE_TXT, $1.class, $1.ttl, $2}
@@ -1465,6 +1471,10 @@ rrtypetok:
 	{
 		$$ = rr.TYPE_NSEC3PARAM
 	}
+|	tTA
+	{
+		$$ = rr.TYPE_DS
+	}
 |	tNXT
 	{
 		$$ = rr.TYPE_NXT
@@ -1631,6 +1641,20 @@ sshfp:
 		$$ = &rr.SSHFP{rr.SSHFPAlgorithm($3), rr.SSHFPType($4), $5}
 	}
 
+
+ta:
+	tTA
+	{
+		yylex.begin(sc_NUM)
+	}
+	uint16 uint8 uint8 hex
+	{
+		if $5 != 1 || len($6) != 20 {
+			yylex.Error(`digest type must be "1" and digest must be exactly 20 bytes (40 hex chars)`)
+		} else {
+			$$ = &rr.DS{uint16($3), rr.AlgorithmType($4), rr.HashAlgorithm($5), $6}
+		}
+	}
 
 ttl:
 	uint31

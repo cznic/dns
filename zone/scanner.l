@@ -285,6 +285,7 @@ E		[eE][-+]?[0-9]+
 <rrHead,type>CERT       ret = tCERT
 <rrHead,type>CNAME      ret = tCNAME
 <rrHead,type>DHCID      ret = tDHCID
+<rrHead,type>DLV        ret = tDLV
 <rrHead,type>DNAME      ret = tDNAME
 <rrHead,type>DNSKEY     ret = tDNSKEY
 <rrHead,type>DS         ret = tDS
@@ -327,6 +328,7 @@ E		[eE][-+]?[0-9]+
 <rrHead,type>SPF        ret = tSPF
 <rrHead,type>SRV        ret = tSRV
 <rrHead,type>SSHFP      ret = tSSHFP
+<rrHead,type>TA         ret = tTA
 <rrHead,type>TALINK     ret = tTALINK
 <rrHead,type>TKEY       ret = tTKEY
 <rrHead,type>TSIG       ret = tTSIG
@@ -336,7 +338,6 @@ E		[eE][-+]?[0-9]+
 <rrHead,type>UNSPEC     ret = tUNSPEC
 <rrHead,type>WKS        ret = tWKS
 <rrHead,type>X25        ret = tX25
-<rrHead,type>DLV        ret = tDLV
 
 <rrHead,type>TYPE{digit}+
 	s := string(l.buf[4:])

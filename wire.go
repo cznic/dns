@@ -294,6 +294,7 @@ const (
 	SniffRDataSPF                          // SPF resource record data
 	SniffRDataSRV                          // SRV resource record data
 	SniffRDataSSHFP                        // SSHFP resource record data
+	SniffRDataTA                           // TA resource record data
 	SniffRDataTKEY                         // TKEY resource record data
 	SniffRDataTSIG                         // TSIG resource record data
 	SniffRDataTXT                          // TXT resource record data
