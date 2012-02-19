@@ -12,14 +12,12 @@ DLV
 IXFR
 MAILA
 MAILB
-TKEY
 +check ALL "*"
 
----- Supported RR types "diff" vs Miek G.'s dns lib
+---- Supported RR types "diff" vs Miek G.'s dns lib @ https://github.com/miekg/dns
 
 +AFSDB
 +GPOS
-+HIP
 +ISDN
 +KEY
 +MD
@@ -36,7 +34,6 @@ TKEY
 -DLV
 -TA
 -TALINK (RFC?)
--TKEY
 -TLSA (RFC? DANE WG?)
 -URI (RFC4501)
 
@@ -49,6 +46,7 @@ TKEY
 =DNSKEY
 =DS
 =HINFO
+=HIP
 =IPSECKEY
 =KX
 =LOC
@@ -68,6 +66,7 @@ TKEY
 =SPF
 =SRV
 =SSHFP
+=TKEY
 =TSIG
 =TXT
 =WKS
@@ -114,25 +113,25 @@ type A struct {
 }
 
 // Implementation of dns.Wirer
-func (d *A) Encode(b *dns.Wirebuf) {
-	ip4(d.Address).Encode(b)
+func (rd *A) Encode(b *dns.Wirebuf) {
+	ip4(rd.Address).Encode(b)
 }
 
 // Implementation of dns.Wirer
-func (d *A) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *A) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*ip4)(&d.Address).Decode(b, pos, sniffer); err != nil {
+	if err = (*ip4)(&rd.Address).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataA, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataA, rd)
 	}
 	return
 }
 
-func (d *A) String() string {
-	return d.Address.String()
+func (rd *A) String() string {
+	return rd.Address.String()
 }
 
 // AAAA holds the zone AAAA RData
@@ -141,25 +140,25 @@ type AAAA struct {
 }
 
 // Implementation of dns.Wirer
-func (d *AAAA) Encode(b *dns.Wirebuf) {
-	ip6(d.Address).Encode(b)
+func (rd *AAAA) Encode(b *dns.Wirebuf) {
+	ip6(rd.Address).Encode(b)
 }
 
 // Implementation of dns.Wirer
-func (d *AAAA) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *AAAA) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*ip6)(&d.Address).Decode(b, pos, sniffer); err != nil {
+	if err = (*ip6)(&rd.Address).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataAAAA, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataAAAA, rd)
 	}
 	return
 }
 
-func (d *AAAA) String() string {
-	return d.Address.String()
+func (rd *AAAA) String() string {
+	return rd.Address.String()
 }
 
 // The AFS (originally the Andrew File System) system uses the DNS to map from
@@ -176,30 +175,30 @@ type AFSDB struct {
 }
 
 // Implementation of dns.Wirer
-func (d *AFSDB) Encode(b *dns.Wirebuf) {
-	(dns.Octets2)(d.SubType).Encode(b)
-	(dns.DomainName)(d.Hostname).Encode(b)
+func (rd *AFSDB) Encode(b *dns.Wirebuf) {
+	(dns.Octets2)(rd.SubType).Encode(b)
+	(dns.DomainName)(rd.Hostname).Encode(b)
 }
 
 // Implementation of dns.Wirer
-func (d *AFSDB) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *AFSDB) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*dns.Octets2)(&d.SubType).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octets2)(&rd.SubType).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if err = (*dns.DomainName)(&d.Hostname).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.DomainName)(&rd.Hostname).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataAFSDB, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataAFSDB, rd)
 	}
 	return
 }
 
-func (d *AFSDB) String() string {
-	return fmt.Sprintf("%d %s", d.SubType, d.Hostname)
+func (rd *AFSDB) String() string {
+	return fmt.Sprintf("%d %s", rd.SubType, rd.Hostname)
 }
 
 // CertType is the type of the Type field in the CERT RData
@@ -275,25 +274,25 @@ type CERT struct {
 }
 
 // Implementation of dns.Wirer
-func (r *CERT) Encode(b *dns.Wirebuf) {
-	dns.Octets2(r.Type).Encode(b)
-	dns.Octets2(r.KeyTag).Encode(b)
-	dns.Octet(r.Algorithm).Encode(b)
-	b.Buf = append(b.Buf, r.Cert...)
+func (rd *CERT) Encode(b *dns.Wirebuf) {
+	dns.Octets2(rd.Type).Encode(b)
+	dns.Octets2(rd.KeyTag).Encode(b)
+	dns.Octet(rd.Algorithm).Encode(b)
+	b.Buf = append(b.Buf, rd.Cert...)
 }
 
 // Implementation of dns.Wirer
-func (r *CERT) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *CERT) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*dns.Octets2)(&r.Type).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octets2)(&rd.Type).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if err = (*dns.Octets2)(&r.KeyTag).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octets2)(&rd.KeyTag).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if err = (*dns.Octet)(&r.Algorithm).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octet)(&rd.Algorithm).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
@@ -302,21 +301,21 @@ func (r *CERT) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err er
 		return fmt.Errorf("(*CERT).Decode: no certificate data")
 	}
 
-	r.Cert = make([]byte, n)
-	copy(r.Cert, b[*pos:])
+	rd.Cert = make([]byte, n)
+	copy(rd.Cert, b[*pos:])
 	*pos += n
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataCERT, r)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataCERT, rd)
 	}
 	return
 }
 
-func (r *CERT) String() string {
+func (rd *CERT) String() string {
 	return fmt.Sprintf("%d %d %d %s",
-		r.Type,
-		r.KeyTag,
-		r.Algorithm,
-		strutil.Base64Encode(r.Cert),
+		rd.Type,
+		rd.KeyTag,
+		rd.Algorithm,
+		strutil.Base64Encode(rd.Cert),
 	)
 }
 
@@ -326,25 +325,25 @@ type CNAME struct {
 }
 
 // Implementation of dns.Wirer
-func (c CNAME) Encode(b *dns.Wirebuf) {
-	(dns.DomainName)(c.Name).Encode(b)
+func (rd CNAME) Encode(b *dns.Wirebuf) {
+	(dns.DomainName)(rd.Name).Encode(b)
 }
 
 // Implementation of dns.Wirer
-func (c *CNAME) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *CNAME) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*dns.DomainName)(&c.Name).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.DomainName)(&rd.Name).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataCNAME, c)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataCNAME, rd)
 	}
 	return
 }
 
-func (c CNAME) String() string {
-	return c.Name
+func (rd CNAME) String() string {
+	return rd.Name
 }
 
 // DHCID represents the RDATA of an DHCID RR.
@@ -372,41 +371,41 @@ type DHCID struct {
 // only SHA-256 (digest type code 1).
 //
 // See also TestDHCID in all_test.go for examples.
-func (d *DHCID) SetData(identifierType uint16, identifier []byte, fqdn string) {
+func (rd *DHCID) SetData(identifierType uint16, identifier []byte, fqdn string) {
 	w := dns.NewWirebuf()
 	w.Buf = identifier
 	w.DisableCompression()
 	dns.DomainName(dns.RootedName(fqdn)).Encode(w)
 	h := sha256.New()
 	h.Write(w.Buf)
-	d.Data = h.Sum([]byte{byte(identifierType >> 8), byte(identifierType), 1})
+	rd.Data = h.Sum([]byte{byte(identifierType >> 8), byte(identifierType), 1})
 
 }
 
 // Implementation of dns.Wirer
-func (d DHCID) Encode(b *dns.Wirebuf) {
-	b.Buf = append(b.Buf, d.Data...)
+func (rd DHCID) Encode(b *dns.Wirebuf) {
+	b.Buf = append(b.Buf, rd.Data...)
 }
 
 // Implementation of dns.Wirer
-func (d *DHCID) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *DHCID) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
 	n := len(b) - *pos
 	if n <= 0 {
 		return fmt.Errorf("(*DHCID).Decode: no key data")
 	}
-	d.Data = make([]byte, n)
-	copy(d.Data, b[*pos:])
+	rd.Data = make([]byte, n)
+	copy(rd.Data, b[*pos:])
 	*pos += n
 
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataDHCID, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataDHCID, rd)
 	}
 	return
 }
 
-func (d DHCID) String() string {
-	return string(strutil.Base64Encode(d.Data))
+func (rd DHCID) String() string {
+	return string(strutil.Base64Encode(rd.Data))
 }
 
 // DNAME holds the zone DNAME RData
@@ -415,25 +414,25 @@ type DNAME struct {
 }
 
 // Implementation of dns.Wirer
-func (c DNAME) Encode(b *dns.Wirebuf) {
-	(dns.DomainName)(c.Name).Encode(b)
+func (rd DNAME) Encode(b *dns.Wirebuf) {
+	(dns.DomainName)(rd.Name).Encode(b)
 }
 
 // Implementation of dns.Wirer
-func (c *DNAME) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *DNAME) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*dns.DomainName)(&c.Name).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.DomainName)(&rd.Name).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataDNAME, c)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataDNAME, rd)
 	}
 	return
 }
 
-func (c DNAME) String() string {
-	return c.Name
+func (rd DNAME) String() string {
+	return rd.Name
 }
 
 // DNSSEC Algorithm Types
@@ -499,28 +498,28 @@ var classStr = map[Class]string{
 	CLASS_HS:   "HS",
 }
 
-func (n Class) String() (s string) {
+func (c Class) String() (s string) {
 	var ok bool
-	if s, ok = classStr[n]; !ok {
-		return fmt.Sprintf("CLASS%d", uint16(n))
+	if s, ok = classStr[c]; !ok {
+		return fmt.Sprintf("CLASS%d", uint16(c))
 	}
 	return
 }
 
 // Implementation of dns.Wirer
-func (n Class) Encode(b *dns.Wirebuf) {
-	dns.Octets2(n).Encode(b)
+func (c Class) Encode(b *dns.Wirebuf) {
+	dns.Octets2(c).Encode(b)
 }
 
 // Implementation of dns.Wirer
-func (n *Class) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (c *Class) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*dns.Octets2)(n).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octets2)(c).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffClass, *n)
+		sniffer(p0, &b[*pos-1], dns.SniffClass, *c)
 	}
 	return
 }
@@ -567,40 +566,40 @@ func NewDNSKEY(Flags uint16, Algorithm AlgorithmType, Key []byte) *DNSKEY {
 }
 
 // Implementation of dns.Wirer
-func (d *DNSKEY) Encode(b *dns.Wirebuf) {
-	dns.Octets2(d.Flags).Encode(b)
-	dns.Octet(d.Protocol).Encode(b)
-	dns.Octet(d.Algorithm).Encode(b)
-	b.Buf = append(b.Buf, d.Key...)
+func (rd *DNSKEY) Encode(b *dns.Wirebuf) {
+	dns.Octets2(rd.Flags).Encode(b)
+	dns.Octet(rd.Protocol).Encode(b)
+	dns.Octet(rd.Algorithm).Encode(b)
+	b.Buf = append(b.Buf, rd.Key...)
 }
 
 // Implementation of dns.Wirer
-func (d *DNSKEY) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *DNSKEY) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*dns.Octets2)(&d.Flags).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octets2)(&rd.Flags).Decode(b, pos, sniffer); err != nil {
 		return
 	}
-	if err = (*dns.Octet)(&d.Protocol).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octet)(&rd.Protocol).Decode(b, pos, sniffer); err != nil {
 		return
 	}
-	if err = (*dns.Octet)(&d.Algorithm).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octet)(&rd.Algorithm).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 	n := len(b) - *pos
 	if n <= 0 {
 		return fmt.Errorf("(*DNSKEY).Decode: no key data")
 	}
-	d.Key = make([]byte, n)
-	copy(d.Key, b[*pos:])
+	rd.Key = make([]byte, n)
+	copy(rd.Key, b[*pos:])
 	*pos += n
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataDNSKEY, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataDNSKEY, rd)
 	}
 	return
 }
 
-func (d *DNSKEY) String() string {
-	return fmt.Sprintf("%d %d %d %s", d.Flags, d.Protocol, d.Algorithm, strutil.Base64Encode(d.Key))
+func (rd *DNSKEY) String() string {
+	return fmt.Sprintf("%d %d %d %s", rd.Flags, rd.Protocol, rd.Algorithm, strutil.Base64Encode(rd.Key))
 }
 
 // The delegation signer (DS) resource record (RR) is inserted at a zone
@@ -621,78 +620,78 @@ type DS struct {
 }
 
 // Implementation of dns.Wirer
-func (d *DS) Encode(b *dns.Wirebuf) {
-	dns.Octets2(d.KeyTag).Encode(b)
-	dns.Octet(d.Algorithm).Encode(b)
-	dns.Octet(d.DigestType).Encode(b)
-	b.Buf = append(b.Buf, d.Digest...)
+func (rd *DS) Encode(b *dns.Wirebuf) {
+	dns.Octets2(rd.KeyTag).Encode(b)
+	dns.Octet(rd.Algorithm).Encode(b)
+	dns.Octet(rd.DigestType).Encode(b)
+	b.Buf = append(b.Buf, rd.Digest...)
 }
 
 // Implementation of dns.Wirer
-func (d *DS) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *DS) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*dns.Octets2)(&d.KeyTag).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octets2)(&rd.KeyTag).Decode(b, pos, sniffer); err != nil {
 		return
 	}
-	if err = (*dns.Octet)(&d.Algorithm).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octet)(&rd.Algorithm).Decode(b, pos, sniffer); err != nil {
 		return
 	}
-	if err = (*dns.Octet)(&d.DigestType).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octet)(&rd.DigestType).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 	var n int
-	switch d.DigestType {
+	switch rd.DigestType {
 	case HashAlgorithmSHA1:
 		n = 20
 	default:
-		return fmt.Errorf("unsupported digest type %d", d.DigestType)
+		return fmt.Errorf("unsupported digest type %d", rd.DigestType)
 	}
 
 	end := *pos + n
 	if end > len(b) {
 		return fmt.Errorf("(*rr.DS).Decode() - buffer underflow")
 	}
-	d.Digest = append([]byte{}, b[*pos:end]...)
+	rd.Digest = append([]byte{}, b[*pos:end]...)
 	*pos = end
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataDS, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataDS, rd)
 	}
 	return
 }
 
-func (d *DS) String() string {
-	if asserts && len(d.Digest) == 0 {
+func (rd *DS) String() string {
+	if asserts && len(rd.Digest) == 0 {
 		panic("internal error")
 	}
 
-	return fmt.Sprintf("%d %d %d %s", d.KeyTag, d.Algorithm, d.DigestType, hex.EncodeToString(d.Digest))
+	return fmt.Sprintf("%d %d %d %s", rd.KeyTag, rd.Algorithm, rd.DigestType, hex.EncodeToString(rd.Digest))
 }
 
 type ip4 net.IP
 
 // Implementation of dns.Wirer
-func (d ip4) Encode(b *dns.Wirebuf) {
-	b4 := net.IP(d).To4()
+func (ip ip4) Encode(b *dns.Wirebuf) {
+	b4 := net.IP(ip).To4()
 	if asserts {
 		if b4 == nil {
-			panic(fmt.Errorf("%s is not an IPv4 address", net.IP(d)))
+			panic(fmt.Errorf("%s is not an IPv4 address", net.IP(ip)))
 		}
 	}
 	b.Buf = append(b.Buf, b4...)
 }
 
 // Implementation of dns.Wirer
-func (d *ip4) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (ip *ip4) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p := *pos
 	if p+4 > len(b) {
 		return fmt.Errorf("(*rr.ip4).Decode() - buffer underflow")
 	}
 
 	p0 := &b[p]
-	*d = ip4(net.IPv4(b[p], b[p+1], b[p+2], b[p+3]))
+	*ip = ip4(net.IPv4(b[p], b[p+1], b[p+2], b[p+3]))
 	*pos = p + 4
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffIPV4, d)
+		sniffer(p0, &b[*pos-1], dns.SniffIPV4, ip)
 	}
 	return
 }
@@ -700,29 +699,29 @@ func (d *ip4) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 type ip6 net.IP
 
 // Implementation of dns.Wirer
-func (d ip6) Encode(b *dns.Wirebuf) {
-	b16 := net.IP(d).To16()
+func (ip ip6) Encode(b *dns.Wirebuf) {
+	b16 := net.IP(ip).To16()
 	if asserts {
 		if b16 == nil {
-			panic(fmt.Errorf("%s is not an IPv6 address", d))
+			panic(fmt.Errorf("%s is not an IPv6 address", ip))
 		}
 	}
 	b.Buf = append(b.Buf, b16...)
 }
 
 // Implementation of dns.Wirer
-func (d *ip6) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (ip *ip6) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p := *pos
 	if p+16 > len(b) {
 		return fmt.Errorf("(*rr.ip6).Decode() - buffer underflow")
 	}
 
 	p0 := &b[p]
-	*d = make([]byte, 16)
-	copy(*d, b[p:])
+	*ip = make([]byte, 16)
+	copy(*ip, b[p:])
 	*pos = p + 16
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffIPV6, d)
+		sniffer(p0, &b[*pos-1], dns.SniffIPV6, ip)
 	}
 	return
 }
@@ -753,18 +752,18 @@ type GPOS struct {
 }
 
 // Implementation of dns.Wirer
-func (d *GPOS) Encode(b *dns.Wirebuf) {
+func (rd *GPOS) Encode(b *dns.Wirebuf) {
 	var s dns.CharString
-	s = dns.CharString(fmt.Sprintf("%f", d.Longitude))
+	s = dns.CharString(fmt.Sprintf("%f", rd.Longitude))
 	s.Encode(b)
-	s = dns.CharString(fmt.Sprintf("%f", d.Latitude))
+	s = dns.CharString(fmt.Sprintf("%f", rd.Latitude))
 	s.Encode(b)
-	s = dns.CharString(fmt.Sprintf("%f", d.Altitude))
+	s = dns.CharString(fmt.Sprintf("%f", rd.Altitude))
 	s.Encode(b)
 }
 
 // Implementation of dns.Wirer
-func (d *GPOS) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *GPOS) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
 	var s dns.CharString
 
@@ -772,7 +771,7 @@ func (d *GPOS) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err er
 		return
 	}
 
-	if _, err = fmt.Sscanf(string(s), "%f", &d.Longitude); err != nil {
+	if _, err = fmt.Sscanf(string(s), "%f", &rd.Longitude); err != nil {
 		return
 	}
 
@@ -780,7 +779,7 @@ func (d *GPOS) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err er
 		return
 	}
 
-	if _, err = fmt.Sscanf(string(s), "%f", &d.Latitude); err != nil {
+	if _, err = fmt.Sscanf(string(s), "%f", &rd.Latitude); err != nil {
 		return
 	}
 
@@ -788,18 +787,18 @@ func (d *GPOS) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err er
 		return
 	}
 
-	if _, err = fmt.Sscanf(string(s), "%f", &d.Altitude); err != nil {
+	if _, err = fmt.Sscanf(string(s), "%f", &rd.Altitude); err != nil {
 		return
 	}
 
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataGPOS, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataGPOS, rd)
 	}
 	return
 }
 
-func (d *GPOS) String() string {
-	return fmt.Sprintf("%f %f %f", d.Longitude, d.Latitude, d.Altitude)
+func (rd *GPOS) String() string {
+	return fmt.Sprintf("%f %f %f", rd.Longitude, rd.Latitude, rd.Altitude)
 }
 
 // HINFO records are used to acquire general information about a host.  The
@@ -811,30 +810,30 @@ type HINFO struct {
 }
 
 // Implementation of dns.Wirer
-func (d *HINFO) Encode(b *dns.Wirebuf) {
-	(dns.CharString)(d.Cpu).Encode(b)
-	(dns.CharString)(d.Os).Encode(b)
+func (rd *HINFO) Encode(b *dns.Wirebuf) {
+	(dns.CharString)(rd.Cpu).Encode(b)
+	(dns.CharString)(rd.Os).Encode(b)
 }
 
 // Implementation of dns.Wirer
-func (d *HINFO) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *HINFO) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*dns.CharString)(&d.Cpu).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.CharString)(&rd.Cpu).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if err = (*dns.CharString)(&d.Os).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.CharString)(&rd.Os).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataHINFO, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataHINFO, rd)
 	}
 	return
 }
 
-func (d *HINFO) String() string {
-	return fmt.Sprintf(`"%s" "%s"`, quote(d.Cpu), quote(d.Os))
+func (rd *HINFO) String() string {
+	return fmt.Sprintf(`"%s" "%s"`, quote(rd.Cpu), quote(rd.Os))
 }
 
 // HIP represents the RDATA of a HIP RR. This RR allows a HIP node to store in
@@ -873,7 +872,7 @@ type HIP struct {
 }
 
 // Implementation of dns.Wirer
-func (d *HIP) Encode(b *dns.Wirebuf) {
+func (rd *HIP) Encode(b *dns.Wirebuf) {
 	//  0                   1                   2                   3
 	//  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 	// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -897,13 +896,13 @@ func (d *HIP) Encode(b *dns.Wirebuf) {
 	// +             +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 	// |             |
 	// +-+-+-+-+-+-+-+
-	dns.Octet(len(d.HIT)).Encode(b)
-	dns.Octet(d.PKAlgorithm).Encode(b)
-	dns.Octets2(len(d.PublicKey)).Encode(b)
-	b.Buf = append(b.Buf, d.HIT...)
-	b.Buf = append(b.Buf, d.PublicKey...)
+	dns.Octet(len(rd.HIT)).Encode(b)
+	dns.Octet(rd.PKAlgorithm).Encode(b)
+	dns.Octets2(len(rd.PublicKey)).Encode(b)
+	b.Buf = append(b.Buf, rd.HIT...)
+	b.Buf = append(b.Buf, rd.PublicKey...)
 	b.DisableCompression()
-	for _, v := range d.RendezvousServers {
+	for _, v := range rd.RendezvousServers {
 		dns.DomainName(v).Encode(b)
 	}
 	b.EnableCompression()
@@ -911,14 +910,14 @@ func (d *HIP) Encode(b *dns.Wirebuf) {
 }
 
 // Implementation of dns.Wirer
-func (d *HIP) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *HIP) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
 	var hitLength dns.Octet
 	if err = hitLength.Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if err = (*dns.Octet)(&d.PKAlgorithm).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octet)(&rd.PKAlgorithm).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
@@ -931,44 +930,44 @@ func (d *HIP) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 		return fmt.Errorf("(*rr.HIP).Decode() - buffer underflow")
 	}
 
-	d.HIT = make([]byte, int(hitLength))
-	copy(d.HIT, b[*pos:*pos+int(hitLength)])
+	rd.HIT = make([]byte, int(hitLength))
+	copy(rd.HIT, b[*pos:*pos+int(hitLength)])
 	*pos += int(hitLength)
 
 	if *pos+int(pkLength) > len(b)+1 {
 		return fmt.Errorf("(*rr.HIP).Decode() - buffer underflow")
 	}
 
-	d.PublicKey = make([]byte, int(pkLength))
-	copy(d.PublicKey, b[*pos:*pos+int(pkLength)])
+	rd.PublicKey = make([]byte, int(pkLength))
+	copy(rd.PublicKey, b[*pos:*pos+int(pkLength)])
 	*pos += int(pkLength)
 
-	d.RendezvousServers = nil
+	rd.RendezvousServers = nil
 	for *pos < len(b) {
 		var s dns.DomainName
 		if err = s.Decode(b, pos, sniffer); err != nil {
 			return
 		}
 
-		d.RendezvousServers = append(d.RendezvousServers, string(s))
+		rd.RendezvousServers = append(rd.RendezvousServers, string(s))
 	}
 
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataHIP, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataHIP, rd)
 	}
 	return
 }
 
-func (d *HIP) String() string {
+func (rd *HIP) String() string {
 	a := []string{}
-	for _, v := range d.RendezvousServers {
+	for _, v := range rd.RendezvousServers {
 		a = append(a, v)
 	}
 	s := ""
 	if len(a) != 0 {
 		s = " " + strings.Join(a, " ")
 	}
-	return fmt.Sprintf("%d %x %s%s", d.PKAlgorithm, d.HIT, strutil.Base64Encode(d.PublicKey), s)
+	return fmt.Sprintf("%d %x %s%s", rd.PKAlgorithm, rd.HIT, strutil.Base64Encode(rd.PublicKey), s)
 }
 
 // IPSECKEYAlgorithm is the type of the IPSECKEY RData Algorithm field
@@ -1085,72 +1084,72 @@ type IPSECKEY struct {
 
 // SetGeteway will safely set d.Gateway and d.GatewayType or return an error
 // otherwise if g type is not (nil or net.IP or a string).
-func (d *IPSECKEY) SetGateway(g interface{}) (t GatewayType, err error) {
+func (rd *IPSECKEY) SetGateway(g interface{}) (t GatewayType, err error) {
 	switch x := g.(type) {
 	default:
 		err = fmt.Errorf("(*IPSECKEY).SetGateway(%T): unsupported", g)
 	case nil:
-		d.GatewayType, d.Gateway = GatewayNone, nil
+		rd.GatewayType, rd.Gateway = GatewayNone, nil
 	case net.IP:
 		if ip := x.To4(); ip != nil {
-			d.GatewayType, d.Gateway = GatewayIPV4, ip
+			rd.GatewayType, rd.Gateway = GatewayIPV4, ip
 			break
 		}
 
 		if ip := x.To16(); ip != nil {
-			d.GatewayType, d.Gateway = GatewayIPV6, ip
+			rd.GatewayType, rd.Gateway = GatewayIPV6, ip
 			break
 		}
 
 		err = fmt.Errorf("(*IPSECKEY).SetGateway(%#v): unsupported", g)
 	case string:
-		d.GatewayType, d.Gateway = GatewayDomain, dns.DomainName(x)
+		rd.GatewayType, rd.Gateway = GatewayDomain, dns.DomainName(x)
 	case dns.DomainName:
-		d.GatewayType, d.Gateway = GatewayDomain, string(x)
+		rd.GatewayType, rd.Gateway = GatewayDomain, string(x)
 	}
 
-	t = d.GatewayType
+	t = rd.GatewayType
 	return
 }
 
 // Implementation of dns.Wirer
-func (d *IPSECKEY) Encode(b *dns.Wirebuf) {
-	dns.Octet(d.Precedence).Encode(b)
-	dns.Octet(d.GatewayType).Encode(b)
-	dns.Octet(d.Algorithm).Encode(b)
-	switch d.GatewayType {
+func (rd *IPSECKEY) Encode(b *dns.Wirebuf) {
+	dns.Octet(rd.Precedence).Encode(b)
+	dns.Octet(rd.GatewayType).Encode(b)
+	dns.Octet(rd.Algorithm).Encode(b)
+	switch rd.GatewayType {
 	case GatewayNone:
 		// nop
 	case GatewayIPV4:
-		b.Buf = append(b.Buf, d.Gateway.(net.IP).To4()...)
+		b.Buf = append(b.Buf, rd.Gateway.(net.IP).To4()...)
 	case GatewayIPV6:
-		b.Buf = append(b.Buf, d.Gateway.(net.IP).To16()...)
+		b.Buf = append(b.Buf, rd.Gateway.(net.IP).To16()...)
 	case GatewayDomain:
 		b.DisableCompression()
-		dns.DomainName(d.Gateway.(string)).Encode(b)
+		dns.DomainName(rd.Gateway.(string)).Encode(b)
 		b.EnableCompression()
 	}
-	b.Buf = append(b.Buf, d.PublicKey...)
+	b.Buf = append(b.Buf, rd.PublicKey...)
 }
 
 // Implementation of dns.Wirer
-func (d *IPSECKEY) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *IPSECKEY) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*dns.Octet)(&d.Precedence).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octet)(&rd.Precedence).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if err = (*dns.Octet)(&d.GatewayType).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octet)(&rd.GatewayType).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if err = (*dns.Octet)(&d.Algorithm).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octet)(&rd.Algorithm).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	switch d.GatewayType {
+	switch rd.GatewayType {
 	default:
-		return fmt.Errorf("(*IPSECKEY.Decode(): Unknown GatewayType %d", d.GatewayType)
+		return fmt.Errorf("(*IPSECKEY.Decode(): Unknown GatewayType %d", rd.GatewayType)
 	case GatewayNone:
 		// nop
 	case GatewayIPV4:
@@ -1158,14 +1157,14 @@ func (d *IPSECKEY) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (er
 			return errors.New("(*IPSECKEY.Decode(): Buffer undeflow")
 		}
 
-		d.Gateway = net.IP(append([]byte{}, b[*pos:*pos+4]...))
+		rd.Gateway = net.IP(append([]byte{}, b[*pos:*pos+4]...))
 		*pos += 4
 	case GatewayIPV6:
 		if *pos+16 > len(b)+1 {
 			return errors.New("(*IPSECKEY.Decode(): Buffer undeflow")
 		}
 
-		d.Gateway = net.IP(append([]byte{}, b[*pos:*pos+16]...))
+		rd.Gateway = net.IP(append([]byte{}, b[*pos:*pos+16]...))
 		*pos += 16
 	case GatewayDomain:
 		var n dns.DomainName
@@ -1173,7 +1172,7 @@ func (d *IPSECKEY) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (er
 			return
 		}
 
-		d.Gateway = string(n)
+		rd.Gateway = string(n)
 	}
 
 	n := len(b) - *pos
@@ -1181,31 +1180,31 @@ func (d *IPSECKEY) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (er
 		return fmt.Errorf("(*IPSECKEY).Decode: no key data")
 	}
 
-	d.PublicKey = make([]byte, n)
-	copy(d.PublicKey, b[*pos:])
+	rd.PublicKey = make([]byte, n)
+	copy(rd.PublicKey, b[*pos:])
 	*pos += n
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataIPSECKEY, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataIPSECKEY, rd)
 	}
 	return
 }
 
-func (d *IPSECKEY) String() (s string) {
+func (rd *IPSECKEY) String() (s string) {
 	defer func() {
 		if e := recover(); e != nil {
-			s = fmt.Sprintf("; (*IPSECKEY).String(%#v): %v", d, e)
+			s = fmt.Sprintf("; (*IPSECKEY).String(%#v): %v", rd, e)
 		}
 	}()
 
-	switch d.GatewayType {
+	switch rd.GatewayType {
 	default:
-		panic(fmt.Errorf("(*IPSECKEY.Decode(): Unknown GatewayType %d", d.GatewayType))
+		panic(fmt.Errorf("(*IPSECKEY.Decode(): Unknown GatewayType %d", rd.GatewayType))
 	case GatewayNone:
-		return fmt.Sprintf("%d %d %d . %s", d.Precedence, d.GatewayType, d.Algorithm, strutil.Base64Encode(d.PublicKey))
+		return fmt.Sprintf("%d %d %d . %s", rd.Precedence, rd.GatewayType, rd.Algorithm, strutil.Base64Encode(rd.PublicKey))
 	case GatewayIPV4, GatewayIPV6:
-		return fmt.Sprintf("%d %d %d %s %s", d.Precedence, d.GatewayType, d.Algorithm, d.Gateway.(net.IP), strutil.Base64Encode(d.PublicKey))
+		return fmt.Sprintf("%d %d %d %s %s", rd.Precedence, rd.GatewayType, rd.Algorithm, rd.Gateway.(net.IP), strutil.Base64Encode(rd.PublicKey))
 	case GatewayDomain:
-		return fmt.Sprintf("%d %d %d %s %s", d.Precedence, d.GatewayType, d.Algorithm, d.Gateway.(string), strutil.Base64Encode(d.PublicKey))
+		return fmt.Sprintf("%d %d %d %s %s", rd.Precedence, rd.GatewayType, rd.Algorithm, rd.Gateway.(string), strutil.Base64Encode(rd.PublicKey))
 	}
 	panic("unreachable")
 }
@@ -1230,30 +1229,30 @@ type ISDN struct {
 }
 
 // Implementation of dns.Wirer
-func (d *ISDN) Encode(b *dns.Wirebuf) {
-	(dns.CharString)(d.ISDN).Encode(b)
-	(dns.CharString)(d.Sa).Encode(b)
+func (rd *ISDN) Encode(b *dns.Wirebuf) {
+	(dns.CharString)(rd.ISDN).Encode(b)
+	(dns.CharString)(rd.Sa).Encode(b)
 }
 
 // Implementation of dns.Wirer
-func (d *ISDN) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *ISDN) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*dns.CharString)(&d.ISDN).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.CharString)(&rd.ISDN).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if err = (*dns.CharString)(&d.Sa).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.CharString)(&rd.Sa).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataISDN, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataISDN, rd)
 	}
 	return
 }
 
-func (d *ISDN) String() string {
-	return fmt.Sprintf(`"%s" "%s"`, quote(d.ISDN), quote(d.Sa))
+func (rd *ISDN) String() string {
+	return fmt.Sprintf(`"%s" "%s"`, quote(rd.ISDN), quote(rd.Sa))
 }
 
 // The KEY resource record (RR) is used to store a public key that is
@@ -1305,40 +1304,40 @@ func NewKEY(Flags uint16, Algorithm AlgorithmType, Key []byte) *KEY {
 }
 
 // Implementation of dns.Wirer
-func (d *KEY) Encode(b *dns.Wirebuf) {
-	dns.Octets2(d.Flags).Encode(b)
-	dns.Octet(d.Protocol).Encode(b)
-	dns.Octet(d.Algorithm).Encode(b)
-	b.Buf = append(b.Buf, d.Key...)
+func (rd *KEY) Encode(b *dns.Wirebuf) {
+	dns.Octets2(rd.Flags).Encode(b)
+	dns.Octet(rd.Protocol).Encode(b)
+	dns.Octet(rd.Algorithm).Encode(b)
+	b.Buf = append(b.Buf, rd.Key...)
 }
 
 // Implementation of dns.Wirer
-func (d *KEY) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *KEY) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*dns.Octets2)(&d.Flags).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octets2)(&rd.Flags).Decode(b, pos, sniffer); err != nil {
 		return
 	}
-	if err = (*dns.Octet)(&d.Protocol).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octet)(&rd.Protocol).Decode(b, pos, sniffer); err != nil {
 		return
 	}
-	if err = (*dns.Octet)(&d.Algorithm).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octet)(&rd.Algorithm).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 	n := len(b) - *pos
 	if n <= 0 {
 		return fmt.Errorf("(*KEY).Decode: no key data")
 	}
-	d.Key = make([]byte, n)
-	copy(d.Key, b[*pos:])
+	rd.Key = make([]byte, n)
+	copy(rd.Key, b[*pos:])
 	*pos += n
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataKEY, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataKEY, rd)
 	}
 	return
 }
 
-func (d *KEY) String() string {
-	return fmt.Sprintf("%d %d %d %s", d.Flags, d.Protocol, d.Algorithm, strutil.Base64Encode(d.Key))
+func (rd *KEY) String() string {
+	return fmt.Sprintf("%d %d %d %s", rd.Flags, rd.Protocol, rd.Algorithm, strutil.Base64Encode(rd.Key))
 }
 
 type KX struct {
@@ -1352,33 +1351,33 @@ type KX struct {
 }
 
 // Implementation of dns.Wirer
-func (d *KX) Encode(b *dns.Wirebuf) {
+func (rd *KX) Encode(b *dns.Wirebuf) {
 	b.DisableCompression()
 	defer b.EnableCompression()
 
-	dns.Octets2(d.Preference).Encode(b)
-	dns.DomainName(d.Exchanger).Encode(b)
+	dns.Octets2(rd.Preference).Encode(b)
+	dns.DomainName(rd.Exchanger).Encode(b)
 }
 
 // Implementation of dns.Wirer
-func (d *KX) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *KX) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*dns.Octets2)(&d.Preference).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octets2)(&rd.Preference).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if err = (*dns.DomainName)(&d.Exchanger).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.DomainName)(&rd.Exchanger).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataKX, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataKX, rd)
 	}
 	return
 }
 
-func (d *KX) String() string {
-	return fmt.Sprintf("%d %s", d.Preference, d.Exchanger)
+func (rd *KX) String() string {
+	return fmt.Sprintf("%d %s", rd.Preference, rd.Exchanger)
 }
 
 // The LOC record is expressed in a master file in the following format:
@@ -1466,49 +1465,49 @@ type LOC struct {
 }
 
 // Implementation of dns.Wirer
-func (d *LOC) Encode(b *dns.Wirebuf) {
-	dns.Octet(d.Version).Encode(b)
-	dns.Octet(d.Size).Encode(b)
-	dns.Octet(d.HorizPre).Encode(b)
-	dns.Octet(d.VertPre).Encode(b)
-	dns.Octets4(d.Longitude).Encode(b)
-	dns.Octets4(d.Latitude).Encode(b)
-	dns.Octets4(d.Altitude).Encode(b)
+func (rd *LOC) Encode(b *dns.Wirebuf) {
+	dns.Octet(rd.Version).Encode(b)
+	dns.Octet(rd.Size).Encode(b)
+	dns.Octet(rd.HorizPre).Encode(b)
+	dns.Octet(rd.VertPre).Encode(b)
+	dns.Octets4(rd.Longitude).Encode(b)
+	dns.Octets4(rd.Latitude).Encode(b)
+	dns.Octets4(rd.Altitude).Encode(b)
 }
 
 // Implementation of dns.Wirer
-func (d *LOC) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *LOC) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if (*dns.Octet)(&d.Version).Decode(b, pos, sniffer); err != nil {
+	if (*dns.Octet)(&rd.Version).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if (*dns.Octet)(&d.Size).Decode(b, pos, sniffer); err != nil {
+	if (*dns.Octet)(&rd.Size).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if (*dns.Octet)(&d.HorizPre).Decode(b, pos, sniffer); err != nil {
+	if (*dns.Octet)(&rd.HorizPre).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if (*dns.Octet)(&d.VertPre).Decode(b, pos, sniffer); err != nil {
+	if (*dns.Octet)(&rd.VertPre).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if (*dns.Octets4)(&d.Longitude).Decode(b, pos, sniffer); err != nil {
+	if (*dns.Octets4)(&rd.Longitude).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if (*dns.Octets4)(&d.Latitude).Decode(b, pos, sniffer); err != nil {
+	if (*dns.Octets4)(&rd.Latitude).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if (*dns.Octets4)(&d.Altitude).Decode(b, pos, sniffer); err != nil {
+	if (*dns.Octets4)(&rd.Altitude).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataLOC, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataLOC, rd)
 	}
 	return
 }
@@ -1535,21 +1534,21 @@ func (*LOC) ThousandsSecs(x uint32) (ts int) {
 	return int(f % 60000)
 }
 
-func (d *LOC) DecAlt() (cm int64) {
-	return int64(d.Altitude) - 10000000
+func (rd *LOC) DecAlt() (cm int64) {
+	return int64(rd.Altitude) - 10000000
 }
 
-func (d *LOC) EncAlt(cm int64) {
-	d.Altitude = uint32(cm + 10000000)
+func (rd *LOC) EncAlt(cm int64) {
+	rd.Altitude = uint32(cm + 10000000)
 }
 
-func (d *LOC) DecDMTS(x uint32) (deg, min, ts int, positive bool) {
-	deg = d.Degrees(x)
+func (rd *LOC) DecDMTS(x uint32) (deg, min, ts int, positive bool) {
+	deg = rd.Degrees(x)
 	if positive = deg >= 0; !positive {
 		deg = -deg
 	}
-	min = d.Minutes(x)
-	ts = d.ThousandsSecs(x)
+	min = rd.Minutes(x)
+	ts = rd.ThousandsSecs(x)
 	return
 }
 
@@ -1598,10 +1597,10 @@ func (*LOC) EncPrec(cm uint64) byte {
 	return byte(x<<4) | e
 }
 
-func (d *LOC) String() string {
-	latDeg, latMin, latTS, north := d.DecDMTS(d.Latitude)
-	lonDeg, lonMin, lonTS, east := d.DecDMTS(d.Longitude)
-	altM := d.DecAlt()
+func (rd *LOC) String() string {
+	latDeg, latMin, latTS, north := rd.DecDMTS(rd.Latitude)
+	lonDeg, lonMin, lonTS, east := rd.DecDMTS(rd.Longitude)
+	altM := rd.DecAlt()
 	altCm := altM % 100
 	if altCm < 0 {
 		altCm = -altCm
@@ -1614,7 +1613,7 @@ func (d *LOC) String() string {
 	if east {
 		we = "E"
 	}
-	siz, hp, vp := d.DecPrec(d.Size), d.DecPrec(d.HorizPre), d.DecPrec(d.VertPre)
+	siz, hp, vp := rd.DecPrec(rd.Size), rd.DecPrec(rd.HorizPre), rd.DecPrec(rd.VertPre)
 	return fmt.Sprintf(
 		"%d %d %d.%03d %s %d %d %d.%03d %s %d.%02dm %dm %dm %dm",
 		latDeg, latMin, latTS/1000, latTS%1000, sn,
@@ -1633,25 +1632,25 @@ type MB struct {
 }
 
 // Implementation of dns.Wirer
-func (d *MB) Encode(b *dns.Wirebuf) {
-	dns.DomainName(d.MADNAME).Encode(b)
+func (rd *MB) Encode(b *dns.Wirebuf) {
+	dns.DomainName(rd.MADNAME).Encode(b)
 }
 
 // Implementation of dns.Wirer
-func (d *MB) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *MB) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*dns.DomainName)(&d.MADNAME).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.DomainName)(&rd.MADNAME).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataMB, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataMB, rd)
 	}
 	return
 }
 
-func (d *MB) String() string {
-	return d.MADNAME
+func (rd *MB) String() string {
+	return rd.MADNAME
 }
 
 // MD records cause additional section processing which looks up an A type
@@ -1668,25 +1667,25 @@ type MD struct {
 }
 
 // Implementation of dns.Wirer
-func (d *MD) Encode(b *dns.Wirebuf) {
-	dns.DomainName(d.MADNAME).Encode(b)
+func (rd *MD) Encode(b *dns.Wirebuf) {
+	dns.DomainName(rd.MADNAME).Encode(b)
 }
 
 // Implementation of dns.Wirer
-func (d *MD) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *MD) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*dns.DomainName)(&d.MADNAME).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.DomainName)(&rd.MADNAME).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataMD, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataMD, rd)
 	}
 	return
 }
 
-func (d *MD) String() string {
-	return d.MADNAME
+func (rd *MD) String() string {
+	return rd.MADNAME
 }
 
 // MF records cause additional section processing which looks up an A type
@@ -1703,25 +1702,25 @@ type MF struct {
 }
 
 // Implementation of dns.Wirer
-func (d *MF) Encode(b *dns.Wirebuf) {
-	dns.DomainName(d.MADNAME).Encode(b)
+func (rd *MF) Encode(b *dns.Wirebuf) {
+	dns.DomainName(rd.MADNAME).Encode(b)
 }
 
 // Implementation of dns.Wirer
-func (d *MF) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *MF) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*dns.DomainName)(&d.MADNAME).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.DomainName)(&rd.MADNAME).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataMF, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataMF, rd)
 	}
 	return
 }
 
-func (d *MF) String() string {
-	return d.MADNAME
+func (rd *MF) String() string {
+	return rd.MADNAME
 }
 
 // MG records cause no additional section processing.
@@ -1732,25 +1731,25 @@ type MG struct {
 }
 
 // Implementation of dns.Wirer
-func (d *MG) Encode(b *dns.Wirebuf) {
-	dns.DomainName(d.MGNAME).Encode(b)
+func (rd *MG) Encode(b *dns.Wirebuf) {
+	dns.DomainName(rd.MGNAME).Encode(b)
 }
 
 // Implementation of dns.Wirer
-func (d *MG) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *MG) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*dns.DomainName)(&d.MGNAME).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.DomainName)(&rd.MGNAME).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataMG, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataMG, rd)
 	}
 	return
 }
 
-func (d *MG) String() string {
-	return d.MGNAME
+func (rd *MG) String() string {
+	return rd.MGNAME
 }
 
 // MINFO records cause no additional section processing.  Although these
@@ -1773,30 +1772,30 @@ type MINFO struct {
 }
 
 // Implementation of dns.Wirer
-func (d *MINFO) Encode(b *dns.Wirebuf) {
-	(dns.DomainName)(d.RMAILBX).Encode(b)
-	(dns.DomainName)(d.EMAILBX).Encode(b)
+func (rd *MINFO) Encode(b *dns.Wirebuf) {
+	(dns.DomainName)(rd.RMAILBX).Encode(b)
+	(dns.DomainName)(rd.EMAILBX).Encode(b)
 }
 
 // Implementation of dns.Wirer
-func (d *MINFO) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *MINFO) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*dns.DomainName)(&d.RMAILBX).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.DomainName)(&rd.RMAILBX).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if err = (*dns.DomainName)(&d.EMAILBX).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.DomainName)(&rd.EMAILBX).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataMINFO, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataMINFO, rd)
 	}
 	return
 }
 
-func (d *MINFO) String() string {
-	return fmt.Sprintf("%s %s", d.RMAILBX, d.EMAILBX)
+func (rd *MINFO) String() string {
+	return fmt.Sprintf("%s %s", rd.RMAILBX, rd.EMAILBX)
 }
 
 // MR records cause no additional section processing.  The main use for MR is
@@ -1808,25 +1807,25 @@ type MR struct {
 }
 
 // Implementation of dns.Wirer
-func (d *MR) Encode(b *dns.Wirebuf) {
-	dns.DomainName(d.NEWNAME).Encode(b)
+func (rd *MR) Encode(b *dns.Wirebuf) {
+	dns.DomainName(rd.NEWNAME).Encode(b)
 }
 
 // Implementation of dns.Wirer
-func (d *MR) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *MR) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*dns.DomainName)(&d.NEWNAME).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.DomainName)(&rd.NEWNAME).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataMR, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataMR, rd)
 	}
 	return
 }
 
-func (d *MR) String() string {
-	return d.NEWNAME
+func (rd *MR) String() string {
+	return rd.NEWNAME
 }
 
 // MX holds the zone MX RData
@@ -1841,30 +1840,30 @@ type MX struct {
 }
 
 // Implementation of dns.Wirer
-func (d *MX) Encode(b *dns.Wirebuf) {
-	dns.Octets2(d.Preference).Encode(b)
-	dns.DomainName(d.Exchange).Encode(b)
+func (rd *MX) Encode(b *dns.Wirebuf) {
+	dns.Octets2(rd.Preference).Encode(b)
+	dns.DomainName(rd.Exchange).Encode(b)
 }
 
 // Implementation of dns.Wirer
-func (d *MX) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *MX) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*dns.Octets2)(&d.Preference).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octets2)(&rd.Preference).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if err = (*dns.DomainName)(&d.Exchange).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.DomainName)(&rd.Exchange).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataMX, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataMX, rd)
 	}
 	return
 }
 
-func (d *MX) String() string {
-	return fmt.Sprintf("%d %s", d.Preference, d.Exchange)
+func (rd *MX) String() string {
+	return fmt.Sprintf("%d %s", rd.Preference, rd.Exchange)
 }
 
 type NAPTR struct {
@@ -1948,50 +1947,50 @@ type NAPTR struct {
 }
 
 // Implementation of dns.Wirer
-func (d *NAPTR) Encode(b *dns.Wirebuf) {
-	dns.Octets2(d.Order).Encode(b)
-	dns.Octets2(d.Preference).Encode(b)
-	dns.CharString(d.Flags).Encode(b)
-	dns.CharString(d.Services).Encode(b)
-	dns.CharString(d.Regexp).Encode(b)
-	dns.DomainName(d.Replacement).Encode(b)
+func (rd *NAPTR) Encode(b *dns.Wirebuf) {
+	dns.Octets2(rd.Order).Encode(b)
+	dns.Octets2(rd.Preference).Encode(b)
+	dns.CharString(rd.Flags).Encode(b)
+	dns.CharString(rd.Services).Encode(b)
+	dns.CharString(rd.Regexp).Encode(b)
+	dns.DomainName(rd.Replacement).Encode(b)
 }
 
 // Implementation of dns.Wirer
-func (d *NAPTR) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *NAPTR) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*dns.Octets2)(&d.Order).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octets2)(&rd.Order).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if err = (*dns.Octets2)(&d.Preference).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octets2)(&rd.Preference).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if err = (*dns.CharString)(&d.Flags).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.CharString)(&rd.Flags).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if err = (*dns.CharString)(&d.Services).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.CharString)(&rd.Services).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if err = (*dns.CharString)(&d.Regexp).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.CharString)(&rd.Regexp).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if err = (*dns.DomainName)(&d.Replacement).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.DomainName)(&rd.Replacement).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataNAPTR, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataNAPTR, rd)
 	}
 	return
 }
 
-func (d *NAPTR) String() string {
-	return fmt.Sprintf("%d %d \"%s\" \"%s\" \"%s\" %s", d.Order, d.Preference, quote(d.Flags), quote(d.Services), quote(d.Regexp), d.Replacement)
+func (rd *NAPTR) String() string {
+	return fmt.Sprintf("%d %d \"%s\" \"%s\" \"%s\" %s", rd.Order, rd.Preference, quote(rd.Flags), quote(rd.Services), quote(rd.Regexp), rd.Replacement)
 }
 
 // NODATA is used for negative caching of authoritative answers
@@ -2001,25 +2000,25 @@ type NODATA struct {
 }
 
 // Implementation of dns.Wirer
-func (d *NODATA) Encode(b *dns.Wirebuf) {
-	d.Type.Encode(b)
+func (rd *NODATA) Encode(b *dns.Wirebuf) {
+	rd.Type.Encode(b)
 }
 
 // Implementation of dns.Wirer
-func (d *NODATA) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *NODATA) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = d.Type.Decode(b, pos, sniffer); err != nil {
+	if err = rd.Type.Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataNODATA, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataNODATA, rd)
 	}
 	return
 }
 
-func (d *NODATA) String() string {
-	return fmt.Sprintf("%s", d.Type)
+func (rd *NODATA) String() string {
+	return fmt.Sprintf("%s", rd.Type)
 }
 
 // NXDOMAIN is used for negative caching of authoritave answers 
@@ -2027,17 +2026,17 @@ func (d *NODATA) String() string {
 type NXDOMAIN struct{}
 
 // Implementation of dns.Wirer
-func (d *NXDOMAIN) Encode(b *dns.Wirebuf) {
+func (rd *NXDOMAIN) Encode(b *dns.Wirebuf) {
 	// nop
 }
 
 // Implementation of dns.Wirer
-func (d *NXDOMAIN) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *NXDOMAIN) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	// nop
 	return
 }
 
-func (d *NXDOMAIN) String() (s string) {
+func (rd *NXDOMAIN) String() (s string) {
 	// nop
 	return
 }
@@ -2050,25 +2049,25 @@ type NS struct {
 }
 
 // Implementation of dns.Wirer
-func (d *NS) Encode(b *dns.Wirebuf) {
-	dns.DomainName(d.NSDName).Encode(b)
+func (rd *NS) Encode(b *dns.Wirebuf) {
+	dns.DomainName(rd.NSDName).Encode(b)
 }
 
 // Implementation of dns.Wirer
-func (d *NS) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *NS) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*dns.DomainName)(&d.NSDName).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.DomainName)(&rd.NSDName).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataNS, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataNS, rd)
 	}
 	return
 }
 
-func (d *NS) String() string {
-	return d.NSDName
+func (rd *NS) String() string {
+	return rd.NSDName
 }
 
 // The NSAP RR is used to map from domain names to NSAPs. Name-to-NSAP mapping
@@ -2086,31 +2085,31 @@ type NSAP struct {
 }
 
 // Implementation of dns.Wirer
-func (d *NSAP) Encode(b *dns.Wirebuf) {
-	b.Buf = append(b.Buf, d.NSAP...)
+func (rd *NSAP) Encode(b *dns.Wirebuf) {
+	b.Buf = append(b.Buf, rd.NSAP...)
 }
 
 // Implementation of dns.Wirer
-func (d *NSAP) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *NSAP) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	if *pos >= len(b) {
-		d.NSAP = []byte{}
+		rd.NSAP = []byte{}
 		if sniffer != nil {
-			sniffer(nil, nil, dns.SniffRDataNSAP, d)
+			sniffer(nil, nil, dns.SniffRDataNSAP, rd)
 		}
 		return
 	}
 
 	p0 := &b[*pos]
-	d.NSAP = append([]byte{}, b[*pos:]...)
+	rd.NSAP = append([]byte{}, b[*pos:]...)
 	*pos = len(b)
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataNSAP, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataNSAP, rd)
 	}
 	return
 }
 
-func (d *NSAP) String() string {
-	return fmt.Sprintf("0x%x", d.NSAP)
+func (rd *NSAP) String() string {
+	return fmt.Sprintf("0x%x", rd.NSAP)
 }
 
 // NSAP_PTR has a function analogous to the PTR record used for IP addresses
@@ -2119,25 +2118,25 @@ type NSAP_PTR struct {
 }
 
 // Implementation of dns.Wirer
-func (c NSAP_PTR) Encode(b *dns.Wirebuf) {
-	(dns.DomainName)(c.Name).Encode(b)
+func (rd NSAP_PTR) Encode(b *dns.Wirebuf) {
+	(dns.DomainName)(rd.Name).Encode(b)
 }
 
 // Implementation of dns.Wirer
-func (c *NSAP_PTR) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *NSAP_PTR) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*dns.DomainName)(&c.Name).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.DomainName)(&rd.Name).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataCNAME, c)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataCNAME, rd)
 	}
 	return
 }
 
-func (c NSAP_PTR) String() string {
-	return c.Name
+func (rd NSAP_PTR) String() string {
+	return rd.Name
 }
 
 // HashAlgorithm is the type of the hash algorithm in the NSEC3 RR
@@ -2196,34 +2195,34 @@ type NSEC struct {
 }
 
 // Implementation of dns.Wirer
-func (d *NSEC) Encode(b *dns.Wirebuf) {
-	(dns.DomainName)(d.NextDomainName).Encode(b)
-	b.Buf = append(b.Buf, d.TypeBitMaps...)
+func (rd *NSEC) Encode(b *dns.Wirebuf) {
+	(dns.DomainName)(rd.NextDomainName).Encode(b)
+	b.Buf = append(b.Buf, rd.TypeBitMaps...)
 }
 
 // Implementation of dns.Wirer
-func (d *NSEC) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *NSEC) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*dns.DomainName)(&d.NextDomainName).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.DomainName)(&rd.NextDomainName).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
 	end := len(b)
-	d.TypeBitMaps = append([]byte{}, b[*pos:end]...)
+	rd.TypeBitMaps = append([]byte{}, b[*pos:end]...)
 	*pos = end
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataNSEC, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataNSEC, rd)
 	}
 	return
 }
 
-func (d *NSEC) String() string {
-	types, err := TypesDecode(d.TypeBitMaps)
+func (rd *NSEC) String() string {
+	types, err := TypesDecode(rd.TypeBitMaps)
 	if err != nil {
 		panic(err)
 	}
 
-	return fmt.Sprintf("%s %s", d.NextDomainName, TypesString(types))
+	return fmt.Sprintf("%s %s", rd.NextDomainName, TypesString(types))
 }
 
 // The NSEC3 Resource Record (RR) provides authenticated denial of
@@ -2239,18 +2238,18 @@ type NSEC3 struct {
 }
 
 // Implementation of dns.Wirer
-func (d *NSEC3) Encode(b *dns.Wirebuf) {
-	d.NSEC3PARAM.Encode(b)
-	n := dns.Octets2(len(d.NextHashedOwnerName))
+func (rd *NSEC3) Encode(b *dns.Wirebuf) {
+	rd.NSEC3PARAM.Encode(b)
+	n := dns.Octets2(len(rd.NextHashedOwnerName))
 	n.Encode(b)
-	b.Buf = append(b.Buf, d.NextHashedOwnerName...)
-	b.Buf = append(b.Buf, d.TypeBitMaps...)
+	b.Buf = append(b.Buf, rd.NextHashedOwnerName...)
+	b.Buf = append(b.Buf, rd.TypeBitMaps...)
 }
 
 // Implementation of dns.Wirer
-func (d *NSEC3) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *NSEC3) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = d.NSEC3PARAM.Decode(b, pos, sniffer); err != nil {
+	if err = rd.NSEC3PARAM.Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
@@ -2264,26 +2263,26 @@ func (d *NSEC3) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err e
 		return fmt.Errorf("(*rr.NSEC3).Decode() - buffer underflow")
 	}
 
-	d.NextHashedOwnerName = append([]byte{}, b[*pos:*pos+in]...)
+	rd.NextHashedOwnerName = append([]byte{}, b[*pos:*pos+in]...)
 	*pos = *pos + in
 
 	// here we (have to) rely on b being sliced exactly at the end of the wire format packet
 	end := len(b)
-	d.TypeBitMaps = append([]byte{}, b[*pos:end]...)
+	rd.TypeBitMaps = append([]byte{}, b[*pos:end]...)
 	*pos = end
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataNSEC3, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataNSEC3, rd)
 	}
 	return
 }
 
-func (d *NSEC3) String() string {
-	types, err := TypesDecode(d.TypeBitMaps)
+func (rd *NSEC3) String() string {
+	types, err := TypesDecode(rd.TypeBitMaps)
 	if err != nil {
 		panic(err)
 	}
 
-	return fmt.Sprintf("%s %s %s", d.NSEC3PARAM.String(), strutil.Base32ExtEncode(d.NextHashedOwnerName), TypesString(types))
+	return fmt.Sprintf("%s %s %s", rd.NSEC3PARAM.String(), strutil.Base32ExtEncode(rd.NextHashedOwnerName), TypesString(types))
 }
 
 // The NSEC3PARAM RR contains the NSEC3 parameters (hash algorithm,
@@ -2308,27 +2307,27 @@ type NSEC3PARAM struct {
 }
 
 // Implementation of dns.Wirer
-func (d *NSEC3PARAM) Encode(b *dns.Wirebuf) {
-	dns.Octet(d.HashAlgorithm).Encode(b)
-	dns.Octet(d.Flags).Encode(b)
-	dns.Octets2(d.Iterations).Encode(b)
-	if asserts && len(d.Salt) > 255 {
+func (rd *NSEC3PARAM) Encode(b *dns.Wirebuf) {
+	dns.Octet(rd.HashAlgorithm).Encode(b)
+	dns.Octet(rd.Flags).Encode(b)
+	dns.Octets2(rd.Iterations).Encode(b)
+	if asserts && len(rd.Salt) > 255 {
 		panic("internal error")
 	}
-	dns.Octet(len(d.Salt)).Encode(b)
-	b.Buf = append(b.Buf, d.Salt...)
+	dns.Octet(len(rd.Salt)).Encode(b)
+	b.Buf = append(b.Buf, rd.Salt...)
 }
 
 // Implementation of dns.Wirer
-func (d *NSEC3PARAM) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *NSEC3PARAM) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*dns.Octet)(&d.HashAlgorithm).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octet)(&rd.HashAlgorithm).Decode(b, pos, sniffer); err != nil {
 		return
 	}
-	if err = (*dns.Octet)(&d.Flags).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octet)(&rd.Flags).Decode(b, pos, sniffer); err != nil {
 		return
 	}
-	if err = (*dns.Octets2)(&d.Iterations).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octets2)(&rd.Iterations).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 	var n byte
@@ -2340,20 +2339,20 @@ func (d *NSEC3PARAM) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (
 	if next > len(b) {
 		return fmt.Errorf("(*rr.NSEC3PARAM).Decode() - buffer underflow")
 	}
-	d.Salt = append([]byte{}, b[p:next]...)
+	rd.Salt = append([]byte{}, b[p:next]...)
 	*pos = next
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataNSEC3PARAM, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataNSEC3PARAM, rd)
 	}
 	return
 }
 
-func (d *NSEC3PARAM) String() string {
-	s := hex.EncodeToString(d.Salt)
+func (rd *NSEC3PARAM) String() string {
+	s := hex.EncodeToString(rd.Salt)
 	if s == "" {
 		s = "-"
 	}
-	return fmt.Sprintf("%d %d %d %s", d.HashAlgorithm, d.Flags, d.Iterations, s)
+	return fmt.Sprintf("%d %d %d %s", rd.HashAlgorithm, rd.Flags, rd.Iterations, s)
 }
 
 type NULL struct {
@@ -2361,40 +2360,40 @@ type NULL struct {
 }
 
 // Implementation of dns.Wirer
-func (d *NULL) Encode(b *dns.Wirebuf) {
-	b.Buf = append(b.Buf, d.Data...)
+func (rd *NULL) Encode(b *dns.Wirebuf) {
+	b.Buf = append(b.Buf, rd.Data...)
 }
 
 // Implementation of dns.Wirer
-func (d *NULL) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *NULL) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	n := 0
 	var p0 *byte
 	if *pos < len(b) {
 		p0 = &b[*pos]
 		n = len(b) - *pos
-		d.Data = make([]byte, n)
-		copy(d.Data, b[*pos:])
+		rd.Data = make([]byte, n)
+		copy(rd.Data, b[*pos:])
 	} else {
-		d.Data = []byte{}
+		rd.Data = []byte{}
 		if sniffer != nil {
-			sniffer(nil, nil, dns.SniffRDataNULL, d)
+			sniffer(nil, nil, dns.SniffRDataNULL, rd)
 		}
 		return
 	}
 
 	*pos += n
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataNULL, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataNULL, rd)
 	}
 	return
 }
 
-func (d *NULL) String() string {
-	if len(d.Data) == 0 {
+func (rd *NULL) String() string {
+	if len(rd.Data) == 0 {
 		return "\\#"
 	}
 
-	return fmt.Sprintf("\\# %d %x", len(d.Data), d.Data)
+	return fmt.Sprintf("\\# %d %x", len(rd.Data), rd.Data)
 }
 
 // OPT_DATA holds an {attribute, value} pair of the OPT RR
@@ -2404,16 +2403,16 @@ type OPT_DATA struct {
 }
 
 // Implementation of dns.Wirer
-func (d *OPT_DATA) Encode(b *dns.Wirebuf) {
-	dns.Octets2(d.Code).Encode(b)
-	dns.Octets2(len(d.Data)).Encode(b)
-	b.Buf = append(b.Buf, d.Data...)
+func (rd *OPT_DATA) Encode(b *dns.Wirebuf) {
+	dns.Octets2(rd.Code).Encode(b)
+	dns.Octets2(len(rd.Data)).Encode(b)
+	b.Buf = append(b.Buf, rd.Data...)
 }
 
 // Implementation of dns.Wirer
-func (d *OPT_DATA) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *OPT_DATA) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*dns.Octets2)(&d.Code).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octets2)(&rd.Code).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 	var n dns.Octets2
@@ -2425,21 +2424,21 @@ func (d *OPT_DATA) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (er
 	if next > len(b) {
 		return fmt.Errorf("(*rr.OPT_DATA).Decode() - buffer underflow")
 	}
-	d.Data = b[p:next]
+	rd.Data = b[p:next]
 	*pos = next
 	if next > len(b) {
-		sniffer(p0, nil, dns.SniffOPT_DATA, d)
+		sniffer(p0, nil, dns.SniffOPT_DATA, rd)
 		return
 	}
 
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffOPT_DATA, d)
+		sniffer(p0, &b[*pos-1], dns.SniffOPT_DATA, rd)
 	}
 	return
 }
 
-func (d *OPT_DATA) String() string {
-	return fmt.Sprintf("%04x:% x", d.Code, d.Data)
+func (rd *OPT_DATA) String() string {
+	return fmt.Sprintf("%04x:% x", rd.Code, rd.Data)
 }
 
 // OPT holds the RFC2671 OPT pseudo RR RData
@@ -2448,14 +2447,14 @@ type OPT struct {
 }
 
 // Implementation of dns.Wirer
-func (d *OPT) Encode(b *dns.Wirebuf) {
-	for _, v := range d.Values {
+func (rd *OPT) Encode(b *dns.Wirebuf) {
+	for _, v := range rd.Values {
 		v.Encode(b)
 	}
 }
 
 // Implementation of dns.Wirer
-func (d *OPT) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *OPT) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
 	for *pos < len(b) {
 		v := OPT_DATA{}
@@ -2463,17 +2462,17 @@ func (d *OPT) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 			return
 		}
 
-		d.Values = append(d.Values, v)
+		rd.Values = append(rd.Values, v)
 	}
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataOPT, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataOPT, rd)
 	}
 	return
 }
 
-func (d *OPT) String() string {
-	a := make([]string, len(d.Values))
-	for i, v := range d.Values {
+func (rd *OPT) String() string {
+	a := make([]string, len(rd.Values))
+	for i, v := range rd.Values {
 		a[i] = v.String()
 	}
 	return strings.Join(a, " ")
@@ -2487,39 +2486,39 @@ type EXT_RCODE struct {
 }
 
 // FromTTL sets up the fields of EXT_RCODE from an int32 value (as is e.g. RR.TTL)
-func (d *EXT_RCODE) FromTTL(n int32) {
-	d.RCODE = byte(n >> 24)
-	d.Version = byte(n >> 16)
-	d.Z = uint16(n)
+func (rd *EXT_RCODE) FromTTL(n int32) {
+	rd.RCODE = byte(n >> 24)
+	rd.Version = byte(n >> 16)
+	rd.Z = uint16(n)
 }
 
-// ToTTL returns d as the value of a RR.TTL
-func (d *EXT_RCODE) ToTTL() int32 {
-	return int32(d.RCODE)<<24 | int32(d.Version)<<16 | int32(d.Z)
+// ToTTL returns rd as the value of a RR.TTL
+func (rd *EXT_RCODE) ToTTL() int32 {
+	return int32(rd.RCODE)<<24 | int32(rd.Version)<<16 | int32(rd.Z)
 }
 
 // Implementation of dns.Wirer
-func (d *EXT_RCODE) Encode(b *dns.Wirebuf) {
-	n := dns.Octets4(uint32(d.RCODE<<24) | uint32(d.Version<<16) | uint32(d.Z))
+func (rd *EXT_RCODE) Encode(b *dns.Wirebuf) {
+	n := dns.Octets4(uint32(rd.RCODE<<24) | uint32(rd.Version<<16) | uint32(rd.Z))
 	n.Encode(b)
 }
 
 // Implementation of dns.Wirer
-func (d *EXT_RCODE) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *EXT_RCODE) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
 	var n dns.Octets4
 	if err = n.Decode(b, pos, sniffer); err != nil {
 		return
 	}
-	d.FromTTL(int32(n))
+	rd.FromTTL(int32(n))
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffEXT_RCODE, d)
+		sniffer(p0, &b[*pos-1], dns.SniffEXT_RCODE, rd)
 	}
 	return
 }
 
-func (d *EXT_RCODE) String() string {
-	return fmt.Sprintf("EXT_RCODE:%02xx Ver:%d Z:%d", d.RCODE, d.Version, d.Z)
+func (rd *EXT_RCODE) String() string {
+	return fmt.Sprintf("EXT_RCODE:%02xx Ver:%d Z:%d", rd.RCODE, rd.Version, rd.Z)
 }
 
 // PTR holds the zone PTR RData
@@ -2530,24 +2529,24 @@ type PTR struct {
 }
 
 // Implementation of dns.Wirer
-func (d *PTR) Encode(b *dns.Wirebuf) {
-	dns.DomainName(d.PTRDName).Encode(b)
+func (rd *PTR) Encode(b *dns.Wirebuf) {
+	dns.DomainName(rd.PTRDName).Encode(b)
 }
 
 // Implementation of dns.Wirer
-func (d *PTR) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *PTR) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*dns.DomainName)(&d.PTRDName).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.DomainName)(&rd.PTRDName).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataPTR, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataPTR, rd)
 	}
 	return
 }
 
-func (d *PTR) String() string {
-	return d.PTRDName
+func (rd *PTR) String() string {
+	return rd.PTRDName
 }
 
 type PX struct {
@@ -2564,68 +2563,68 @@ type PX struct {
 }
 
 // Implementation of dns.Wirer
-func (d *PX) Encode(b *dns.Wirebuf) {
-	dns.Octets2(d.Preference).Encode(b)
-	dns.DomainName(d.MAP822).Encode(b)
-	dns.DomainName(d.MAPX400).Encode(b)
+func (rd *PX) Encode(b *dns.Wirebuf) {
+	dns.Octets2(rd.Preference).Encode(b)
+	dns.DomainName(rd.MAP822).Encode(b)
+	dns.DomainName(rd.MAPX400).Encode(b)
 }
 
 // Implementation of dns.Wirer
-func (d *PX) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *PX) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*dns.Octets2)(&d.Preference).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octets2)(&rd.Preference).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if err = (*dns.DomainName)(&d.MAP822).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.DomainName)(&rd.MAP822).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if err = (*dns.DomainName)(&d.MAPX400).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.DomainName)(&rd.MAPX400).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataPX, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataPX, rd)
 	}
 	return
 }
 
-func (d *PX) String() string {
-	return fmt.Sprintf("%d %s %s", d.Preference, d.MAP822, d.MAPX400)
+func (rd *PX) String() string {
+	return fmt.Sprintf("%d %s %s", rd.Preference, rd.MAP822, rd.MAPX400)
 }
 
-// RDATA hodls DNS RR rdata for a unknown/unsupported RR type
+// RDATA hodls DNS RR rdata for a unknown/unsupported RR type (RFC3597).
 type RDATA []byte
 
 // Implementation of dns.Wirer
-func (d *RDATA) Encode(b *dns.Wirebuf) {
-	b.Buf = append(b.Buf, *d...)
+func (rd *RDATA) Encode(b *dns.Wirebuf) {
+	b.Buf = append(b.Buf, *rd...)
 }
 
 // Implementation of dns.Wirer
-func (d *RDATA) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *RDATA) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	if *pos >= len(b) {
-		*d = RDATA{}
+		*rd = RDATA{}
 		if sniffer != nil {
-			sniffer(nil, nil, dns.SniffRData, d)
+			sniffer(nil, nil, dns.SniffRData, rd)
 		}
 		return
 	}
 
 	p0 := &b[*pos]
 	n := len(b) - *pos
-	*d = b[*pos:]
+	*rd = b[*pos:]
 	*pos += n
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRData, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRData, rd)
 	}
 	return
 }
 
-func (d *RDATA) String() string {
-	if n := len(*d); n != 0 {
-		return fmt.Sprintf("\\# %d %02x", len(*d), *d)
+func (rd *RDATA) String() string {
+	if n := len(*rd); n != 0 {
+		return fmt.Sprintf("\\# %d %02x", len(*rd), *rd)
 	}
 
 	return "\\# 0"
@@ -2807,6 +2806,8 @@ func (rr *RR) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 		rr.RData = &SRV{}
 	case TYPE_SSHFP:
 		rr.RData = &SSHFP{}
+	case TYPE_TKEY:
+		rr.RData = &TKEY{}
 	case TYPE_TSIG:
 		rr.RData = &TSIG{}
 	case TYPE_TXT:
@@ -3115,6 +3116,15 @@ func (a *RR) Equal(b *RR) (equal bool) {
 		return x.Algorithm == y.Algorithm &&
 			x.Type == y.Type &&
 			bytes.Equal(x.Fingerprint, y.Fingerprint)
+	case *TKEY:
+		y := b.RData.(*TKEY)
+		return strings.ToLower(x.Algorithm) == strings.ToLower(y.Algorithm) &&
+			x.Inception.Unix() == y.Inception.Unix() &&
+			x.Expiration.Unix() == y.Expiration.Unix() &&
+			x.Mode == y.Mode &&
+			x.Error == y.Error &&
+			bytes.Equal(x.KeyData, y.KeyData) &&
+			bytes.Equal(x.OtherData, y.OtherData)
 	case *TSIG:
 		y := b.RData.(*TSIG)
 		return strings.ToLower(x.AlgorithmName) == strings.ToLower(y.AlgorithmName) &&
@@ -3276,30 +3286,30 @@ type RP struct {
 }
 
 // Implementation of dns.Wirer
-func (d *RP) Encode(b *dns.Wirebuf) {
-	(dns.DomainName)(d.Mbox).Encode(b)
-	(dns.DomainName)(d.Txt).Encode(b)
+func (rd *RP) Encode(b *dns.Wirebuf) {
+	(dns.DomainName)(rd.Mbox).Encode(b)
+	(dns.DomainName)(rd.Txt).Encode(b)
 }
 
 // Implementation of dns.Wirer
-func (d *RP) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *RP) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*dns.DomainName)(&d.Mbox).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.DomainName)(&rd.Mbox).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if err = (*dns.DomainName)(&d.Txt).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.DomainName)(&rd.Txt).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataRP, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataRP, rd)
 	}
 	return
 }
 
-func (d *RP) String() string {
-	return fmt.Sprintf("%s %s", d.Mbox, d.Txt)
+func (rd *RP) String() string {
+	return fmt.Sprintf("%s %s", rd.Mbox, rd.Txt)
 }
 
 // RRSIG holds the zone RRSIG RData (RFC4034)
@@ -3335,32 +3345,32 @@ type RRSIG struct {
 }
 
 // Implementation of dns.Wirer
-func (r *RRSIG) Encode(b *dns.Wirebuf) {
-	dns.Octets2(r.Type).Encode(b)
-	dns.Octet(r.Algorithm).Encode(b)
-	dns.Octet(r.Labels).Encode(b)
-	dns.Octets4(r.TTL).Encode(b)
-	dns.Octets4(r.Expiration).Encode(b)
-	dns.Octets4(r.Inception).Encode(b)
-	dns.Octets2(r.KeyTag).Encode(b)
+func (rd *RRSIG) Encode(b *dns.Wirebuf) {
+	dns.Octets2(rd.Type).Encode(b)
+	dns.Octet(rd.Algorithm).Encode(b)
+	dns.Octet(rd.Labels).Encode(b)
+	dns.Octets4(rd.TTL).Encode(b)
+	dns.Octets4(rd.Expiration).Encode(b)
+	dns.Octets4(rd.Inception).Encode(b)
+	dns.Octets2(rd.KeyTag).Encode(b)
 	b.DisableCompression()
-	(*dns.DomainName)(&r.Name).Encode(b)
+	(*dns.DomainName)(&rd.Name).Encode(b)
 	b.EnableCompression()
-	b.Buf = append(b.Buf, r.Signature...)
+	b.Buf = append(b.Buf, rd.Signature...)
 }
 
 // Implementation of dns.Wirer
-func (r *RRSIG) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *RRSIG) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*dns.Octets2)(&r.Type).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octets2)(&rd.Type).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if err = (*dns.Octet)(&r.Algorithm).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octet)(&rd.Algorithm).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if err = (*dns.Octet)(&r.Labels).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octet)(&rd.Labels).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
@@ -3369,21 +3379,21 @@ func (r *RRSIG) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err e
 		return
 	}
 
-	r.TTL = int32(ttl)
+	rd.TTL = int32(ttl)
 
-	if err = (*dns.Octets4)(&r.Expiration).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octets4)(&rd.Expiration).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if err = (*dns.Octets4)(&r.Inception).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octets4)(&rd.Inception).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if err = (*dns.Octets2)(&r.KeyTag).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octets2)(&rd.KeyTag).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if err = (*dns.DomainName)(&r.Name).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.DomainName)(&rd.Name).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
@@ -3392,26 +3402,26 @@ func (r *RRSIG) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err e
 		return fmt.Errorf("(*RRSIG).Decode: no signature data")
 	}
 
-	r.Signature = make([]byte, n)
-	copy(r.Signature, b[*pos:])
+	rd.Signature = make([]byte, n)
+	copy(rd.Signature, b[*pos:])
 	*pos += n
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataRRSIG, r)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataRRSIG, rd)
 	}
 	return
 }
 
-func (r *RRSIG) String() string {
+func (rd *RRSIG) String() string {
 	return fmt.Sprintf("%s %d %d %d %s %s %d %s %s",
-		r.Type,
-		r.Algorithm,
-		r.Labels,
-		r.TTL,
-		dns.Seconds2String(int64(r.Expiration)),
-		dns.Seconds2String(int64(r.Inception)),
-		r.KeyTag,
-		r.Name,
-		strutil.Base64Encode(r.Signature),
+		rd.Type,
+		rd.Algorithm,
+		rd.Labels,
+		rd.TTL,
+		dns.Seconds2String(int64(rd.Expiration)),
+		dns.Seconds2String(int64(rd.Inception)),
+		rd.KeyTag,
+		rd.Name,
+		strutil.Base64Encode(rd.Signature),
 	)
 }
 
@@ -3433,30 +3443,30 @@ type RT struct {
 }
 
 // Implementation of dns.Wirer
-func (d *RT) Encode(b *dns.Wirebuf) {
-	(dns.Octets2)(d.Preference).Encode(b)
-	(dns.DomainName)(d.Hostname).Encode(b)
+func (rd *RT) Encode(b *dns.Wirebuf) {
+	(dns.Octets2)(rd.Preference).Encode(b)
+	(dns.DomainName)(rd.Hostname).Encode(b)
 }
 
 // Implementation of dns.Wirer
-func (d *RT) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *RT) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*dns.Octets2)(&d.Preference).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octets2)(&rd.Preference).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if err = (*dns.DomainName)(&d.Hostname).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.DomainName)(&rd.Hostname).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataRT, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataRT, rd)
 	}
 	return
 }
 
-func (d *RT) String() string {
-	return fmt.Sprintf("%d %s", d.Preference, d.Hostname)
+func (rd *RT) String() string {
+	return fmt.Sprintf("%d %s", rd.Preference, rd.Hostname)
 }
 
 // The SIG or "signature" resource record (RR) is the fundamental way that data
@@ -3494,32 +3504,32 @@ type SIG struct {
 }
 
 // Implementation of dns.Wirer
-func (r *SIG) Encode(b *dns.Wirebuf) {
-	dns.Octets2(r.Type).Encode(b)
-	dns.Octet(r.Algorithm).Encode(b)
-	dns.Octet(r.Labels).Encode(b)
-	dns.Octets4(r.TTL).Encode(b)
-	dns.Octets4(r.Expiration).Encode(b)
-	dns.Octets4(r.Inception).Encode(b)
-	dns.Octets2(r.KeyTag).Encode(b)
+func (rd *SIG) Encode(b *dns.Wirebuf) {
+	dns.Octets2(rd.Type).Encode(b)
+	dns.Octet(rd.Algorithm).Encode(b)
+	dns.Octet(rd.Labels).Encode(b)
+	dns.Octets4(rd.TTL).Encode(b)
+	dns.Octets4(rd.Expiration).Encode(b)
+	dns.Octets4(rd.Inception).Encode(b)
+	dns.Octets2(rd.KeyTag).Encode(b)
 	b.DisableCompression()
-	(*dns.DomainName)(&r.Name).Encode(b)
+	(*dns.DomainName)(&rd.Name).Encode(b)
 	b.EnableCompression()
-	b.Buf = append(b.Buf, r.Signature...)
+	b.Buf = append(b.Buf, rd.Signature...)
 }
 
 // Implementation of dns.Wirer
-func (r *SIG) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *SIG) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*dns.Octets2)(&r.Type).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octets2)(&rd.Type).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if err = (*dns.Octet)(&r.Algorithm).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octet)(&rd.Algorithm).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if err = (*dns.Octet)(&r.Labels).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octet)(&rd.Labels).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
@@ -3528,21 +3538,21 @@ func (r *SIG) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 		return
 	}
 
-	r.TTL = int32(ttl)
+	rd.TTL = int32(ttl)
 
-	if err = (*dns.Octets4)(&r.Expiration).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octets4)(&rd.Expiration).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if err = (*dns.Octets4)(&r.Inception).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octets4)(&rd.Inception).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if err = (*dns.Octets2)(&r.KeyTag).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octets2)(&rd.KeyTag).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if err = (*dns.DomainName)(&r.Name).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.DomainName)(&rd.Name).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
@@ -3551,26 +3561,26 @@ func (r *SIG) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 		return fmt.Errorf("(*SIG).Decode: no signature data")
 	}
 
-	r.Signature = make([]byte, n)
-	copy(r.Signature, b[*pos:])
+	rd.Signature = make([]byte, n)
+	copy(rd.Signature, b[*pos:])
 	*pos += n
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataSIG, r)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataSIG, rd)
 	}
 	return
 }
 
-func (r *SIG) String() string {
+func (rd *SIG) String() string {
 	return fmt.Sprintf("%s %d %d %d %s %s %d %s %s",
-		r.Type,
-		r.Algorithm,
-		r.Labels,
-		r.TTL,
-		dns.Seconds2String(int64(r.Expiration)),
-		dns.Seconds2String(int64(r.Inception)),
-		r.KeyTag,
-		r.Name,
-		strutil.Base64Encode(r.Signature),
+		rd.Type,
+		rd.Algorithm,
+		rd.Labels,
+		rd.TTL,
+		dns.Seconds2String(int64(rd.Expiration)),
+		dns.Seconds2String(int64(rd.Inception)),
+		rd.KeyTag,
+		rd.Name,
+		strutil.Base64Encode(rd.Signature),
 	)
 }
 
@@ -3603,48 +3613,48 @@ type SOA struct {
 }
 
 // Implementation of dns.Wirer
-func (d *SOA) Encode(b *dns.Wirebuf) {
-	dns.DomainName(d.MName).Encode(b)
-	dns.DomainName(d.RName).Encode(b)
-	dns.Octets4(d.Serial).Encode(b)
-	dns.Octets4(d.Refresh).Encode(b)
-	dns.Octets4(d.Retry).Encode(b)
-	dns.Octets4(d.Expire).Encode(b)
-	dns.Octets4(d.Minimum).Encode(b)
+func (rd *SOA) Encode(b *dns.Wirebuf) {
+	dns.DomainName(rd.MName).Encode(b)
+	dns.DomainName(rd.RName).Encode(b)
+	dns.Octets4(rd.Serial).Encode(b)
+	dns.Octets4(rd.Refresh).Encode(b)
+	dns.Octets4(rd.Retry).Encode(b)
+	dns.Octets4(rd.Expire).Encode(b)
+	dns.Octets4(rd.Minimum).Encode(b)
 }
 
 // Implementation of dns.Wirer
-func (d *SOA) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *SOA) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*dns.DomainName)(&d.MName).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.DomainName)(&rd.MName).Decode(b, pos, sniffer); err != nil {
 		return
 	}
-	if err = (*dns.DomainName)(&d.RName).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.DomainName)(&rd.RName).Decode(b, pos, sniffer); err != nil {
 		return
 	}
-	if (*dns.Octets4)(&d.Serial).Decode(b, pos, sniffer); err != nil {
+	if (*dns.Octets4)(&rd.Serial).Decode(b, pos, sniffer); err != nil {
 		return
 	}
-	if (*dns.Octets4)(&d.Refresh).Decode(b, pos, sniffer); err != nil {
+	if (*dns.Octets4)(&rd.Refresh).Decode(b, pos, sniffer); err != nil {
 		return
 	}
-	if (*dns.Octets4)(&d.Retry).Decode(b, pos, sniffer); err != nil {
+	if (*dns.Octets4)(&rd.Retry).Decode(b, pos, sniffer); err != nil {
 		return
 	}
-	if (*dns.Octets4)(&d.Expire).Decode(b, pos, sniffer); err != nil {
+	if (*dns.Octets4)(&rd.Expire).Decode(b, pos, sniffer); err != nil {
 		return
 	}
-	if err = (*dns.Octets4)(&d.Minimum).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octets4)(&rd.Minimum).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataSOA, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataSOA, rd)
 	}
 	return
 }
 
-func (d *SOA) String() string {
-	return fmt.Sprintf("%s %s %d %d %d %d %d", d.MName, d.RName, d.Serial, d.Refresh, d.Retry, d.Expire, d.Minimum)
+func (rd *SOA) String() string {
+	return fmt.Sprintf("%s %s %d %d %d %d %d", rd.MName, rd.RName, rd.Serial, rd.Refresh, rd.Retry, rd.Expire, rd.Minimum)
 }
 
 // SPF represents SPF RR RDATA. The format of this type is identical to the TXT
@@ -3673,14 +3683,14 @@ type SPF struct {
 }
 
 // Implementation of dns.Wirer
-func (t *SPF) Encode(b *dns.Wirebuf) {
-	for _, s := range t.S {
+func (rd *SPF) Encode(b *dns.Wirebuf) {
+	for _, s := range rd.S {
 		dns.CharString(s).Encode(b)
 	}
 }
 
 // Implementation of dns.Wirer
-func (t *SPF) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *SPF) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
 	s := []string{}
 	for *pos < len(b) {
@@ -3691,16 +3701,16 @@ func (t *SPF) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 
 		s = append(s, string(part))
 	}
-	t.S = s
+	rd.S = s
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataSPF, t)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataSPF, rd)
 	}
 	return
 }
 
-func (t *SPF) String() string {
+func (rd *SPF) String() string {
 	a := []string{}
-	for _, s := range t.S {
+	for _, s := range rd.S {
 		a = append(a, fmt.Sprintf(`"%s"`, quote(s)))
 	}
 	return strings.Join(a, " ")
@@ -3762,40 +3772,40 @@ type SRV struct {
 }
 
 // Implementation of dns.Wirer
-func (d *SRV) Encode(b *dns.Wirebuf) {
-	dns.Octets2(d.Priority).Encode(b)
-	dns.Octets2(d.Weight).Encode(b)
-	dns.Octets2(d.Port).Encode(b)
-	dns.DomainName(d.Target).Encode(b)
+func (rd *SRV) Encode(b *dns.Wirebuf) {
+	dns.Octets2(rd.Priority).Encode(b)
+	dns.Octets2(rd.Weight).Encode(b)
+	dns.Octets2(rd.Port).Encode(b)
+	dns.DomainName(rd.Target).Encode(b)
 }
 
 // Implementation of dns.Wirer
-func (d *SRV) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *SRV) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*dns.Octets2)(&d.Priority).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octets2)(&rd.Priority).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if err = (*dns.Octets2)(&d.Weight).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octets2)(&rd.Weight).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if err = (*dns.Octets2)(&d.Port).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octets2)(&rd.Port).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if err = (*dns.DomainName)(&d.Target).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.DomainName)(&rd.Target).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataSRV, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataSRV, rd)
 	}
 	return
 }
 
-func (d *SRV) String() string {
-	return fmt.Sprintf("%d %d %d %s", d.Priority, d.Weight, d.Port, d.Target)
+func (rd *SRV) String() string {
+	return fmt.Sprintf("%d %d %d %s", rd.Priority, rd.Weight, rd.Port, rd.Target)
 }
 
 // SSHFPAlgorithm is the type of the SSHFP RData Algorithm field
@@ -3849,20 +3859,20 @@ type SSHFP struct {
 }
 
 // Implementation of dns.Wirer
-func (r *SSHFP) Encode(b *dns.Wirebuf) {
-	dns.Octet(r.Algorithm).Encode(b)
-	dns.Octet(r.Type).Encode(b)
-	b.Buf = append(b.Buf, r.Fingerprint...)
+func (rd *SSHFP) Encode(b *dns.Wirebuf) {
+	dns.Octet(rd.Algorithm).Encode(b)
+	dns.Octet(rd.Type).Encode(b)
+	b.Buf = append(b.Buf, rd.Fingerprint...)
 }
 
 // Implementation of dns.Wirer
-func (r *SSHFP) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *SSHFP) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*dns.Octet)(&r.Algorithm).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octet)(&rd.Algorithm).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if err = (*dns.Octet)(&r.Type).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octet)(&rd.Type).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
@@ -3871,24 +3881,197 @@ func (r *SSHFP) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err e
 		return fmt.Errorf("(*SSHFP).Decode: no fingerprint data")
 	}
 
-	r.Fingerprint = make([]byte, n)
-	copy(r.Fingerprint, b[*pos:])
+	rd.Fingerprint = make([]byte, n)
+	copy(rd.Fingerprint, b[*pos:])
 	*pos += n
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataSSHFP, r)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataSSHFP, rd)
 	}
 	return
 }
 
-func (r *SSHFP) String() string {
+func (rd *SSHFP) String() string {
 	return fmt.Sprintf("%d %d %x",
-		r.Algorithm,
-		r.Type,
-		r.Fingerprint,
+		rd.Algorithm,
+		rd.Type,
+		rd.Fingerprint,
 	)
 }
 
-// TSIGRCODE is the type of the TSIG Error field. Values of TSIGRCODE <= 15
+// TKEYMode type is the type of the TKEY Mode field.
+type TKEYMode uint16
+
+func (m TKEYMode) String() (s string) {
+	if s = TKEYModes[m]; s != "" {
+		return
+	}
+
+	return fmt.Sprintf("TKEYMode%d", m)
+}
+
+//Values of TKEYMode
+const (
+	// RFC2930/2.5
+	//         Value    Description
+	//         -----    -----------
+	//          0        - reserved, see section 7
+	//          1       server assignment
+	//          2       Diffie-Hellman exchange
+	//          3       GSS-API negotiation
+	//          4       resolver assignment
+	//          5       key deletion
+	//         6-65534   - available, see section 7
+	//         65535     - reserved, see section 7
+
+	TKEYModeReserved0 TKEYMode = iota
+	TKEYModeServerAssignment
+	TKEYModeDiffieHellmanExchange
+	TKEYModeGSSAPINegotation
+	TKEYModeResolverAssignment
+	TKEYModeKeyDeletion
+	TKEYModeReserved65535 TKEYMode = 65535
+)
+
+var TKEYModes = map[TKEYMode]string{
+	TKEYModeReserved0:             "Reserved0",
+	TKEYModeServerAssignment:      "ServerAssignment",
+	TKEYModeDiffieHellmanExchange: "DiffieHellmanExchange",
+	TKEYModeGSSAPINegotation:      "GSSAPINegotation",
+	TKEYModeResolverAssignment:    "ResolverAssignment",
+	TKEYModeKeyDeletion:           "KeyDeletion",
+	TKEYModeReserved65535:         "Reserved65535",
+}
+
+// TKEY represents TKEY RR RDATA [RFC2930]. TKEY RR can be used in a number of
+// different modes to establish and delete such shared secret keys between a
+// DNS resolver and server. 
+type TKEY struct {
+	// The algorithm name is in the form of a domain name with the same
+	// meaning as in [RFC 2845].  The algorithm determines how the secret
+	// keying material agreed to using the TKEY RR is actually used to
+	// derive the algorithm specific key.
+	Algorithm string
+	// The inception time and expiration times are in number of seconds
+	// since the beginning of 1 January 1970 GMT ignoring leap seconds
+	// treated as modulo 2**32 using ring arithmetic [RFC 1982]. In
+	// messages between a DNS resolver and a DNS server where these fields
+	// are meaningful, they are either the requested validity interval for
+	// the keying material asked for or specify the validity interval of
+	// keying material provided.
+	//
+	// To avoid different interpretations of the inception and expiration
+	// times in TKEY RRs, resolvers and servers exchanging them must have
+	// the same idea of what time it is.  One way of doing this is with the
+	// NTP protocol [RFC 2030] but that or any other time synchronization
+	// used for this purpose MUST be done securely.
+	Inception  time.Time
+	Expiration time.Time
+	// The mode field specifies the general scheme for key agreement or the
+	// purpose of the TKEY DNS message.  Servers and resolvers supporting
+	// this specification MUST implement the Diffie-Hellman key agreement
+	// mode and the key deletion mode for queries.  All other modes are
+	// OPTIONAL.  A server supporting TKEY that receives a TKEY request
+	// with a mode it does not support returns the BADMODE error.
+	Mode TKEYMode
+	// The error code field is an extended RCODE.
+	Error TSIGRCODE
+	// The meaning of this data depends on the mode.
+	KeyData []byte
+	// The Other Data field is not used in this specification but may be
+	// used in future extensions.
+	OtherData []byte
+}
+
+// Implementation of dns.Wirer
+func (rd *TKEY) Encode(b *dns.Wirebuf) {
+	//BUG Supports times only up to 2106-02-07 06:28:15 +0000 UTC
+	dns.DomainName(rd.Algorithm).Encode(b)
+	dns.Octets4(rd.Inception.UTC().Unix()).Encode(b)
+	dns.Octets4(rd.Expiration.UTC().Unix()).Encode(b)
+	dns.Octets2(rd.Mode).Encode(b)
+	dns.Octets2(rd.Error).Encode(b)
+	dns.Octets2(len(rd.KeyData)).Encode(b)
+	b.Buf = append(b.Buf, rd.KeyData...)
+	dns.Octets2(len(rd.OtherData)).Encode(b)
+	b.Buf = append(b.Buf, rd.OtherData...)
+}
+
+// Implementation of dns.Wirer
+func (rd *TKEY) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	//BUG Supports times only up to 2106-02-07 06:28:15 +0000 UTC
+	p0 := &b[*pos]
+	if err = (*dns.DomainName)(&rd.Algorithm).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	var u32 dns.Octets4
+	if err = u32.Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	rd.Inception = time.Unix(int64(u32), 0)
+
+	if err = u32.Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	rd.Expiration = time.Unix(int64(u32), 0)
+
+	if err = (*dns.Octets2)(&rd.Mode).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if err = (*dns.Octets2)(&rd.Error).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	var u16 dns.Octets2
+	if err = u16.Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	n := int(u16)
+	if *pos+n > len(b)+1 {
+		return fmt.Errorf("(*rr.TKEY).Decode() - buffer underflow")
+	}
+
+	rd.KeyData = make([]byte, n)
+	copy(rd.KeyData, b[*pos:])
+	*pos += n
+
+	if err = u16.Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	n = int(u16)
+	if *pos+n > len(b)+1 {
+		return fmt.Errorf("(*rr.TKEY).Decode() - buffer underflow")
+	}
+
+	rd.OtherData = make([]byte, n)
+	copy(rd.OtherData, b[*pos:])
+	*pos += n
+
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataTKEY, rd)
+	}
+	return
+}
+
+func (rd *TKEY) String() string {
+	return fmt.Sprintf(
+		"%s %s %s %s %s %x %x",
+		rd.Algorithm,
+		time.Unix(rd.Inception.UTC().Unix(), 0),
+		time.Unix(rd.Expiration.UTC().Unix(), 0),
+		rd.Mode,
+		rd.Error,
+		rd.KeyData,
+		rd.OtherData,
+	)
+}
+
+// TSIGRCODE is the type of the TKEY/TSIG Error field. Values of TSIGRCODE <= 15
 // have the same meaning as the same numbered values of msg.RCODE.
 type TSIGRCODE uint16
 
@@ -3905,6 +4088,9 @@ const (
 	TSIG_BADSIG TSIGRCODE = iota + 16
 	TSIG_BADKEY
 	TSIG_BADTIME
+	TKEY_BADMODE
+	TKEY_BADNAME
+	TKEY_BADLAG
 )
 
 // Text values of TSIGRCODE
@@ -3940,6 +4126,9 @@ var TSIGRCODEs = map[TSIGRCODE]string{
 	TSIG_BADSIG:  "BADSIG",
 	TSIG_BADKEY:  "BADKEY",
 	TSIG_BADTIME: "BADTIME",
+	TKEY_BADMODE: "BADMODE",
+	TKEY_BADNAME: "BADNAME",
+	TKEY_BADLAG:  "BADALG",
 }
 
 // TSIG represents TSIG RR RDATA. TSIG RRs are dynamically computed to cover a
@@ -3955,26 +4144,26 @@ type TSIG struct {
 }
 
 // Implementation of dns.Wirer
-func (d *TSIG) Encode(b *dns.Wirebuf) {
-	dns.DomainName(d.AlgorithmName).Encode(b)
-	secs := d.TimeSigned.UTC().Unix()
+func (rd *TSIG) Encode(b *dns.Wirebuf) {
+	dns.DomainName(rd.AlgorithmName).Encode(b)
+	secs := rd.TimeSigned.UTC().Unix()
 	for i := 0; i < 6; i++ {
 		dns.Octet(secs >> 40).Encode(b)
 		secs <<= 8
 	}
-	dns.Octets2(d.Fudge / time.Second).Encode(b)
-	dns.Octets2(len(d.MAC)).Encode(b)
-	b.Buf = append(b.Buf, d.MAC...)
-	dns.Octets2(d.OriginalID).Encode(b)
-	dns.Octets2(d.Error).Encode(b)
-	dns.Octets2(len(d.OtherData)).Encode(b)
-	b.Buf = append(b.Buf, d.OtherData...)
+	dns.Octets2(rd.Fudge / time.Second).Encode(b)
+	dns.Octets2(len(rd.MAC)).Encode(b)
+	b.Buf = append(b.Buf, rd.MAC...)
+	dns.Octets2(rd.OriginalID).Encode(b)
+	dns.Octets2(rd.Error).Encode(b)
+	dns.Octets2(len(rd.OtherData)).Encode(b)
+	b.Buf = append(b.Buf, rd.OtherData...)
 }
 
 // Implementation of dns.Wirer
-func (d *TSIG) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *TSIG) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*dns.DomainName)(&d.AlgorithmName).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.DomainName)(&rd.AlgorithmName).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
@@ -3987,14 +4176,14 @@ func (d *TSIG) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err er
 
 		ts = ts<<8 | int64(bt)
 	}
-	d.TimeSigned = time.Unix(ts, 0)
+	rd.TimeSigned = time.Unix(ts, 0)
 
 	var u16 dns.Octets2
 	if err = u16.Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	d.Fudge = time.Duration(u16) * time.Second
+	rd.Fudge = time.Duration(u16) * time.Second
 
 	if err = u16.Decode(b, pos, sniffer); err != nil {
 		return
@@ -4005,21 +4194,21 @@ func (d *TSIG) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err er
 		return fmt.Errorf("(*rr.TSIG).Decode() - buffer underflow")
 	}
 
-	d.MAC = make([]byte, n)
-	copy(d.MAC, b[*pos:])
+	rd.MAC = make([]byte, n)
+	copy(rd.MAC, b[*pos:])
 	*pos += n
 
 	if err = u16.Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	d.OriginalID = uint16(u16)
+	rd.OriginalID = uint16(u16)
 
 	if err = u16.Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	d.Error = TSIGRCODE(u16)
+	rd.Error = TSIGRCODE(u16)
 
 	if err = u16.Decode(b, pos, sniffer); err != nil {
 		return
@@ -4030,18 +4219,27 @@ func (d *TSIG) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err er
 		return fmt.Errorf("(*rr.TSIG).Decode() - buffer underflow")
 	}
 
-	d.OtherData = make([]byte, n)
-	copy(d.OtherData, b[*pos:])
+	rd.OtherData = make([]byte, n)
+	copy(rd.OtherData, b[*pos:])
 	*pos += n
 
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataTSIG, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataTSIG, rd)
 	}
 	return
 }
 
-func (d *TSIG) String() string {
-	return fmt.Sprintf("%s %s %s %x %d %s %x", d.AlgorithmName, d.TimeSigned.UTC().Add(time.Duration(-d.TimeSigned.Nanosecond())), d.Fudge, d.MAC, d.OriginalID, d.Error, d.OtherData)
+func (rd *TSIG) String() string {
+	return fmt.Sprintf(
+		"%s %s %s %x %d %s %x",
+		rd.AlgorithmName,
+		time.Unix(rd.TimeSigned.UTC().Unix(), 0),
+		rd.Fudge,
+		rd.MAC,
+		rd.OriginalID,
+		rd.Error,
+		rd.OtherData,
+	)
 }
 
 // TXT holds the TXT RData
@@ -4050,14 +4248,14 @@ type TXT struct {
 }
 
 // Implementation of dns.Wirer
-func (t *TXT) Encode(b *dns.Wirebuf) {
-	for _, s := range t.S {
+func (rd *TXT) Encode(b *dns.Wirebuf) {
+	for _, s := range rd.S {
 		dns.CharString(s).Encode(b)
 	}
 }
 
 // Implementation of dns.Wirer
-func (t *TXT) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *TXT) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
 	s := []string{}
 	for *pos < len(b) {
@@ -4068,16 +4266,16 @@ func (t *TXT) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 
 		s = append(s, string(part))
 	}
-	t.S = s
+	rd.S = s
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataTXT, t)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataTXT, rd)
 	}
 	return
 }
 
-func (t *TXT) String() string {
+func (rd *TXT) String() string {
 	a := []string{}
-	for _, s := range t.S {
+	for _, s := range rd.S {
 		a = append(a, fmt.Sprintf(`"%s"`, quote(s)))
 	}
 	return strings.Join(a, " ")
@@ -4111,11 +4309,11 @@ type WKS struct {
 }
 
 // Implementation of dns.Wirer
-func (d *WKS) Encode(b *dns.Wirebuf) {
-	ip4(d.Address).Encode(b)
-	dns.Octet(d.Protocol).Encode(b)
+func (rd *WKS) Encode(b *dns.Wirebuf) {
+	ip4(rd.Address).Encode(b)
+	dns.Octet(rd.Protocol).Encode(b)
 	bits := make([]byte, 0, 1024/8)
-	for k := range d.Ports {
+	for k := range rd.Ports {
 		i := int(k)
 		x := i >> 3
 		mask := 1 << uint(i&7)
@@ -4128,21 +4326,21 @@ func (d *WKS) Encode(b *dns.Wirebuf) {
 }
 
 // Implementation of dns.Wirer
-func (d *WKS) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *WKS) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*ip4)(&d.Address).Decode(b, pos, sniffer); err != nil {
+	if err = (*ip4)(&rd.Address).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	if err = (*dns.Octet)(&d.Protocol).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octet)(&rd.Protocol).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
-	d.Ports = map[IP_Port]struct{}{}
+	rd.Ports = map[IP_Port]struct{}{}
 	n := len(b) - *pos
 	if n == 0 {
 		if sniffer != nil {
-			sniffer(p0, &b[*pos-1], dns.SniffRDataWKS, d)
+			sniffer(p0, &b[*pos-1], dns.SniffRDataWKS, rd)
 		}
 		return
 	}
@@ -4151,27 +4349,27 @@ func (d *WKS) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 	for i, v := range b {
 		for bit := 0; v != 0; bit, v = bit+1, v>>1 {
 			if v&1 != 0 {
-				d.Ports[IP_Port(i<<3+bit)] = struct{}{}
+				rd.Ports[IP_Port(i<<3+bit)] = struct{}{}
 			}
 		}
 	}
 	*pos += n
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataWKS, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataWKS, rd)
 	}
 	return
 }
 
-func (d *WKS) String() string {
+func (rd *WKS) String() string {
 	buf := &bytes.Buffer{}
-	buf.WriteString(d.Address.String())
+	buf.WriteString(rd.Address.String())
 	buf.WriteString(" ")
-	proto := IP_Protocols[d.Protocol]
+	proto := IP_Protocols[rd.Protocol]
 	if proto == "" {
-		proto = strconv.Itoa(int(d.Protocol))
+		proto = strconv.Itoa(int(rd.Protocol))
 	}
 	buf.WriteString(proto)
-	for k := range d.Ports {
+	for k := range rd.Ports {
 		port := IP_Ports[k]
 		if port == "" {
 			port = strconv.Itoa(int(k))
@@ -4371,28 +4569,28 @@ var Types = map[Type]string{
 	TYPE_X25:        "X25",
 }
 
-func (n Type) String() (s string) {
+func (t Type) String() (s string) {
 	var ok bool
-	if s, ok = Types[n]; !ok {
-		return fmt.Sprintf("TYPE%d", uint16(n))
+	if s, ok = Types[t]; !ok {
+		return fmt.Sprintf("TYPE%d", uint16(t))
 	}
 	return
 }
 
 // Implementation of dns.Wirer
-func (n Type) Encode(b *dns.Wirebuf) {
-	dns.Octets2(n).Encode(b)
+func (t Type) Encode(b *dns.Wirebuf) {
+	dns.Octets2(t).Encode(b)
 }
 
 // Implementation of dns.Wirer
-func (n *Type) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (t *Type) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*dns.Octets2)(n).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.Octets2)(t).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffType, *n)
+		sniffer(p0, &b[*pos-1], dns.SniffType, *t)
 	}
 	return
 }
@@ -4409,23 +4607,23 @@ type X25 struct {
 }
 
 // Implementation of dns.Wirer
-func (d *X25) Encode(b *dns.Wirebuf) {
-	(dns.CharString)(d.PSDN).Encode(b)
+func (rd *X25) Encode(b *dns.Wirebuf) {
+	(dns.CharString)(rd.PSDN).Encode(b)
 }
 
 // Implementation of dns.Wirer
-func (d *X25) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+func (rd *X25) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	p0 := &b[*pos]
-	if err = (*dns.CharString)(&d.PSDN).Decode(b, pos, sniffer); err != nil {
+	if err = (*dns.CharString)(&rd.PSDN).Decode(b, pos, sniffer); err != nil {
 		return
 	}
 
 	if sniffer != nil {
-		sniffer(p0, &b[*pos-1], dns.SniffRDataX25, d)
+		sniffer(p0, &b[*pos-1], dns.SniffRDataX25, rd)
 	}
 	return
 }
 
-func (d *X25) String() string {
-	return fmt.Sprintf(`"%s"`, quote(d.PSDN))
+func (rd *X25) String() string {
+	return fmt.Sprintf(`"%s"`, quote(rd.PSDN))
 }
