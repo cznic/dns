@@ -7,11 +7,6 @@
 /*
 
 -- Types to do:
-AXFR
-DLV
-IXFR
-MAILA
-MAILB
 +check ALL "*"
 
 ---- Supported RR types "diff" vs Miek G.'s dns lib @ https://github.com/miekg/dns
@@ -31,7 +26,6 @@ MAILB
 +SIG
 +X25
 
--DLV
 -TA
 -TALINK (RFC?)
 -TLSA (RFC? DANE WG?)
@@ -42,6 +36,7 @@ MAILB
 =CERT
 =CNAME
 =DHCID
+=DLV
 =DNAME
 =DNSKEY
 =DS
@@ -522,6 +517,80 @@ func (c *Class) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err e
 		sniffer(p0, &b[*pos-1], dns.SniffClass, *c)
 	}
 	return
+}
+
+// DLC represents DLV RR RDATA [RFC4431]. The DLV resource record has exactly
+// the same wire and presentation formats as the DS resource record, defined in
+// RFC 4034, Section 5.  It uses the same IANA-assigned values in the algorithm
+// and digest type fields as the DS record.  (Those IANA registries are known
+// as the "DNS Security Algorithm Numbers" and "DS RR Type Algorithm Numbers"
+// registries.)
+//
+// The DLV record is a normal DNS record type without any special processing
+// requirements.  In particular, the DLV record does not inherit any of the
+// special processing or handling requirements of the DS record type (described
+// in Section 3.1.4.1 of RFC 4035).  Unlike the DS record, the DLV record may
+// not appear on the parent's side of a zone cut.  A DLV record may, however,
+// appear at the apex of a zone.
+type DLV struct {
+	// The key tag is calculated as specified in RFC 2535
+	KeyTag uint16
+	// Algorithm MUST be allowed to sign DNS data
+	Algorithm AlgorithmType
+	// The digest type is an identifier for the digest algorithm used
+	DigestType HashAlgorithm
+	// The digest is calculated over the
+	// canonical name of the delegated domain name followed by the whole
+	// RDATA of the KEY record (all four fields)
+	Digest []byte
+}
+
+// Implementation of dns.Wirer
+func (rd *DLV) Encode(b *dns.Wirebuf) {
+	dns.Octets2(rd.KeyTag).Encode(b)
+	dns.Octet(rd.Algorithm).Encode(b)
+	dns.Octet(rd.DigestType).Encode(b)
+	b.Buf = append(b.Buf, rd.Digest...)
+}
+
+// Implementation of dns.Wirer
+func (rd *DLV) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	p0 := &b[*pos]
+	if err = (*dns.Octets2)(&rd.KeyTag).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+	if err = (*dns.Octet)(&rd.Algorithm).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+	if err = (*dns.Octet)(&rd.DigestType).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+	var n int
+	switch rd.DigestType {
+	case HashAlgorithmSHA1:
+		n = 20
+	default:
+		return fmt.Errorf("unsupported digest type %d", rd.DigestType)
+	}
+
+	end := *pos + n
+	if end > len(b) {
+		return fmt.Errorf("(*rr.DLV).Decode() - buffer underflow")
+	}
+	rd.Digest = append([]byte{}, b[*pos:end]...)
+	*pos = end
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataDLV, rd)
+	}
+	return
+}
+
+func (rd *DLV) String() string {
+	if asserts && len(rd.Digest) == 0 {
+		panic("internal error")
+	}
+
+	return fmt.Sprintf("%d %d %d %s", rd.KeyTag, rd.Algorithm, rd.DigestType, hex.EncodeToString(rd.Digest))
 }
 
 // DNSKEY holds the DNS key RData // RFC 4034
@@ -2728,6 +2797,8 @@ func (rr *RR) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 		rr.RData = &CNAME{}
 	case TYPE_DHCID:
 		rr.RData = &DHCID{}
+	case TYPE_DLV:
+		rr.RData = &DLV{}
 	case TYPE_DNAME:
 		rr.RData = &DNAME{}
 	case TYPE_DNSKEY:
@@ -2871,6 +2942,12 @@ func (a *RR) Equal(b *RR) (equal bool) {
 	case *DHCID:
 		y := b.RData.(*DHCID)
 		return bytes.Equal(x.Data, y.Data)
+	case *DLV:
+		y := b.RData.(*DLV)
+		return x.KeyTag == y.KeyTag &&
+			x.Algorithm == y.Algorithm &&
+			x.DigestType == y.DigestType &&
+			bytes.Equal(x.Digest, y.Digest)
 	case *DNAME:
 		return strings.ToLower(x.Name) == strings.ToLower(b.RData.(*DNAME).Name)
 	case *DNSKEY:

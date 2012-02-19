@@ -19,6 +19,7 @@ nDHCID.chi.example.com.      IN DHCID   ( AAEBOSD+XR3Os/0LozeXVqcNc7FwCfQdW
 nDHCID.client.example.com.   IN DHCID   ( AAABxLmlskllE0MVjd57zHcWmEH3pCQ6V
                                      ytcKD//7es/deY= )
 
+nDLV.example.com. IN DLV 4660 86 1 000102030405060708090a0b0c0d0e0f10111213
 nDNAME.example.com. IN DNAME dname.example.com
 nDNSKEY.example.com. IN DNSKEY 2 3 4 CwwNDg8QERIT
 nDS.example.com. IN DS 4660 86 1 000102030405060708090a0b0c0d0e0f10111213
@@ -42,16 +43,16 @@ b1slImA8YVJyuIDsj7kwzG7jnERNqnWxZ48AWkskmdHaVDP4BcelrTI3rMXdXF5D )
 
 nHIP.example.com.      IN  HIP ( 2 200100107B1A74DF365639CC39F1D578
                                 AwEAAbdxyhNuSutc5EMzxTs9LBPCIkOFH8cIvM4p
-9+LrV4e19WzK00+CI6zBCQTdtWsuxKbWIy87UOoJTwkUs7lBu+Upr1gsNrut79ryra+bSRGQ
-b1slImA8YVJyuIDsj7kwzG7jnERNqnWxZ48AWkskmdHaVDP4BcelrTI3rMXdXF5D
+ 9+LrV4e19WzK00+CI6zBCQTdtWsuxKbWIy87UOoJTwkUs7lBu+Upr1gsNrut79ryra+bSRGQ
+b1slImA8YVJyuIDsj7kwzG7jnERNqnWxZ48AWkskmdHaVDP4BcelrTI3rMXdXF5D 
                                 rvs.example.com. )
 
 ;   Example of a node with a HI, HIT, and two RVSs:
 
 nHIP.example.com.      IN  HIP ( 2 200100107B1A74DF365639CC39F1D578
                                 AwEAAbdxyhNuSutc5EMzxTs9LBPCIkOFH8cIvM4p
-9+LrV4e19WzK00+CI6zBCQTdtWsuxKbWIy87UOoJTwkUs7lBu+Upr1gsNrut79ryra+bSRGQ
-b1slImA8YVJyuIDsj7kwzG7jnERNqnWxZ48AWkskmdHaVDP4BcelrTI3rMXdXF5D
+9+LrV4e19WzK00+CI6zBCQTdtWsuxKbWIy87UOoJTwkUs7lBu+Upr1gsNrut79ryra+bSRGQ 
+ b1slImA8YVJyuIDsj7kwzG7jnERNqnWxZ48AWkskmdHaVDP4BcelrTI3rMXdXF5 D
                                 rvs1.example.com.
                                 rvs2.example.com. )
 

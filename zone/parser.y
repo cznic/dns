@@ -125,6 +125,8 @@ type rrHead struct{
 	tSMTP_PORT
 	tDNS_PORT
 
+	tDLV
+
 %token <data>
 	tHEX
 	t0xHEX
@@ -176,6 +178,7 @@ type rrHead struct{
 	cert
 	cname
 	dhcid
+	dlv
 	dname
 	dnskey
 	ds
@@ -404,6 +407,21 @@ dhcid:
 	tDHCID base64
 	{
 		$$ = &rr.DHCID{$2}
+	}
+
+
+dlv:
+	tDLV
+	{
+		yylex.begin(sc_NUM)
+	}
+	uint16 uint8 uint8 hex
+	{
+		if $5 != 1 || len($6) != 20 {
+			yylex.Error(`digest type must be "1" and digest must be exactly 20 bytes (40 hex chars)`)
+		} else {
+			$$ = &rr.DS{uint16($3), rr.AlgorithmType($4), rr.HashAlgorithm($5), $6}
+		}
 	}
 
 
@@ -1051,6 +1069,10 @@ rr2:
 	{
 		$$ = &rr.RR{"", rr.TYPE_DHCID, $1.class, $1.ttl, $2}
 	}
+|	rrHead dlv
+	{
+		$$ = &rr.RR{"", rr.TYPE_DLV, $1.class, $1.ttl, $2}
+	}
 |	rrHead dname
 	{
 		$$ = &rr.RR{"", rr.TYPE_DNAME, $1.class, $1.ttl, $2}
@@ -1326,6 +1348,10 @@ rrtypetok:
 |	tDHCID
 	{
 		$$ = rr.TYPE_DHCID
+	}
+|	tDLV
+	{
+		$$ = rr.TYPE_DLV
 	}
 |	tDNAME
 	{

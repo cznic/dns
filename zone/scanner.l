@@ -336,6 +336,7 @@ E		[eE][-+]?[0-9]+
 <rrHead,type>UNSPEC     ret = tUNSPEC
 <rrHead,type>WKS        ret = tWKS
 <rrHead,type>X25        ret = tX25
+<rrHead,type>DLV        ret = tDLV
 
 <rrHead,type>TYPE{digit}+
 	s := string(l.buf[4:])
