@@ -173,6 +173,7 @@ nDNSKEY.example.com. 86400 IN DNSKEY 256 3 5 ( AQPSKmynfzW4kyBv015MUG2DeIQ3
                                        aNvv4w==  )
 
 nTA.example.com. IN TA 4660 86 1 000102030405060708090a0b0c0d0e0f10111213
+nTALINK.example.com. IN TALINK prev.example.com. next.example.com.
 
 nTXT.example.com. IN TXT;
 nTXT.example.com. IN TXT ;

@@ -219,6 +219,7 @@ type rrHead struct{
 	srv
 	sshfp
 	ta
+	talink
 	txt
 	wks
 	x25
@@ -422,7 +423,7 @@ dlv:
 		if $5 != 1 || len($6) != 20 {
 			yylex.Error(`digest type must be "1" and digest must be exactly 20 bytes (40 hex chars)`)
 		} else {
-			$$ = &rr.DS{uint16($3), rr.AlgorithmType($4), rr.HashAlgorithm($5), $6}
+			$$ = &rr.DLV{uint16($3), rr.AlgorithmType($4), rr.HashAlgorithm($5), $6}
 		}
 	}
 
@@ -1224,6 +1225,10 @@ rr2:
 	{
 		$$ = &rr.RR{"", rr.TYPE_TA, $1.class, $1.ttl, $2}
 	}
+|	rrHead talink
+	{
+		$$ = &rr.RR{"", rr.TYPE_TALINK, $1.class, $1.ttl, $2}
+	}
 |	rrHead txt
 	{
 		$$ = &rr.RR{"", rr.TYPE_TXT, $1.class, $1.ttl, $2}
@@ -1471,10 +1476,6 @@ rrtypetok:
 	{
 		$$ = rr.TYPE_NSEC3PARAM
 	}
-|	tTA
-	{
-		$$ = rr.TYPE_DS
-	}
 |	tNXT
 	{
 		$$ = rr.TYPE_NXT
@@ -1526,6 +1527,10 @@ rrtypetok:
 |	tSSHFP
 	{
 		$$ = rr.TYPE_SSHFP
+	}
+|	tTA
+	{
+		$$ = rr.TYPE_DS
 	}
 |	tTALINK
 	{
@@ -1652,9 +1657,19 @@ ta:
 		if $5 != 1 || len($6) != 20 {
 			yylex.Error(`digest type must be "1" and digest must be exactly 20 bytes (40 hex chars)`)
 		} else {
-			$$ = &rr.DS{uint16($3), rr.AlgorithmType($4), rr.HashAlgorithm($5), $6}
+			$$ = &rr.TA{uint16($3), rr.AlgorithmType($4), rr.HashAlgorithm($5), $6}
 		}
 	}
+talink:
+	tTALINK
+	{
+		yylex.begin(sc_DOMAIN)
+	}
+	tDOMAIN_NAME tDOMAIN_NAME
+	{
+		$$ = &rr.TALINK{$3, $4}
+	}
+
 
 ttl:
 	uint31

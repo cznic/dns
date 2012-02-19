@@ -65,7 +65,7 @@ Unassigned   52-54
 //HIP          55 Host Identity Protocol                      [RFC5205] done
 NINFO        56 NINFO                                       [Reid]
 RKEY         57 RKEY                                        [Reid]
-TALINK       58 Trust Anchor LINK                           [Wijngaards]
+//TALINK       58 Trust Anchor LINK                           [Wijngaards] done
 CDS          59 Child DS                                    [Barwood]
 Unassigned   60-98
 //SPF          99                                             [RFC4408] done
@@ -119,7 +119,6 @@ are in use, though if so their assignment does conflict with those above.
 +SIG
 +X25
 
--TALINK (RFC?)
 -TLSA (RFC? DANE WG?)
 -URI (RFC4501)
 
@@ -154,6 +153,7 @@ are in use, though if so their assignment does conflict with those above.
 =SRV
 =SSHFP
 =TA
+=TALINK
 =TKEY
 =TSIG
 =TXT
@@ -2972,6 +2972,8 @@ func (rr *RR) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 		rr.RData = &SSHFP{}
 	case TYPE_TA:
 		rr.RData = &TA{}
+	case TYPE_TALINK:
+		rr.RData = &TALINK{}
 	case TYPE_TKEY:
 		rr.RData = &TKEY{}
 	case TYPE_TSIG:
@@ -3294,6 +3296,10 @@ func (a *RR) Equal(b *RR) (equal bool) {
 			x.Algorithm == y.Algorithm &&
 			x.DigestType == y.DigestType &&
 			bytes.Equal(x.Digest, y.Digest)
+	case *TALINK:
+		y := b.RData.(*TALINK)
+		return strings.ToLower(x.PrevName) == strings.ToLower(y.PrevName) &&
+			strings.ToLower(x.NextName) == strings.ToLower(y.NextName)
 	case *TKEY:
 		y := b.RData.(*TKEY)
 		return strings.ToLower(x.Algorithm) == strings.ToLower(y.Algorithm) &&
@@ -4130,12 +4136,15 @@ func (rd *TA) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 	if err = (*dns.Octets2)(&rd.KeyTag).Decode(b, pos, sniffer); err != nil {
 		return
 	}
+
 	if err = (*dns.Octet)(&rd.Algorithm).Decode(b, pos, sniffer); err != nil {
 		return
 	}
+
 	if err = (*dns.Octet)(&rd.DigestType).Decode(b, pos, sniffer); err != nil {
 		return
 	}
+
 	var n int
 	switch rd.DigestType {
 	case HashAlgorithmSHA1:
@@ -4148,6 +4157,7 @@ func (rd *TA) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 	if end > len(b) {
 		return fmt.Errorf("(*rr.TA).Decode() - buffer underflow")
 	}
+
 	rd.Digest = append([]byte{}, b[*pos:end]...)
 	*pos = end
 	if sniffer != nil {
@@ -4162,6 +4172,57 @@ func (rd *TA) String() string {
 	}
 
 	return fmt.Sprintf("%d %d %d %s", rd.KeyTag, rd.Algorithm, rd.DigestType, hex.EncodeToString(rd.Digest))
+}
+
+/*
+TALINK represent TALINK RR RDATA.
+
+From: http://tools.ietf.org/html/draft-lewis-dns-undocumented-types-01
+
+ 2.6 TALINK (58)
+
+ TALINK stands for Trust Anchor Link and is last defined in the draft
+ named draft-wijngaards-dnsop-trust-history-02, available on the
+ tools.ietf.org site.
+
+ The RDATA section is defined as two fully qualified domain names that
+ are not subject to message compression nor DNSSEC downcasing.
+
+ The draft expired in February 2010.
+
+*/
+type TALINK struct {
+	PrevName string
+	NextName string
+}
+
+// Implementation of dns.Wirer
+func (rd *TALINK) Encode(b *dns.Wirebuf) {
+	b.DisableCompression()
+	dns.DomainName(rd.PrevName).Encode(b)
+	dns.DomainName(rd.NextName).Encode(b)
+	b.EnableCompression()
+}
+
+// Implementation of dns.Wirer
+func (rd *TALINK) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	p0 := &b[*pos]
+	if err = (*dns.DomainName)(&rd.PrevName).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if err = (*dns.DomainName)(&rd.NextName).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataTALINK, rd)
+	}
+	return
+}
+
+func (rd *TALINK) String() string {
+	return fmt.Sprintf("%s %s", rd.PrevName, rd.NextName)
 }
 
 // TKEYMode type is the type of the TKEY Mode field.
