@@ -334,6 +334,7 @@ E		[eE][-+]?[0-9]+
 <rrHead,type>TSIG       ret = tTSIG
 <rrHead,type>TXT        ret = tTXT
 <rrHead,type>UID        ret = tUID
+<rrHead,type>URI        ret = tURI
 <rrHead,type>UINFO      ret = tUINFO
 <rrHead,type>UNSPEC     ret = tUNSPEC
 <rrHead,type>WKS        ret = tWKS

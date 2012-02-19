@@ -39,6 +39,12 @@ func TestLoad(t *testing.T) {
 					t.Error("!!!", r)
 					return false
 				}
+			case rr.TYPE_URI:
+				if !strings.Contains(r.Name, "._uri") {
+					err2 = errors.New("fail")
+					t.Error("!!!", r)
+					return false
+				}
 			default:
 				if !strings.HasPrefix(r.Name, "n"+r.Type.String()+".") {
 					err2 = errors.New("fail")
@@ -81,6 +87,12 @@ func TestLoad(t *testing.T) {
 			switch r.Type {
 			case rr.TYPE_SRV:
 				if !strings.Contains(r.Name, ".nSRV.") {
+					err2 = errors.New("fail")
+					t.Error("!!!", r)
+					return false
+				}
+			case rr.TYPE_URI:
+				if !strings.Contains(r.Name, "._uri") {
 					err2 = errors.New("fail")
 					t.Error("!!!", r)
 					return false

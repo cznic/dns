@@ -203,6 +203,14 @@ nTXT.example.com. IN TXT "\""
 nTXT.example.com. IN TXT "a\""
 nTXT.example.com. IN TXT "\"z"
 nTXT.example.com. IN TXT "a\"z"
+
+;-----------
+_http._uri._web    IN URI 10 1 "http://www.example.com/"
+_http._uri._web    IN URI 11 2 "http://www2.example.com/"
+_http._uri._web    IN URI 13 4 "http://www3.example.com/" "http://www4.example.com/"
+_ProtA._tcp._uri  IN URI 12 3 "schemeA:service.example.com/example"
+;-----------
+
 nWKS.example.com. IN WKS 1.2.3.4 UDP
 nWKS.example.com. IN WKS 5.6.7.8 UDP DNS
 nWKS.example.com. IN WKS 9.10.11.12 TCP SMTP

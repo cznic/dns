@@ -115,6 +115,7 @@ type rrHead struct{
 	tUDP_PROTO
 	tUID
 	tUINFO
+	tURI
 	tUNSPEC
 	tWKS
 	tX25
@@ -221,6 +222,7 @@ type rrHead struct{
 	ta
 	talink
 	txt
+	uri
 	wks
 	x25
 
@@ -1233,6 +1235,10 @@ rr2:
 	{
 		$$ = &rr.RR{"", rr.TYPE_TXT, $1.class, $1.ttl, $2}
 	}
+|	rrHead uri
+	{
+		$$ = &rr.RR{"", rr.TYPE_URI, $1.class, $1.ttl, $2}
+	}
 |	rrHead wks
 	{
 		$$ = &rr.RR{"", rr.TYPE_WKS, $1.class, $1.ttl, $2}
@@ -1560,6 +1566,10 @@ rrtypetok:
 	{
 		$$ = rr.TYPE_UNSPEC
 	}
+|	tURI
+	{
+		$$ = rr.TYPE_URI
+	}
 |	tWKS
 	{
 		$$ = rr.TYPE_WKS
@@ -1689,6 +1699,17 @@ txt2:
 	{
 		$$ = append($$, $2)
 	}
+
+uri:
+	tURI
+	{
+		yylex.begin(sc_NUM)
+	}
+	uint16 uint16 txt2
+	{
+		$$ = &rr.URI{uint16($3), uint16($4), $5}
+	}
+
 
 gpos:
 	tGPOS

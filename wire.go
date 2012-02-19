@@ -299,6 +299,7 @@ const (
 	SniffRDataTKEY                         // TKEY resource record data
 	SniffRDataTSIG                         // TSIG resource record data
 	SniffRDataTXT                          // TXT resource record data
+	SniffRDataURI                          // URI resource record data
 	SniffRDataWKS                          // WKS resource record data
 	SniffRDataX25                          // X25 resource record data
 	SniffRR                                // Any or unknown/unsupported type resource record

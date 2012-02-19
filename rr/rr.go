@@ -81,7 +81,7 @@ Unassigned   104-248
 //MAILB        253 mailbox-related RRs (MB, MG or MR)         [RFC1035] only a QTYPE, done
 //MAILA        254 mail agent RRs (OBSOLETE - see MX)         [RFC1035] only a QTYPE, done
 //*            255 A request for all records                  [RFC1035] only a QTYPE, done
-URI          256 URI                                        [Faltstrom]
+//URI          256 URI                                        [Faltstrom] done
 //CAA          257 Certification Authority Authorization      [Hallam-Baker]
 Unassigned   258-32767
 //TA           32768   DNSSEC Trust Authorities               [Weiler] done
@@ -120,7 +120,6 @@ are in use, though if so their assignment does conflict with those above.
 +X25
 
 -TLSA (RFC? DANE WG?)
--URI (RFC4501)
 
 =A
 =AAAA
@@ -157,6 +156,7 @@ are in use, though if so their assignment does conflict with those above.
 =TKEY
 =TSIG
 =TXT
+=URI
 =WKS
 =any/unknown (RFC3597)
 
@@ -2980,6 +2980,8 @@ func (rr *RR) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 		rr.RData = &TSIG{}
 	case TYPE_TXT:
 		rr.RData = &TXT{}
+	case TYPE_URI:
+		rr.RData = &URI{}
 	case TYPE_WKS:
 		rr.RData = &WKS{}
 	case TYPE_X25:
@@ -3323,8 +3325,26 @@ func (a *RR) Equal(b *RR) (equal bool) {
 		if len(x.S) != len(y.S) {
 			return false
 		}
+
 		for i, s := range x.S {
 			if s != y.S[i] {
+				return false
+			}
+		}
+
+		return true
+	case *URI:
+		y := b.RData.(*URI)
+		if x.Priority != y.Priority || x.Weight != y.Weight {
+			return false
+		}
+
+		if len(x.Target) != len(y.Target) {
+			return false
+		}
+
+		for i, s := range x.Target {
+			if s != y.Target[i] {
 				return false
 			}
 		}
@@ -4606,6 +4626,95 @@ func (rd *TXT) String() string {
 		a = append(a, fmt.Sprintf(`"%s"`, quote(s)))
 	}
 	return strings.Join(a, " ")
+}
+
+/*
+URI represent URI RR RDATA.
+
+From: http://tools.ietf.org/html/draft-lewis-dns-undocumented-types-01
+
+ 2.8 URI (256)
+
+ The URI RR type is last defined in draft-faltstrom-uri-06, which expired in
+ April 2011.  The draft is available on tools.ietf.org.
+
+ The RDATA consists of two 16 bit fields called Priority and Weight and a
+ series of text strings called the Target.
+
+The URI resource record enables the querying party to select which ones of the
+NAPTR records one is interested in.  This because data in the service field of
+the NAPTR record is included in the owner part of the URI resource record type.
+
+Querying for URI resource records is not replacing querying for NAPTR resource
+records (or use of S-NAPTR [RFC3958]).  Instead, the URI resource record type
+provides a complementary mechanism to use when one already knows what service
+field is interesting.  With it, one can directly query for the specific subset
+of the otherwise possibly large RRSet given back when querying for NAPTR
+resource records.
+*/
+type URI struct {
+	// The priority of the target URI in this RR.  Its range is 0-65535.  A
+	// client MUST attempt to contact the URI with the lowest-numbered
+	// priority it can reach; URIs with the same priority SHOULD be tried
+	// in the order defined by the weight field.
+	Priority uint16
+	// A server selection mechanism.  The weight field specifies a relative
+	// weight for entries with the same priority.  Larger weights SHOULD be
+	// given a proportionately higher probability of being selected.  The
+	// range of this number is 0-65535.
+	Weight uint16
+	// The URI of the target, enclosed in double-quote characters ('"').
+	// Resolution of the URI is according to the definitions for the Scheme
+	// of the URI.
+	//
+	// The URI is encoded as one or more <character-string> RFC1035 section
+	// 3.3 [RFC1035].
+	Target []string
+}
+
+// Implementation of dns.Wirer
+func (rd *URI) Encode(b *dns.Wirebuf) {
+	dns.Octets2(rd.Priority).Encode(b)
+	dns.Octets2(rd.Weight).Encode(b)
+	for _, s := range rd.Target {
+		dns.CharString(s).Encode(b)
+	}
+}
+
+// Implementation of dns.Wirer
+func (rd *URI) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	p0 := &b[*pos]
+	if err = (*dns.Octets2)(&rd.Priority).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if err = (*dns.Octets2)(&rd.Weight).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	s := []string{}
+	for *pos < len(b) {
+		var part dns.CharString
+		if err = part.Decode(b, pos, sniffer); err != nil {
+			return
+		}
+
+		s = append(s, string(part))
+	}
+	rd.Target = s
+
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataURI, rd)
+	}
+	return
+}
+
+func (rd *URI) String() string {
+	a := []string{}
+	for _, s := range rd.Target {
+		a = append(a, fmt.Sprintf(`"%s"`, quote(s)))
+	}
+	return fmt.Sprintf("%d %d %s", rd.Priority, rd.Weight, strings.Join(a, " "))
 }
 
 // The WKS record is used to describe the well known services supported by
