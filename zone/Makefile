@@ -16,4 +16,6 @@ parser.go: parser.y
 
 
 clean:
-	rm -f scanner.go parser.go lex.yy.go y.output *~
+	rm -f scanner.go parser.go lex.yy.go y.go y.tab.c y.output *~
+
+nuke: clean

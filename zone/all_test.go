@@ -32,25 +32,11 @@ func TestLoad(t *testing.T) {
 			if r.TTL < 0 {
 				r.TTL = 12345
 			}
-			switch r.Type {
-			case rr.TYPE_SRV:
-				if !strings.Contains(r.Name, ".nSRV.") {
-					err2 = errors.New("fail")
-					t.Error("!!!", r)
-					return false
-				}
-			case rr.TYPE_URI:
-				if !strings.Contains(r.Name, "._uri") {
-					err2 = errors.New("fail")
-					t.Error("!!!", r)
-					return false
-				}
-			default:
-				if !strings.HasPrefix(r.Name, "n"+r.Type.String()+".") {
-					err2 = errors.New("fail")
-					t.Error("!!!", r)
-					return false
-				}
+			w := strings.ToLower(r.Type.String()) + "."
+			if !strings.HasPrefix(r.Name, w) && !strings.Contains(r.Name, "."+w) {
+				err2 = errors.New("fail")
+				t.Error("!!!", r)
+				return false
 			}
 
 			a += r.String() + "\n"
@@ -84,25 +70,11 @@ func TestLoad(t *testing.T) {
 		fn,
 		nil,
 		func(r *rr.RR) bool {
-			switch r.Type {
-			case rr.TYPE_SRV:
-				if !strings.Contains(r.Name, ".nSRV.") {
-					err2 = errors.New("fail")
-					t.Error("!!!", r)
-					return false
-				}
-			case rr.TYPE_URI:
-				if !strings.Contains(r.Name, "._uri") {
-					err2 = errors.New("fail")
-					t.Error("!!!", r)
-					return false
-				}
-			default:
-				if !strings.HasPrefix(r.Name, "n"+r.Type.String()+".") {
-					err2 = errors.New("fail")
-					t.Error("!!!", r)
-					return false
-				}
+			w := strings.ToLower(r.Type.String()) + "."
+			if !strings.HasPrefix(r.Name, w) && !strings.Contains(r.Name, "."+w) {
+				err2 = errors.New("fail")
+				t.Error("!!!", r)
+				return false
 			}
 
 			b += r.String() + "\n"

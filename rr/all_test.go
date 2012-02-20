@@ -382,6 +382,18 @@ func Test0(t *testing.T) {
 				[]byte{13, 23, 33, 43, 53},
 			},
 		},
+		&RR{"nTLSA.example.com.", TYPE_TLSA, CLASS_IN, -1,
+			&TLSA{
+				TLSAUsagePKIX_CA, TLSASelectorFullCert, TLSAMatchingTypeNoHash,
+				nil,
+			},
+		},
+		&RR{"nTLSA.example.com.", TYPE_TLSA, CLASS_IN, -1,
+			&TLSA{
+				TLSAUsagePKIX_EE, TLSASelectorSubjectPKInfo, TLSAMatchingTypeSHA256,
+				[]byte{1, 2, 3, 4, 5},
+			},
+		},
 		&RR{"nTSIG.example.com.", TYPE_TSIG, CLASS_IN, -1,
 			&TSIG{"SAMPLE-ALG.EXAMPLE.",
 				time.Now(),

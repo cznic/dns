@@ -331,6 +331,7 @@ E		[eE][-+]?[0-9]+
 <rrHead,type>TA         ret = tTA
 <rrHead,type>TALINK     ret = tTALINK
 <rrHead,type>TKEY       ret = tTKEY
+<rrHead,type>TLSA       ret = tTLSA
 <rrHead,type>TSIG       ret = tTSIG
 <rrHead,type>TXT        ret = tTXT
 <rrHead,type>UID        ret = tUID

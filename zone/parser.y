@@ -40,7 +40,7 @@ type rrHead struct{
 	uint   uint
 	ip     net.IP
 	rrh    rrHead
-	rrData dns.Wirer
+	rrd    dns.Wirer
 	rr     *rr.RR
 	typ    rr.Type
 	types  []rr.Type
@@ -48,225 +48,60 @@ type rrHead struct{
 }
 
 
-%token
-	tA
-	tA6
-	tAAAA
-	tAFSDB
-	tAPL
-	tATMA
-	tBACKSLASH_HASH
-	tBLANK_START
-	tCDS
-	tCERT
-	tCNAME
-	tDHCID
-	tDLR_TTL
-	tDNAME
-	tDNSKEY
-	tDNS_PORT
-	tDS
-	tEID
-	tGID
-	tGPOS
-	tHINFO
-	tHIP
-	tIPSECKEY
-	tISDN
-	tKEY
-	tKX
-	tLOC
-	tMB
-	tMD
-	tMF
-	tMG
-	tMINFO
-	tMR
-	tMX
-	tNAPTR
-	tNIMLOC
-	tNINFO
-	tNS
-	tNSAP
-	tNSAP_PTR
-	tNSEC
-	tNSEC3
-	tNSEC3PARAM
-	tNULL
-	tNXT
-	tPTR
-	tPX
-	tRKEY
-	tRP
-	tRRSIG
-	tRT
-	tSIG
-	tSMTP_PORT
-	tSOA
-	tSPF
-	tSRV
-	tSSHFP
-	tTA
-	tTALINK
-	tTCP_PROTO
-	tTKEY
-	tTSIG
-	tTXT
-	tUDP_PROTO
-	tUID
-	tUINFO
-	tURI
-	tUNSPEC
-	tWKS
-	tX25
+%token	tA tA6 tAAAA tAFSDB tAPL tATMA
+%token	tBACKSLASH_HASH tBLANK_START
+%token	tCDS tCERT tCNAME
+%token	tDHCID tDLR_TTL	tDLV tDNAME tDNSKEY tDNS_PORT tDS
+%token	tEID
+%token	tGID tGPOS
+%token	tHINFO tHIP
+%token	tIPSECKEY tISDN
+%token	tKEY tKX
+%token	tLOC
+%token	tMB tMD tMF tMG	tMINFO tMR tMX
+%token	tNAPTR tNIMLOC tNINFO tNS tNSAP	tNSAP_PTR tNSEC	tNSEC3 tNSEC3PARAM tNULL tNXT
+%token	tPTR tPX
+%token	tRKEY tRP tRRSIG tRT
+%token	tSIG tSMTP_PORT	tSOA tSPF tSRV tSSHFP
+%token	tTA tTALINK tTCP_PROTO tTKEY tTLSA tTSIG tTXT tTYPE_X
+%token	tUDP_PROTO tUID	tUINFO tUNSPEC tURI
+%token	tWKS
+%token	tX25
+%token	<class>	tCLASS
+%token	<data>	tHEX t0xHEX
+%token	<float>	tFLOAT
+%token	<ip>	tIPV4 tIPV6
+%token	<str>	tBASE32EXT tBASE64 tDOMAIN_NAME tDOMAIN_NAME2 tSRV_DOMAIN tQSTR
+%token	<u64>	tDECADIC
 
-	tTYPE_X
-
-	tTCP_PROTO
-	tUDP_PROTO
-	tSMTP_PORT
-	tDNS_PORT
-
-	tDLV
-
-%token <data>
-	tHEX
-	t0xHEX
-
-%token <str>
-	tBASE32EXT
-	tBASE64
-	tDOMAIN_NAME
-	tDOMAIN_NAME2
-	tSRV_DOMAIN
-	tQSTR
-
-%token	<float>
-	tFLOAT
-
-%token <class>
-	tCLASS
-
-%token <ip>
-	tIPV4
-	tIPV6
-
-%token <u64>
-	tDECADIC
-
-%type <alg>
-	alg
-
-%type <data>
-	base32ext
-	base64
-	base64_2
-	hex
-	hex_with_space
-	hex_with_space_opt
-	wks_ports
-
-%type <int>
-	ttl
-	uint31
-	loc_NS
-	loc_EW
-	loc_alt_sgn
-
-%type <rrData>
-	a
-	aaaa
-	afsdb
-	cert
-	cname
-	dhcid
-	dlv
-	dname
-	dnskey
-	ds
-	gpos
-	hinfo
-	hip
-	ipseckey
-	ipseckey_0
-	isdn
-	key
-	kx
-	loc
-	mb
-	md
-	mf
-	mg
-	minfo
-	mr
-	mx
-	naptr
-	ns
-	nsap
-	nsap_ptr
-	nsec
-	nsec3
-	nsec3param
-	null
-	null_1
-	ptr
-	px
-	rp
-	rrsig
-	rt
-	sig
-	soa
-	spf
-	srv
-	sshfp
-	ta
-	talink
-	txt
-	uri
-	wks
-	x25
-
-%type <rr>
-	rr
-	rr2
-
-%type <rrh>
-	rrHead
-
-%type <str>
-	base64str
-	base64str_2
-
+%type	<alg>	alg
+%type	<data>	base32ext base64 base64_2 hex hex_with_space hex_with_space_opt wks_ports
+%type	<int>	ttl uint31 loc_NS loc_EW loc_alt_sgn
+%type	<rr>	rr rr2
+%type	<rrd>	a aaaa afsdb
+%type	<rrd>	cert cname
+%type	<rrd>	dhcid dlv dname dnskey ds
+%type	<rrd>	gpos
+%type	<rrd>	hinfo hip
+%type	<rrd>	ipseckey ipseckey_0 isdn
+%type	<rrd>	key kx
+%type	<rrd>	loc
+%type	<rrd>	mb md mf mg minfo mr mx
+%type	<rrd>	naptr ns nsap nsap_ptr nsec nsec3 nsec3param null null_1
+%type	<rrd>	ptr px
+%type	<rrd>	rp rrsig rt
+%type	<rrd>	sig soa spf srv sshfp
+%type	<rrd>	ta talink tlsa txt
+%type	<rrd>	uri
+%type	<rrd>	wks
+%type	<rrd>	x25
+%type	<rrh>	rrHead
+%type	<str>	base64str base64str_2
 %type	<strs>	txt2 hip_1
-
-%type <typ>
-	rrtype
-	rrtypetok
-	tTYPE_X
-
-%type <types>
-	rrtypes
-
-%type <u64>
-	dtg
-	loc_lat_dms
-	loc_lon_dms
-	loc_ms
-	loc_s
-	loc_ts
-	loc_alt
-	loc_alt_frac
-	loc_prec_frac
-	loc_prec
-
-%type <uint>
-	dtg32
-	uint8
-	uint16
-	uint32
-	loc_s_h_v
-	loc_h_v
-	loc_v
+%type	<typ>	rrtype rrtypetok tTYPE_X
+%type	<types>	rrtypes
+%type	<u64>	dtg loc_lat_dms loc_lon_dms loc_ms loc_s loc_ts loc_alt loc_alt_frac loc_prec_frac loc_prec
+%type	<uint>	dtg32 uint8 uint16 uint32 loc_s_h_v loc_h_v loc_v
 
 %%
 
@@ -356,7 +191,7 @@ base64str:
 	}
 |	base64str tBASE64
 	{
-		$$ += $2
+		$$ = $1 + $2
 	}
 
 
@@ -382,7 +217,7 @@ base64str_2:
 	}
 |	base64str_2 tBASE64
 	{
-		$$ += $2
+		$$ = $1 + $2
 	}
 
 
@@ -702,7 +537,10 @@ loc_prec_frac:
 	}
 |	'.' uint8
 	{
-		for $$ = uint64($2); $$ != 0 && $$ < 10; $$ *= 10 {}
+		
+		x := $2
+		for ; x != 0 && x < 10; x *= 10 {}
+		$$ = uint64(x)
 	}
 
 loc_alt:
@@ -722,7 +560,9 @@ loc_alt_frac:
 	}
 |	'.' uint8
 	{
-		for $$ = uint64($2); $$ != 0 && $$ < 10; $$ *= 10 {}
+		x := $2
+		for ; x != 0 && x < 10; x *= 10 {}
+		$$ = uint64(x)
 	}
 
 loc_alt_sgn:
@@ -806,7 +646,9 @@ loc_ts:
 	}
 |	'.' uint16
 	{
-		for $$ = uint64($2); $$ != 0 && $$ < 100; $$ *= 10 {}
+		x := $2
+		for ; x != 0 && x < 100; x *= 10 {}
+		$$ = uint64(x)
 	}
 
 mb:
@@ -1231,6 +1073,10 @@ rr2:
 	{
 		$$ = &rr.RR{"", rr.TYPE_TALINK, $1.class, $1.ttl, $2}
 	}
+|	rrHead tlsa
+	{
+		$$ = &rr.RR{"", rr.TYPE_TLSA, $1.class, $1.ttl, $2}
+	}
 |	rrHead txt
 	{
 		$$ = &rr.RR{"", rr.TYPE_TXT, $1.class, $1.ttl, $2}
@@ -1546,6 +1392,10 @@ rrtypetok:
 	{
 		$$ = rr.TYPE_TKEY
 	}
+|	tTLSA
+	{
+		$$ = rr.TYPE_TLSA
+	}
 |	tTSIG
 	{
 		$$ = rr.TYPE_TSIG
@@ -1670,6 +1520,7 @@ ta:
 			$$ = &rr.TA{uint16($3), rr.AlgorithmType($4), rr.HashAlgorithm($5), $6}
 		}
 	}
+
 talink:
 	tTALINK
 	{
@@ -1681,8 +1532,20 @@ talink:
 	}
 
 
+
 ttl:
 	uint31
+
+
+tlsa:
+	tTLSA
+	{
+		yylex.begin(sc_NUM)
+	}
+	uint8 uint8 uint8 hex_with_space
+	{
+		$$ = &rr.TLSA{rr.TLSAUsage($3), rr.TLSASelector($4), rr.TLSAMatchingType($5), $6}
+	}
 
 
 txt:
@@ -1697,7 +1560,7 @@ txt2:
 	}
 |	txt2 tQSTR
 	{
-		$$ = append($$, $2)
+		$$ = append($1, $2)
 	}
 
 uri:
@@ -1861,5 +1724,3 @@ x25:
 	{
 		$$ = &rr.X25{$2}
 	}
-
-

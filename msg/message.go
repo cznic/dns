@@ -658,6 +658,10 @@ const (
 	QTYPE_NXDOMAIN
 )
 
+const (
+	QTYPE_TLSA = 65468 // Experimental, DANE WG, see: http://tools.ietf.org/wg/dane/
+)
+
 var qtypeStr = map[QType]string{
 	QTYPE_A6:         "A6",
 	QTYPE_A:          "A",
@@ -724,6 +728,7 @@ var qtypeStr = map[QType]string{
 	QTYPE_TA:         "TA",
 	QTYPE_TALINK:     "TALINK",
 	QTYPE_TKEY:       "TKEY",
+	QTYPE_TLSA:       "TLSA",
 	QTYPE_TSIG:       "TSIG",
 	QTYPE_TXT:        "TXT",
 	QTYPE_UID:        "UID",

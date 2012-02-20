@@ -2976,6 +2976,8 @@ func (rr *RR) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err err
 		rr.RData = &TALINK{}
 	case TYPE_TKEY:
 		rr.RData = &TKEY{}
+	case TYPE_TLSA:
+		rr.RData = &TLSA{}
 	case TYPE_TSIG:
 		rr.RData = &TSIG{}
 	case TYPE_TXT:
@@ -3311,6 +3313,12 @@ func (a *RR) Equal(b *RR) (equal bool) {
 			x.Error == y.Error &&
 			bytes.Equal(x.KeyData, y.KeyData) &&
 			bytes.Equal(x.OtherData, y.OtherData)
+	case *TLSA:
+		y := b.RData.(*TLSA)
+		return x.Usage == y.Usage &&
+			x.Selector == y.Selector &&
+			x.MatchingType == y.MatchingType &&
+			bytes.Equal(x.Certificate, y.Certificate)
 	case *TSIG:
 		y := b.RData.(*TSIG)
 		return strings.ToLower(x.AlgorithmName) == strings.ToLower(y.AlgorithmName) &&
@@ -4418,6 +4426,136 @@ func (rd *TKEY) String() string {
 	)
 }
 
+// TLSAUsage is the type of the TLSA Usage field.
+type TLSAUsage byte
+
+/*
+Values of TLSAUsage
+   Value    Short description
+  ------------------------------------------------
+   0        Pass PKIX and chain through CA       
+   1        Pass PKIX and match EE               
+   2        Pass PKIX and trusted via certificate
+   3        Match certificate                    
+   4-254    Unassigned
+   255      Private use
+*/
+const (
+	TLSAUsagePKIX_CA TLSAUsage = iota
+	TLSAUsagePKIX_EE
+	TLSAUsagePKIX_CERT
+	TLSAUsageMatchCert
+	TLSAUsagePrivateUse TLSAUsage = 255
+)
+
+// TLSASelector is the type of the TLSA Selector field.
+type TLSASelector byte
+
+/*
+Values of TLSASelector
+   Value    Short description   
+   -----------------------------
+   0        Full Certificate    
+   1        SubjectPublicKeyInfo
+   2-254    Unassigned
+   255      Private use
+*/
+const (
+	TLSASelectorFullCert TLSASelector = iota
+	TLSASelectorSubjectPKInfo
+	TLSASelectorPrivateUse TLSASelector = 255
+)
+
+// TLSAMatchingType is the type of the TLSA MatchingType field.
+type TLSAMatchingType byte
+
+/*
+Values of TLSAMatchingType
+   Value    Short description    Reference
+   ---------------------------------------------
+   0        No hash used
+   1        SHA-256              NIST FIPS 180-3
+   2        SHA-512              NIST FIPS 180-3
+   3-254    Unassigned
+   255      Private use
+*/
+const (
+	TLSAMatchingTypeNoHash TLSAMatchingType = iota
+	TLSAMatchingTypeSHA256
+	TLSAMatchingTypeSHA512
+	TLSAMatchingTypePrivateUse TLSAMatchingType = 255
+)
+
+// TLSA represents TLSA RR RDATA. TLSA (DANE WG) has experimantal status, see:
+// http://tools.ietf.org/wg/dane/
+//
+// From: http://tools.ietf.org/html/draft-ietf-dane-protocol-16
+//
+// The TLSA DNS resource record (RR) is used to associate a certificate with
+// the domain name where the record is found.  The semantics of how the TLSA RR
+// is interpreted are given later in this document.
+type TLSA struct {
+	// A one-octet value, called "certificate usage" or just "usage",
+	// specifying the provided association that will be used to match the
+	// target certificate from the TLS handshake.
+	Usage TLSAUsage
+	// A one-octet value, called "selector", specifying which part of the
+	// TLS certificate presented by the server will be matched against the
+	// association data.
+	Selector TLSASelector
+	// A one-octet value, called "matching type", specifying how the
+	// certificate association is presented.
+	MatchingType TLSAMatchingType
+	// The "certificate association data" to be matched.  This field
+	// contains the data to be matched.  These bytes are either raw data
+	// (that is, the full certificate or its SubjectPublicKeyInfo,
+	// depending on the selector) for matching type 0, or the hash of the
+	// raw data for matching types 1 and 2.  The data refers to the
+	// certificate in the association, not to the TLS ASN.1 Certificate
+	// object.
+	Certificate []byte
+}
+
+// Implementation of dns.Wirer
+func (rd *TLSA) Encode(b *dns.Wirebuf) {
+	dns.Octet(rd.Usage).Encode(b)
+	dns.Octet(rd.Selector).Encode(b)
+	dns.Octet(rd.MatchingType).Encode(b)
+	b.Buf = append(b.Buf, rd.Certificate...)
+}
+
+// Implementation of dns.Wirer
+func (rd *TLSA) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
+	p0 := &b[*pos]
+	if err = (*dns.Octet)(&rd.Usage).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if err = (*dns.Octet)(&rd.Selector).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	if err = (*dns.Octet)(&rd.MatchingType).Decode(b, pos, sniffer); err != nil {
+		return
+	}
+
+	rd.Certificate = nil
+	if *pos < len(b)-1 {
+		rd.Certificate = make([]byte, len(b[*pos:]))
+		copy(rd.Certificate, b[*pos:])
+		*pos = len(b)
+	}
+
+	if sniffer != nil {
+		sniffer(p0, &b[*pos-1], dns.SniffRDataTLSA, rd)
+	}
+	return
+}
+
+func (rd *TLSA) String() string {
+	return fmt.Sprintf("%d %d %d %x", rd.Usage, rd.Selector, rd.MatchingType, rd.Certificate)
+}
+
 // TSIGRCODE is the type of the TKEY/TSIG Error field. Values of TSIGRCODE <= 15
 // have the same meaning as the same numbered values of msg.RCODE.
 type TSIGRCODE uint16
@@ -4929,6 +5067,10 @@ const (
 	TYPE_NXDOMAIN
 )
 
+const (
+	TYPE_TLSA = 65468 // Experimental, DANE WG, see: http://tools.ietf.org/wg/dane/
+)
+
 var Types = map[Type]string{
 	TYPE_A6:         "A6",
 	TYPE_A:          "A",
@@ -4995,6 +5137,7 @@ var Types = map[Type]string{
 	TYPE_TA:         "TA",
 	TYPE_TALINK:     "TALINK",
 	TYPE_TKEY:       "TKEY",
+	TYPE_TLSA:       "TLSA",
 	TYPE_TSIG:       "TSIG",
 	TYPE_TXT:        "TXT",
 	TYPE_UID:        "UID",

@@ -2,29 +2,30 @@
 
  ;
 
-nA.example.com.        IN 0	A 1.2.3.4
-nA.example.com. IN A 1.2.3.4
-nA.example.com. IN A 1.2.3.4
-nA.example.com. 1 IN A 1.2.3.4
-nAAAA.example.com. IN AAAA ::1
-nAFSDB.example.com. IN AFSDB 12345 x.example.com.
-nCERT.example.com. IN CERT 1 2 3 AAZAAQAAAAM=
-nCNAME.example.com. IN CNAME cname.example.com
+a.example.com.	IN 0	A 1.2.3.4
+a.example.com.	IN A 1.2.3.4
+a.example.com.	IN A 1.2.3.4
+a.example.com.	1 IN A 1.2.3.4
+
+aaaa.example.com.	IN AAAA ::1
+afsdb.example.com.	IN AFSDB 12345 x.example.com.
+cert.example.com.	IN CERT 1 2 3 AAZAAQAAAAM=
+cname.example.com.	IN CNAME cname.example.com
 
 ; from RFC4701/3.6
-nDHCID.chi6.example.com.     IN DHCID   ( AAIBY2/AuCccgoJbsaxcQc9TUapptP69l
+dhcid.chi6.example.com.     IN DHCID   ( AAIBY2/AuCccgoJbsaxcQc9TUapptP69l
                                      OjxfNuVAA2kjEA= )
-nDHCID.chi.example.com.      IN DHCID   ( AAEBOSD+XR3Os/0LozeXVqcNc7FwCfQdW
+dhcid.chi.example.com.      IN DHCID   ( AAEBOSD+XR3Os/0LozeXVqcNc7FwCfQdW
                                      L3b/NaiUDlW2No= )
-nDHCID.client.example.com.   IN DHCID   ( AAABxLmlskllE0MVjd57zHcWmEH3pCQ6V
+dhcid.client.example.com.   IN DHCID   ( AAABxLmlskllE0MVjd57zHcWmEH3pCQ6V
                                      ytcKD//7es/deY= )
 
-nDLV.example.com. IN DLV 4660 86 1 000102030405060708090a0b0c0d0e0f10111213
-nDNAME.example.com. IN DNAME dname.example.com
-nDNSKEY.example.com. IN DNSKEY 2 3 4 CwwNDg8QERIT
-nDS.example.com. IN DS 4660 86 1 000102030405060708090a0b0c0d0e0f10111213
-nGPOS.example.com.	IN	6	GPOS -32.6882 116.8652 10.0
-nHINFO.example.com. IN HINFO "x86_\"64" "Linux"
+dlv.example.com. IN DLV 4660 86 1 000102030405060708090a0b0c0d0e0f10111213
+dname.example.com. IN DNAME dname.example.com
+dnskey.example.com. IN DNSKEY 2 3 4 CwwNDg8QERIT
+ds.example.com. IN DS 4660 86 1 000102030405060708090a0b0c0d0e0f10111213
+gpos.example.com.	IN	6	GPOS -32.6882 116.8652 10.0
+hinfo.example.com. IN HINFO "x86_\"64" "Linux"
 
 ; http://tools.ietf.org/html/rfc5205
 ;7.  Examples (moded)
@@ -34,14 +35,14 @@ nHINFO.example.com. IN HINFO "x86_\"64" "Linux"
 ;
 ;   Example of a node with HI and HIT but no RVS:
 
-nHIP.example.com.      IN  HIP ( 2 200100107B1A74DF365639CC39F1D578
+hip.example.com.      IN  HIP ( 2 200100107B1A74DF365639CC39F1D578
                                 AwEAAbdxyhNuSutc5EMzxTs9LBPCIkOFH8cIvM4p
 9+LrV4e19WzK00+CI6zBCQTdtWsuxKbWIy87UOoJTwkUs7lBu+Upr1gsNrut79ryra+bSRGQ
 b1slImA8YVJyuIDsj7kwzG7jnERNqnWxZ48AWkskmdHaVDP4BcelrTI3rMXdXF5D )
 
 ;   Example of a node with a HI, HIT, and one RVS:
 
-nHIP.example.com.      IN  HIP ( 2 200100107B1A74DF365639CC39F1D578
+hip.example.com.      IN  HIP ( 2 200100107B1A74DF365639CC39F1D578
                                 AwEAAbdxyhNuSutc5EMzxTs9LBPCIkOFH8cIvM4p
  9+LrV4e19WzK00+CI6zBCQTdtWsuxKbWIy87UOoJTwkUs7lBu+Upr1gsNrut79ryra+bSRGQ
 b1slImA8YVJyuIDsj7kwzG7jnERNqnWxZ48AWkskmdHaVDP4BcelrTI3rMXdXF5D 
@@ -49,7 +50,7 @@ b1slImA8YVJyuIDsj7kwzG7jnERNqnWxZ48AWkskmdHaVDP4BcelrTI3rMXdXF5D
 
 ;   Example of a node with a HI, HIT, and two RVSs:
 
-nHIP.example.com.      IN  HIP ( 2 200100107B1A74DF365639CC39F1D578
+hip.example.com.      IN  HIP ( 2 200100107B1A74DF365639CC39F1D578
                                 AwEAAbdxyhNuSutc5EMzxTs9LBPCIkOFH8cIvM4p
 9+LrV4e19WzK00+CI6zBCQTdtWsuxKbWIy87UOoJTwkUs7lBu+Upr1gsNrut79ryra+bSRGQ 
  b1slImA8YVJyuIDsj7kwzG7jnERNqnWxZ48AWkskmdHaVDP4BcelrTI3rMXdXF5 D
@@ -57,114 +58,118 @@ nHIP.example.com.      IN  HIP ( 2 200100107B1A74DF365639CC39F1D578
                                 rvs2.example.com. )
 
 
-nIPSECKEY.example.com. 7200 IN     IPSECKEY ( 10 0 1
+ipseckey.example.com. 7200 IN     IPSECKEY ( 10 0 1
                     .
                     AQNRU3mG7TVTO2BkR47usntb102uFJtugbo6BSGvgqt4AQ== )
-nIPSECKEY.example.com. 7200 IN     IPSECKEY ( 10 1 2 1.2.3.4
+ipseckey.example.com. 7200 IN     IPSECKEY ( 10 1 2 1.2.3.4
                     AQNRU3mG7TVTO2BkR47usntb102uFJtugbo6BSGvgqt4AQ== )
-nIPSECKEY.example.com. 7200 IN     IPSECKEY ( 10 2 2 2001:4860:0:2001::68
+ipseckey.example.com. 7200 IN     IPSECKEY ( 10 2 2 2001:4860:0:2001::68
                     AQNRU3mG7TVTO2BkR47usntb102uFJtugbo6BSGvgqt4AQ== )
-nIPSECKEY.example.com. 7200 IN     IPSECKEY ( 10 3 2 gateway.example.com.
+ipseckey.example.com. 7200 IN     IPSECKEY ( 10 3 2 gateway.example.com.
                     AQNRU3mG7TVTO2BkR47usntb102uFJtugbo6BSGvgqt4AQ== )
-nIPSECKEY.example.com. 7200 IN     IPSECKEY ( 10 0 2
+ipseckey.example.com. 7200 IN     IPSECKEY ( 10 0 2
                     .
                     AQNRU3mG7TVTO2BkR47usntb102uFJtugbo6BSGvgqt4AQ== )
-nIPSECKEY.example.com. 7200 IN     IPSECKEY ( 10 1 2
+ipseckey.example.com. 7200 IN     IPSECKEY ( 10 1 2
                  192.0.2.38
                  AQNRU3mG7TVTO2BkR47usntb102uFJtugbo6BSGvgqt4AQ== )
-nIPSECKEY.example.com. 7200 IN     IPSECKEY ( 10 0 2
+ipseckey.example.com. 7200 IN     IPSECKEY ( 10 0 2
                  .
                  AQNRU3mG7TVTO2BkR47usntb102uFJtugbo6BSGvgqt4AQ== )
-nIPSECKEY.example.com. 7200 IN     IPSECKEY ( 10 1 2
+ipseckey.example.com. 7200 IN     IPSECKEY ( 10 1 2
                  192.0.2.3
                  AQNRU3mG7TVTO2BkR47usntb102uFJtugbo6BSGvgqt4AQ== )
-nIPSECKEY.example.com. 7200 IN     IPSECKEY ( 10 3 2
+ipseckey.example.com. 7200 IN     IPSECKEY ( 10 3 2
                  mygateway.example.com.
                  AQNRU3mG7TVTO2BkR47usntb102uFJtugbo6BSGvgqt4AQ== )
-nIPSECKEY.example.com. 7200 IN     IPSECKEY ( 10 2 2
+ipseckey.example.com. 7200 IN     IPSECKEY ( 10 2 2
                  2001:0DB8:0:8002::2000:1
                  AQNRU3mG7TVTO2BkR47usntb102uFJtugbo6BSGvgqt4AQ== )
 
-nISDN.example.com. IN ISDN "\"phone"
-nISDN.example.com. IN ISDN "\"phone" "\"home"
-nKEY.example.com. IN KEY 2 3 4 CwwNDg8QERIT
-nKX.example.com. IN KX 4660 exchanger.example.com.
+isdn.example.com. IN ISDN "\"phone"
+isdn.example.com. IN ISDN "\"phone" "\"home"
+key.example.com. IN KEY 2 3 4 CwwNDg8QERIT
+kx.example.com. IN KX 4660 exchanger.example.com.
 
 ;nLOC.example.com.	IN	10	LOC  0 0.000 N   0 0.000 W          1m 10000m 10m
 ;----------------------------------------------------------------------------------------
-nLOC.example.com.	IN	10	LOC 1         N 2         E   +2    3      4   5
-nLOC.example.com.	IN	10	LOC 1 2       S 2 3       E   -3    4      5
-nLOC.example.com.	IN	10	LOC 1 2 3     N 2 3 4     W    4    5
-nLOC.example.com.	IN	10	LOC 1 2 3     N 2 3 4     W    5
-nLOC.example.com.	IN	10	LOC 1 2 3.4   S 2 3 4.5   W -345  m
-nLOC.example.com.	IN	10	LOC 1 2 3.45  S 2 3 4.56  W -345.6
-nLOC.example.com.	IN	10	LOC 1 2 3.456 S 2 3 4.567 W  -45.67m
+loc.example.com.	IN	10	LOC 1         N 2         E   +2    3      4   5
+loc.example.com.	IN	10	LOC 1 2       S 2 3       E   -3    4      5
+loc.example.com.	IN	10	LOC 1 2 3     N 2 3 4     W    4    5
+loc.example.com.	IN	10	LOC 1 2 3     N 2 3 4     W    5
+loc.example.com.	IN	10	LOC 1 2 3.4   S 2 3 4.5   W -345  m
+loc.example.com.	IN	10	LOC 1 2 3.45  S 2 3 4.56  W -345.6
+loc.example.com.	IN	10	LOC 1 2 3.456 S 2 3 4.567 W  -45.67m
 
-nMB.example.com. IN MB exchange.example.com.
-nMD.example.com. IN MD exchange.example.com.
-nMF.example.com. IN MF exchange.example.com.
-nMG.example.com. IN MG exchange.example.com.
-nMINFO.example.com. IN MINFO a.example.com. b.example.com.
-nMR.example.com. IN MR exchange.example.com.
-nMX.example.com. IN MX 4660 exchange.example.com.
+mb.example.com. IN MB exchange.example.com.
+md.example.com. IN MD exchange.example.com.
+mf.example.com. IN MF exchange.example.com.
+mg.example.com. IN MG exchange.example.com.
+minfo.example.com. IN MINFO a.example.com. b.example.com.
+mr.example.com. IN MR exchange.example.com.
+mx.example.com. IN MX 4660 exchange.example.com.
 
-nNAPTR.example.com IN NAPTR 100 10 "U" "E2U+sip" "!^.*$!sip:customer-service@example.com!" .
-nNAPTR.example.com IN NAPTR 102 10 "U" "E2U+email" "!^.*$!mailto:information@example.com!" .
-nNAPTR.example.com IN NAPTR 100 10 "S" "SIP+D2U" "!^.*$!sip:customer-service@example.com!" _sip._udp.example.com.
-nNAPTR.example.com IN NAPTR 102 10 "S" "SIP+D2T" "!^.*$!sip:customer-service@example.com!" _sip._tcp.example.com.
+naptr.example.com IN NAPTR 100 10 "U" "E2U+sip" "!^.*$!sip:customer-service@example.com!" .
+naptr.example.com IN NAPTR 102 10 "U" "E2U+email" "!^.*$!mailto:information@example.com!" .
+naptr.example.com IN NAPTR 100 10 "S" "SIP+D2U" "!^.*$!sip:customer-service@example.com!" _sip._udp.example.com.
+naptr.example.com IN NAPTR 102 10 "S" "SIP+D2T" "!^.*$!sip:customer-service@example.com!" _sip._tcp.example.com.
 
-nNS.example.com. IN NS ns.example.com
-nNSAP.example.com. IN NSAP 0x01
-nNSAP.example.com. IN NSAP 0x.12
-nNSAP.example.com. IN NSAP 0x.23.
-nNSAP.example.com. IN NSAP 0x.34.45
-nNSAP.example.com. IN NSAP 0x56.
-nNSAP.example.com. IN NSAP 0x67.78
-nNSAP.example.com. IN NSAP 0x89.9a.
-nNSAP.example.com. IN NSAP 0x.Ab.Bc.
-nNSAP-PTR.example.com. IN NSAP-PTR owner.example.com
+ns.example.com. IN NS ns.example.com
 
-nNSEC.example.com. IN NSEC next.example.com A AAAA CNAME PTR
-nNSEC.example.com 86400 IN NSEC host.example.com. (
+nsap.example.com. IN NSAP 0x01
+nsap.example.com. IN NSAP 0x.12
+nsap.example.com. IN NSAP 0x.23.
+nsap.example.com. IN NSAP 0x.34.45
+nsap.example.com. IN NSAP 0x56.
+nsap.example.com. IN NSAP 0x67.78
+nsap.example.com. IN NSAP 0x89.9a.
+nsap.example.com. IN NSAP 0x.Ab.Bc.
+
+nsap-ptr.example.com. IN NSAP-PTR owner.example.com
+
+nsec.example.com. IN NSEC next.example.com A AAAA CNAME PTR
+nsec.example.com 86400 IN NSEC host.example.com. (
                                    A MX RRSIG NSEC TYPE1234 )
 
-nNSEC3.example.com. IN NSEC3 1 2 772 0b0c0d0e0f10111213 041GA1OB A MX RRSIG NSEC
-nNSEC3PARAM.example.com. IN NSEC3PARAM 1 2 772 0b0c0d0e0f10111213
-nNULL.example.com. IN NULL \# 4 03071fFF
-nNULL.example.com. IN NULL \# 5 (
+nsec3.example.com. IN NSEC3 1 2 772 0b0c0d0e0f10111213 041GA1OB A MX RRSIG NSEC
+nsec3param.example.com. IN NSEC3PARAM 1 2 772 0b0c0d0e0f10111213
+null.example.com. IN NULL \# 4 03071fFF
+null.example.com. IN NULL \# 5 (
 	0003071fFF
 	)
-nNULL.example.com. IN NULL \# 3 03071f
-nNULL.example.com. IN NULL \# 2 0307
-nNULL.example.com. IN NULL \# 1 03
-nNULL.example.com. IN NULL \#
-nPTR.example.com. IN PTR ptr.example.com
-nPX.example.com. IN PX 4660 exchange.example.com. px.example.com.
-nRP.example.com. IN RP a.example.com. b.example.com.
-nRRSIG.example.com. IN RRSIG A 3 2 3 20101231205012 20001231235959 4660 signer.example.com. AAZAAQAAAAM=
-nRT.example.com. IN RT 12345 x.example.com.
-nSIG.example.com. IN SIG A 3 2 3 20101231205012 20001231235959 4660 signer.example.com. AAZAAQAAAAM=
-nSOA.example.com. IN SOA mname.example.com. rname.example.com. 305419896 1193046 624485 4913 38930
+null.example.com. IN NULL \# 3 03071f
+null.example.com. IN NULL \# 2 0307
+null.example.com. IN NULL \# 1 03
+null.example.com. IN NULL \#
+
+ptr.example.com. IN PTR ptr.example.com
+px.example.com. IN PX 4660 exchange.example.com. px.example.com.
+rp.example.com. IN RP a.example.com. b.example.com.
+rrsig.example.com. IN RRSIG A 3 2 3 20101231205012 20001231235959 4660 signer.example.com. AAZAAQAAAAM=
+rt.example.com. IN RT 12345 x.example.com.
+sig.example.com. IN SIG A 3 2 3 20101231205012 20001231235959 4660 signer.example.com. AAZAAQAAAAM=
+soa.example.com. IN SOA mname.example.com. rname.example.com. 305419896 1193046 624485 4913 38930
 
 ;-----------------------------------------------------------------
 ; RFC4408
-nSPF.example.com. IN SPF "v=spf1 +mx a:colo.example.com/28 -all"
-nSPF.example.com.        IN SPF  ( "v=spf1 "
+spf.example.com. IN SPF "v=spf1 +mx a:colo.example.com/28 -all"
+spf.example.com.        IN SPF  ( "v=spf1 "
                               "-include:ip4._spf.%{d} "
                               "-include:ptr._spf.%{d} "
                               "+all" )
-nSPF.ip4._spf.example.com. IN SPF  "v=spf1 -ip4:192.0.2.0/24 +all"
-nSPF.ptr._spf.example.com. IN SPF  "v=spf1 -ptr +all"
+spf.ip4._spf.example.com. IN SPF  "v=spf1 -ip4:192.0.2.0/24 +all"
+spf.ptr._spf.example.com. IN SPF  "v=spf1 -ptr +all"
 ;-----------------------------------------------------------------
 
-_sip._tcp.nSRV.example.com. 86400 IN SRV 10 60 5060 bigbox.example.com.
-_sip._tcp.nSRV.example.com. 86400 IN SRV 10 20 5060 smallbox1.example.com.
-_sip._tcp.nSRV.example.com. 86400 IN SRV 10 10 5060 smallbox2.example.com.
-_sip._tcp.nSRV.example.com. 86400 IN SRV 10 10 5066 smallbox2.example.com.
-_sip._tcp.nSRV.example.com. 86400 IN SRV 20 0 5060 backupbox.example.com.
-nSSHFP.example.com.  IN SSHFP 2 1 123456789abcdef67890123456789abcdef67890
-nMX.example.com. IN MX 4660 exchange.example.com.
-nDNSKEY.example.com. 86400 IN DNSKEY 256 3 5 ( AQPSKmynfzW4kyBv015MUG2DeIQ3
+_sip._tcp.srv.example.com. 86400 IN SRV 10 60 5060 bigbox.example.com.
+_sip._tcp.srv.example.com. 86400 IN SRV 10 20 5060 smallbox1.example.com.
+_sip._tcp.srv.example.com. 86400 IN SRV 10 10 5060 smallbox2.example.com.
+_sip._tcp.srv.example.com. 86400 IN SRV 10 10 5066 smallbox2.example.com.
+_sip._tcp.srv.example.com. 86400 IN SRV 20 0 5060 backupbox.example.com.
+
+sshfp.example.com.  IN SSHFP 2 1 123456789abcdef67890123456789abcdef67890
+mx.example.com. IN MX 4660 exchange.example.com.
+dnskey.example.com. 86400 IN DNSKEY 256 3 5 ( AQPSKmynfzW4kyBv015MUG2DeIQ3
                                        Cbl+BBZH4b/0PY1kxkmvHjcZc8no
                                        kfzj31GajIQKY+5CptLr3buXA10h
                                        WqTkF7H6RfoRqXQeogmMHfpftf6z
@@ -172,63 +177,85 @@ nDNSKEY.example.com. 86400 IN DNSKEY 256 3 5 ( AQPSKmynfzW4kyBv015MUG2DeIQ3
                                        742iU/TpPSEDhm2SNKLijfUppn1U
                                        aNvv4w==  )
 
-nTA.example.com. IN TA 4660 86 1 000102030405060708090a0b0c0d0e0f10111213
-nTALINK.example.com. IN TALINK prev.example.com. next.example.com.
+ta.example.com. IN TA 4660 86 1 000102030405060708090a0b0c0d0e0f10111213
+talink.example.com. IN TALINK prev.example.com. next.example.com.
 
-nTXT.example.com. IN TXT;
-nTXT.example.com. IN TXT ;
-nTXT.example.com. IN TXT
-nTXT.example.com. IN TXT 
-nTXT.example.com. IN TXT "abc"
-nTXT.example.com. IN TXT "abc" "DEF"
-nTXT.example.com. IN TXT "abc" ( "DEF" )
-nTXT.example.com. IN TXT "abc" ( 
+;-----------------------------------------------------
+; from: http://tools.ietf.org/html/draft-ietf-dane-protocol-16
+;
+;2.3.  TLSA RR Examples
+;
+; An example of a hashed (SHA-256) association of a PKIX CA
+; certificate:
+
+_443._tcp.tlsa.www.example.com. IN TLSA (
+   0 0 1 d2abde240d7cd3ee6b4b28c54df034b9
+         7983a1d16e8a410e4561cb106618e971 )
+
+; An example of a hashed (SHA-512) subject public key association of a
+; PKIX end entity certificate:
+
+_443._tcp.tlsa.www.example.com. IN TLSA (
+   1 1 2 92003ba34942dc74152e2f2c408d29ec
+         a5a520e7f2e06bb944f4dca346baf63c
+         1b177615d466f6c4b71c216a50292bd5
+         8c9ebdd2f74e38fe51ffd48c43326cbc )
+;-----------------------------------------------------
+
+txt.example.com. IN TXT;
+txt.example.com. IN TXT ;
+txt.example.com. IN TXT
+txt.example.com. IN TXT 
+txt.example.com. IN TXT "abc"
+txt.example.com. IN TXT "abc" "DEF"
+txt.example.com. IN TXT "abc" ( "DEF" )
+txt.example.com. IN TXT "abc" ( 
   	  "DEF" )
-nTXT.example.com. IN TXT "abc" ( 
+txt.example.com. IN TXT "abc" ( 
   	  "DEF" 
          )
-nTXT.example.com. IN TXT ( "abc"
+txt.example.com. IN TXT ( "abc"
   	    "DEF" 
          )
-nTXT.example.com. IN TXT ( 
+txt.example.com. IN TXT ( 
           "abc"
   	    "DEF" 
          )
-nTXT.example.com. IN TXT ""
-nTXT.example.com. IN TXT "\a"
-nTXT.example.com. IN TXT "a\\"
-nTXT.example.com. IN TXT "a\z"
-nTXT.example.com. IN TXT "\z"
-nTXT.example.com. IN TXT "\""
-nTXT.example.com. IN TXT "a\""
-nTXT.example.com. IN TXT "\"z"
-nTXT.example.com. IN TXT "a\"z"
+txt.example.com. IN TXT ""
+txt.example.com. IN TXT "\a"
+txt.example.com. IN TXT "a\\"
+txt.example.com. IN TXT "a\z"
+txt.example.com. IN TXT "\z"
+txt.example.com. IN TXT "\""
+txt.example.com. IN TXT "a\""
+txt.example.com. IN TXT "\"z"
+txt.example.com. IN TXT "a\"z"
 
 ;-----------
-_http._uri._web    IN URI 10 1 "http://www.example.com/"
-_http._uri._web    IN URI 11 2 "http://www2.example.com/"
-_http._uri._web    IN URI 13 4 "http://www3.example.com/" "http://www4.example.com/"
-_ProtA._tcp._uri  IN URI 12 3 "schemeA:service.example.com/example"
+_http.uri._web    IN URI 10 1 "http://www.example.com/"
+_http.uri._web    IN URI 11 2 "http://www2.example.com/"
+_http.uri._web    IN URI 13 4 "http://www3.example.com/" "http://www4.example.com/"
+_ProtA._tcp.uri.w  IN URI 12 3 "schemeA:service.example.com/example"
 ;-----------
 
-nWKS.example.com. IN WKS 1.2.3.4 UDP
-nWKS.example.com. IN WKS 5.6.7.8 UDP DNS
-nWKS.example.com. IN WKS 9.10.11.12 TCP SMTP
-nX25.example.com. IN X25 "Linux \"rulez!\""
+wks.example.com. IN WKS 1.2.3.4 UDP
+wks.example.com. IN WKS 5.6.7.8 UDP DNS
+wks.example.com. IN WKS 9.10.11.12 TCP SMTP
+x25.example.com. IN X25 "Linux \"rulez!\""
 
 
 ;-----------
 ; RFC3597/5.
 ;-----------
-nTYPE731.example.com.   CLASS32     TYPE731         \# 6 abcd (
+type731.example.com.   CLASS32     TYPE731         \# 6 abcd (
                                          ef 01 23 45 )
-nTYPE62347.example.com.   HS          TYPE62347       \# 0
+type62347.example.com.   HS          TYPE62347       \# 0
 
 ; An implementation MAY also choose to represent some RRs of known type using the above generic representations
 ;e.example.   IN          A               \# 4 0A000001
 
-nA.example.com.   CLASS1      TYPE1           10.0.0.2
+a.example.com.   CLASS1      TYPE1           10.0.0.2
 ;-----------
 
 ;--------------
-nTXT.example.com. IN TXT "<EOF>"
+txt.example.com. IN TXT "<EOF>"

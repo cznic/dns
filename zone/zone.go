@@ -76,6 +76,7 @@ var typex = map[rr.Type]int{
 	rr.TYPE_SSHFP:      tSSHFP,
 	rr.TYPE_TALINK:     tTALINK,
 	rr.TYPE_TKEY:       tTKEY,
+	rr.TYPE_TLSA:       tTLSA,
 	rr.TYPE_TSIG:       tTSIG,
 	rr.TYPE_TXT:        tTXT,
 	rr.TYPE_UID:        tUID,

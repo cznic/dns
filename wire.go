@@ -297,6 +297,7 @@ const (
 	SniffRDataTA                           // TA resource record data
 	SniffRDataTALINK                       // TALINK resource record data
 	SniffRDataTKEY                         // TKEY resource record data
+	SniffRDataTLSA                         // TLSA resource record data
 	SniffRDataTSIG                         // TSIG resource record data
 	SniffRDataTXT                          // TXT resource record data
 	SniffRDataURI                          // URI resource record data
