@@ -9,29 +9,15 @@ package msg
 import (
 	"github.com/cznic/dns"
 	"github.com/cznic/dns/rr"
-	"github.com/cznic/mathutil"
-	"math"
 	"net"
 	"testing"
 	"time"
 )
 
-var rng *mathutil.FC32
-
-func init() {
-	var err error
-	rng, err = mathutil.NewFC32(math.MinInt32, math.MaxInt32, true)
-	if err != nil {
-		panic(err)
-	}
-
-	rng.Seed(time.Now().UnixNano())
-}
-
 func test0b(t *testing.T, domain string, addr net.IP, all bool) {
 	buf := dns.NewWirebuf()
 	msg := &Message{}
-	msg.Header.ID = uint16(rng.Next())
+	msg.Header.ID = GenID()
 	msg.Header.RD = true
 	if all {
 		msg.Question.STAR(domain, rr.CLASS_IN)
@@ -50,7 +36,7 @@ func test0b(t *testing.T, domain string, addr net.IP, all bool) {
 	}
 	defer c.Close()
 
-	c.SetDeadline(time.Now().Add(5 * time.Second))
+	c.SetDeadline(time.Now().Add(7 * time.Second))
 
 	t.Logf("remote %s, local %s", raddr, c.LocalAddr())
 	n, err := c.Write(buf.Buf)
@@ -101,17 +87,12 @@ func test0b(t *testing.T, domain string, addr net.IP, all bool) {
 
 func test0(t *testing.T, domain string, addr net.IP) {
 	test0b(t, domain, addr, false)
-	test0b(t, domain, addr, true)
+	<-time.After(time.Second) // Throttle out server timeouts
 }
 
 func Test0(t *testing.T) {
-	test0(t, ".", net.ParseIP("198.41.0.4"))
-	test0(t, ".", net.ParseIP("8.8.8.8"))
-	test0(t, ".", net.ParseIP("8.8.4.4"))
 	test0(t, "google.com.", net.ParseIP("8.8.8.8"))
 	test0(t, "google.com.", net.ParseIP("8.8.4.4"))
-	test0(t, "google.cz.", net.ParseIP("8.8.8.8"))
-	test0(t, "google.cz.", net.ParseIP("8.8.4.4"))
 }
 
 func hd(t *testing.T, msg string, b []byte) {
@@ -130,7 +111,7 @@ func hd(t *testing.T, msg string, b []byte) {
 
 func TestExchange0(t *testing.T) {
 	m := &Message{}
-	m.Header.ID = uint16(rng.Next())
+	m.Header.ID = GenID()
 	m.Question.A("localhost", rr.CLASS_IN)
 	ch := make(ExchangeChan, 10)
 	c, err := net.DialUDP("udp", nil, &net.UDPAddr{net.ParseIP("127.0.0.1"), 7})
@@ -147,7 +128,7 @@ func TestExchange0(t *testing.T) {
 
 func TestExchange1(t *testing.T) {
 	m := &Message{}
-	m.Header.ID = uint16(rng.Next())
+	m.Header.ID = GenID()
 	m.Question.A("localhost", rr.CLASS_IN)
 	ch := make(ExchangeChan, 10)
 	c, err := net.DialUDP("udp", nil, &net.UDPAddr{net.ParseIP("127.0.0.1"), 7})
@@ -168,7 +149,7 @@ func TestExchange1(t *testing.T) {
 
 func TestExchange2(t *testing.T) {
 	m := &Message{}
-	m.Header.ID = uint16(rng.Next())
+	m.Header.ID = GenID()
 	m.Question.NS("google.com", rr.CLASS_IN)
 	ch := make(ExchangeChan, 10)
 	c, err := net.DialUDP("udp", nil, &net.UDPAddr{net.ParseIP("8.8.8.8"), 53})
@@ -189,11 +170,11 @@ func TestExchange2(t *testing.T) {
 
 func TestExchange3(t *testing.T) {
 	m := &Message{}
-	m.Header.ID = uint16(rng.Next())
+	m.Header.ID = GenID()
 	m.Question.STAR("google.com", rr.CLASS_IN)
 	m.RD = true
 	m2 := &Message{}
-	m2.Header.ID = uint16(rng.Next())
+	m2.Header.ID = GenID()
 	m2.Question.STAR("google.cz", rr.CLASS_IN)
 	m2.RD = true
 	c, err := net.DialUDP("udp", nil, &net.UDPAddr{net.ParseIP("8.8.8.8"), 53})

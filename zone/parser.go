@@ -1711,7 +1711,7 @@ yydefault:
 		}
 	case 201:
 		{
-			yyVAL.types = append(yyVAL.types, yyS[yypt-0].typ)
+			yyVAL.types = append(yyS[yypt-1].types, yyS[yypt-0].typ)
 		}
 	case 202:
 		{
@@ -2188,7 +2188,7 @@ yydefault:
 	case 317:
 		{
 			i := rr.IP_Port(yyS[yypt-0].int)
-			yyVAL.data[i>>3] |= 1 << uint(i&7)
+			yyVAL.data[i>>3] = yyS[yypt-1].data[i>>3] | 1<<uint(i&7)
 		}
 	case 318:
 		{

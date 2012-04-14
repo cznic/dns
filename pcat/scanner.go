@@ -218,9 +218,9 @@ yyrule5: // \n{HEX}*
 		r.Reply, err = hex.DecodeString(string(l.buf[1:]))
 		return
 	}
-		panic("unreachable")
+	panic("unreachable")
 
-		goto yyabort // silence unused label error
+	goto yyabort // silence unused label error
 
 yyabort: // no lexem recognized
 	return nil, errors.New(fmt.Sprintf("Unexpected char %q", string(int(c))))

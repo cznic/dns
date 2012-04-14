@@ -497,10 +497,10 @@ yyrule4: // [ \t]+
 	}
 yyrule5: // [ \t]*#.*
 
-		goto yystate0
-		panic("unreachable")
+	goto yystate0
+	panic("unreachable")
 
-		goto yyabort // silence unused label error
+	goto yyabort // silence unused label error
 
 yyabort: // no lexem recognized
 	// fail

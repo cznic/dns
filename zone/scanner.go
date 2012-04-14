@@ -4635,9 +4635,9 @@ yyrule100: // [-+]?{float_lit}
 		ret = tFLOAT
 		goto yystate0
 	}
-		panic("unreachable")
+	panic("unreachable")
 
-		goto yyabort // silence unused label error
+	goto yyabort // silence unused label error
 
 yyabort: // no lexem recognized
 	// no pattern recognized

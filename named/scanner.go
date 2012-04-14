@@ -17825,9 +17825,9 @@ yyrule248: // \0
 		c = l.peek
 		goto yystate0
 	}
-		panic("unreachable")
+	panic("unreachable")
 
-		goto yyabort // silence unused label error
+	goto yyabort // silence unused label error
 
 yyabort: // no lexem recognized
 	if len(l.buf) == 0 { // a single character literal

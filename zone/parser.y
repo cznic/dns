@@ -1167,7 +1167,7 @@ rrtypes:
 	}
 |	rrtypes rrtype
 	{
-		$$ = append($$, $2)
+		$$ = append($1, $2)
 	}
 
 
@@ -1716,7 +1716,7 @@ wks_ports:
 |	wks_ports wks_port
 	{
 		i := rr.IP_Port($<int>2)
-		$$[i>>3] |= 1<<uint(i&7)
+		$$[i>>3] = $1[i>>3] | 1<<uint(i&7)
 	}
 
 x25:
