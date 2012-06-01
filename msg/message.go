@@ -42,7 +42,8 @@ func init() {
 	}()
 }
 
-// GenID returns a new pseudo random message ID. GenID is safe for concurrent access.
+// GenID returns a new pseudo random message ID. GenID is safe for concurrent
+// access.
 func GenID() uint16 {
 	idgen.mtx.Lock()         // X++
 	defer idgen.mtx.Unlock() // X--
@@ -379,86 +380,114 @@ func (m *Message) additionalString() string {
 	return strings.Join(a, "\n")
 }
 
-// Send sends m through conn and returns an Error of any.
-// If the conn is a *net.TCPConn then the 2 byte msg len is prepended.
-func (m *Message) Send(conn net.Conn) (err error) {
-	//TODO use this from Exchange and friends
-	w := dns.NewWirebuf()
-	m.Encode(w)
-
+// SendWire sends w through conn and returns an Error of any.  If the conn is a
+// *net.TCPConn then the 2 byte msg len is prepended.
+func SendWire(conn net.Conn, w []byte) (err error) {
 	var nw int
 	if _, ok := conn.(*net.TCPConn); ok {
-		n := len(w.Buf)
+		n := len(w)
 		b := []byte{byte(n >> 8), byte(n)}
 		if nw, err = conn.Write(b); err != nil {
 			return
 		}
 
-		if nw != len(w.Buf) {
-			err = fmt.Errorf("Message.Send: write %d != %d", nw, len(b))
+		if nw != len(w) {
+			return fmt.Errorf("Message.Send: write %d != %d", nw, len(b))
 		}
 	}
 
-	if nw, err = conn.Write(w.Buf); err != nil {
-		return
-	}
-
-	if nw != len(w.Buf) {
-		err = fmt.Errorf("Message.Send: write %d != %d", nw, len(w.Buf))
-	}
-	return
-}
-
-// ReceiveTCP attempts to read a DNS message m through conn and returns an Error if any.
-// ReceiveTCP uses rxbuf for receiving the message. ReceiveTCP can hang forever if the
-// conn doesn't have appropriate read timeout already set.
-// Returned n reflects the number of bytes revecied to rxbuf.
-// The 2 byte msg len prefix is expected firstly.
-// The two prefix bytes are not reflected in the returned size 'n'.
-func (m *Message) ReceiveTCP(conn *net.TCPConn, rxbuf []byte) (n int, err error) {
-	b := make([]byte, 2)
-	if n, err = io.ReadFull(conn, b); err != nil {
-		return
-	}
-
-	n = int(b[0])<<8 | int(b[1])
-	nr := 0
-	rxbuf = rxbuf[:n]
-	if nr, err = io.ReadFull(conn, rxbuf); err != nil {
-		return nr, fmt.Errorf("msg.ReceiveBuf size=%d(got %d): %s", n, nr, err)
-	}
-
-	p := 0
-	err = m.Decode(rxbuf, &p, nil)
-	return
-}
-
-// ReadceiveUDP reads a UDP packet from conn, copying the payload into rxbuf.
-// It returns the number of bytes copied into b and the address that was on the packet.
-// ReceiveUDP can hang forever if the conn doesn't have appropriate read timeout already set.
-// Returned n reflects the number of bytes revecied to rxbuf.
-func (m *Message) ReceiveUDP(conn *net.UDPConn, rxbuf []byte) (n int, addr *net.UDPAddr, err error) {
-	if n, addr, err = conn.ReadFromUDP(rxbuf); err != nil {
-		return
-	}
-
-	p := 0
-	err = m.Decode(rxbuf[:n], &p, nil)
-	return
-}
-
-// ExchangeWire exchanges a msg 'w' already in wire format through conn and returns a reply or an Error if any.
-// ExchangeBuf uses rxbuf for receiving the reply. ExchangeWire can hang forever if the
-// conn doesn't have appropriate read and/or write timeouts already set.
-// Returned n reflects the number of bytes revecied to rxbuf.
-func ExchangeWire(conn net.Conn, w, rxbuf []byte) (n int, reply *Message, err error) {
-	var nw int
 	if nw, err = conn.Write(w); err != nil {
 		return
 	}
 
 	if nw != len(w) {
-		return 0, nil, fmt.Errorf("ExchangeWire: write %d != %d", nw, len(w))
+		err = fmt.Errorf("Message.Send: write %d != %d", nw, len(w))
+	}
+	return
+}
+
+// Send sends m through conn and returns an Error of any.
+// If the conn is a *net.TCPConn then the 2 byte msg len is prepended.
+func (m *Message) Send(conn net.Conn) (err error) {
+	w := dns.NewWirebuf()
+	m.Encode(w)
+	return SendWire(conn, w.Buf)
+}
+
+// ReceiveWire reads a DNS packet from conn, copying the payload into rxbuf.
+// It returns the number of bytes copied into rxbuf.  If conn is a net.TCPConn
+// then a 2 byte msg len prefix is expected firstly and those two prefix bytes
+// are not reflected in the returned size n. If conn is a net.UPConn then the
+// originating address is returned in addr, otherwise addr will be nil.
+// ReceiveWire can hang forever if the conn doesn't have appropriate read
+// timeout already set.
+func ReceiveWire(conn net.Conn, rxbuf []byte) (n int, addr *net.UDPAddr, err error) {
+	switch x := conn.(type) {
+	case *net.TCPConn:
+		var b [2]byte
+		if n, err = io.ReadFull(conn, b[:]); err != nil {
+			return
+		}
+
+		n = int(b[0])<<8 | int(b[1])
+		nr := 0
+		if nr, err = io.ReadFull(conn, rxbuf[:n]); err != nil {
+			err = fmt.Errorf("msg.ReceiveBuf size=%d(got %d): %s", n, nr, err)
+		}
+	case *net.UDPConn:
+		n, addr, err = x.ReadFromUDP(rxbuf)
+	default:
+		err = fmt.Errorf("ReceiveWire: unsupported conn type %T", conn)
+	}
+	return
+}
+
+// Receive reads a DNS message from conn, copying the packet into rxbuf.  It
+// returns the number of bytes copied into rxbuf and the originating address of
+// the packet if conn is a net.UDPConn, nil otherwise.  Receive can hang
+// forever if the conn doesn't have appropriate read timeout already set.
+func (m *Message) Receive(conn net.Conn, rxbuf []byte) (n int, addr *net.UDPAddr, err error) {
+	if n, addr, err = ReceiveWire(conn, rxbuf); err == nil {
+		p := 0
+		err = m.Decode(rxbuf[:n], &p, nil)
+	}
+	return
+}
+
+// ReceiveTCP attempts to read a DNS message m through conn and returns an
+// Error if any.  ReceiveTCP uses rxbuf for receiving the message. ReceiveTCP
+// can hang forever if the conn doesn't have appropriate read timeout already
+// set.  Returned n reflects the number of bytes revecied to rxbuf.  The 2 byte
+// msg len prefix is expected firstly.  The two prefix bytes are not reflected
+// in the returned size 'n'.
+func (m *Message) ReceiveTCP(conn *net.TCPConn, rxbuf []byte) (n int, err error) {
+	if n, _, err = ReceiveWire(conn, rxbuf); err == nil {
+		p := 0
+		err = m.Decode(rxbuf[:n], &p, nil)
+	}
+	return
+}
+
+// ReceiveUDP reads a UDP packet from conn, copying the payload into rxbuf.  It
+// returns the number of bytes copied into rxbuf and the originating address of
+// the packet.  ReceiveUDP can hang forever if the conn doesn't have
+// appropriate read timeout already set.
+func (m *Message) ReceiveUDP(conn *net.UDPConn, rxbuf []byte) (n int, addr *net.UDPAddr, err error) {
+	if n, addr, err = ReceiveWire(conn, rxbuf); err == nil {
+		p := 0
+		err = m.Decode(rxbuf[:n], &p, nil)
+	}
+	return
+}
+
+// ExchangeWire exchanges a msg 'w' already in wire format through conn and
+// returns a reply or an Error if any.  ExchangeBuf uses rxbuf for receiving
+// the reply. ExchangeWire can hang forever if the conn doesn't have
+// appropriate read and/or write timeouts already set.  Returned n reflects the
+// number of bytes revecied to rxbuf.
+func ExchangeWire(conn net.Conn, w, rxbuf []byte) (n int, reply *Message, err error) {
+	if err = SendWire(conn, w); err != nil {
+		return
 	}
 
 	if n, err = conn.Read(rxbuf); err != nil {
@@ -474,8 +503,8 @@ func ExchangeWire(conn net.Conn, w, rxbuf []byte) (n int, reply *Message, err er
 }
 
 // ExchangeBuf exchanges m through conn and returns a reply or an Error if any.
-// ExchangeBuf uses rxbuf for receiving the reply. ExchangeBuf can hang forever if the
-// conn doesn't have appropriate read and/or write timeouts already set.
+// ExchangeBuf uses rxbuf for receiving the reply. ExchangeBuf can hang forever
+// if the conn doesn't have appropriate read and/or write timeouts already set.
 // Returned n reflects the number of bytes revecied to rxbuf.
 func (m *Message) ExchangeBuf(conn net.Conn, rxbuf []byte) (n int, reply *Message, err error) {
 	w := dns.NewWirebuf()
@@ -495,15 +524,17 @@ type ExchangeReply struct {
 	error
 }
 
-// ExchangeChan is the type of the channel used to report ExchangeReply from GoExchangeBuf and GoExchange.
+// ExchangeChan is the type of the channel used to report ExchangeReply from
+// GoExchangeBuf and GoExchange.
 type ExchangeChan chan ExchangeReply
 
-// GoExchangeBuf invokes ExchangeBuf in a separate goroutine and reports the result back using
-// the supplied reply channel. The goroutine returns after sending the result. 
-// Channel communication errors are ignored, so e.g. if the reply channel is closed when the goroutine
-// wants to send results back through it, the goroutine returns without panic.
-// The reply channel may be nil on invocation, then it is created by this method
-// (buffered with a default size).
+// GoExchangeBuf invokes ExchangeBuf in a separate goroutine and reports the
+// result back using the supplied reply channel. The goroutine returns after
+// sending the result.  Channel communication errors are ignored, so e.g. if
+// the reply channel is closed when the goroutine wants to send results back
+// through it, the goroutine returns without panic.  The reply channel may be
+// nil on invocation, then it is created by this method (buffered with a
+// default size).
 func (m *Message) GoExchangeBuf(conn net.Conn, rxbuf []byte, reply ExchangeChan) ExchangeChan {
 	if reply == nil {
 		reply = make(ExchangeChan, 100)
