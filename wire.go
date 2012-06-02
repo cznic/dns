@@ -218,12 +218,14 @@ func NewWirebuf() *Wirebuf {
 	return &Wirebuf{nil, map[string]int{}, 0}
 }
 
-// EnableCompression increments enable of <domain-name> compression (RFC 1034/4.1.4)
+// EnableCompression increments enable of <domain-name> compression (RFC
+// 1034/4.1.4)
 func (w *Wirebuf) EnableCompression() {
 	w.zip++
 }
 
-// DisableCompression decrements enable of <domain-name> compression (RFC 1034/4.1.4)
+// DisableCompression decrements enable of <domain-name> compression (RFC
+// 1034/4.1.4)
 func (w *Wirebuf) DisableCompression() {
 	w.zip--
 }

@@ -13,7 +13,8 @@ import (
 	"path"
 )
 
-// The Logger type supports simple/simplified logging based on a log.Logger and dns.LogLevel.
+// The Logger type supports simple/simplified logging based on a log.Logger and
+// dns.LogLevel.
 type Logger struct {
 	Logger *log.Logger
 	Level  LogLevel
@@ -30,7 +31,8 @@ func (d devNull) Write(p []byte) (n int, err error) {
 var NoLogger = &Logger{log.New(devNull{}, "", 0), 0}
 
 // NewLogger returns a newly created Logger initialized with logger and level.
-// If the logger is nil and level != LOG_NONE then a defualt log.New logger is provided.
+// If the logger is nil and level != LOG_NONE then a defualt log.New logger is
+// provided.
 func NewLogger(logger *log.Logger, level LogLevel) *Logger {
 	switch {
 	case logger == nil && level != LOG_NONE:
@@ -59,8 +61,8 @@ func NewLogger(logger *log.Logger, level LogLevel) *Logger {
 	return &Logger{logger, level}
 }
 
-// If l.Logger != nil then Output invokes l.Logger.Output.
-// If s contains newlines it is splitted to multiple Outputs.
+// If l.Logger != nil then Output invokes l.Logger.Output.  If s contains
+// newlines it is splitted to multiple Outputs.
 func (l *Logger) Output(calldepth int, s string) (err error) {
 	if l.Logger != nil {
 		err = l.Logger.Output(calldepth, s)

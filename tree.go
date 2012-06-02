@@ -22,9 +22,10 @@ func NewGoTree() *GoTree {
 	return &GoTree{tree: NewTree()}
 }
 
-// Add will add data to GoTree. If the owner node has no data yet, the data will be
-// simply inserted in that node. If the updater is not nil and the owner node already
-// has some existing data then the value returned by updater(existing_data) is inserted into the owner node.
+// Add will add data to GoTree. If the owner node has no data yet, the data
+// will be simply inserted in that node. If the updater is not nil and the
+// owner node already has some existing data then the value returned by
+// updater(existing_data) is inserted into the owner node.
 func (t *GoTree) Add(owner string, data interface{}, updater func(interface{}) interface{}) {
 	t.rwm.Lock()
 	defer t.rwm.Unlock()
@@ -38,9 +39,9 @@ func (t *GoTree) Delete(owner string) {
 	t.tree.Put(owner, nil)
 }
 
-// Enum enumerates all data in the tree starting at root
-// and all of its childs. On every datum found the handler is invoked.
-// If the handler returns false the tree traversing stops.
+// Enum enumerates all data in the tree starting at root and all of its childs.
+// On every datum found the handler is invoked.  If the handler returns false
+// the tree traversing stops.
 func (t *GoTree) Enum(root string, handler func(path []string, data interface{}) bool) {
 	t.rwm.RLock()
 	defer t.rwm.RUnlock()
@@ -52,6 +53,14 @@ func (t *GoTree) Get(owner string) interface{} {
 	t.rwm.RLock()
 	defer t.rwm.RUnlock()
 	return t.tree.Get(owner)
+}
+
+// Match returns the data associated with the largest part of owner or nil if
+// there are none. See also Tree.Match for details.
+func (t *GoTree) Match(owner string) interface{} {
+	t.rwm.RLock()
+	defer t.rwm.RUnlock()
+	return t.tree.Match(owner)
 }
 
 // Put will put data to Tree. If the owner node already has some existing data
@@ -69,9 +78,9 @@ type mixednode struct {
 	data interface{}
 }
 
-// Tree implements a hierarchical tree of any data (interface{}). The hierarchy is based
-// on case insensitive labels of a rooted domain name.
-// Tree is *not* concurrent access safe.
+// Tree implements a hierarchical tree of any data (interface{}). The hierarchy
+// is based on case insensitive labels of a rooted domain name.  Tree is *not*
+// concurrent access safe.
 type Tree struct {
 	root interface{}
 }
@@ -111,15 +120,15 @@ func enum(path []string, node interface{}, handler func(path []string, data inte
 	return true
 }
 
-// Enum enumerates all data in the tree starting at root
-// and all of its childs. On every datum found the handler is invoked.
-// If the handler returns false the tree traversing stops.
+// Enum enumerates all data in the tree starting at root and all of its childs.
+// On every datum found the handler is invoked.  If the handler returns false
+// the tree traversing stops.
 func (t *Tree) Enum(root string, handler func(path []string, data interface{}) bool) {
-	path, node := t.getnode(root)
+	path, node, _ := t.getnode(root)
 	enum(path, node, handler)
 }
 
-func (t *Tree) getnode(owner string) (path []string, node interface{}) {
+func (t *Tree) getnode(owner string) (path []string, node, match interface{}) {
 	path = namev(owner)
 	this := t.root
 	for _, label := range path {
@@ -132,21 +141,24 @@ func (t *Tree) getnode(owner string) (path []string, node interface{}) {
 
 		case mixednode:
 			var ok bool
+			match = x.data
 			if this, ok = x.indexnode[label]; !ok {
 				return
 			}
 
 		default:
+			match = this
 			return
 		}
 
 	}
-	return path, this
+	node = this
+	return
 }
 
 // Get returns the data associated with owner or nil if there are none.
 func (t *Tree) Get(owner string) interface{} {
-	_, node := t.getnode(owner)
+	_, node, _ := t.getnode(owner)
 	switch x := node.(type) {
 	case indexnode:
 		return nil
@@ -158,9 +170,45 @@ func (t *Tree) Get(owner string) interface{} {
 	panic("unreachable")
 }
 
-// Add will add data to Tree. If the owner node has no data yet, the data will be
-// simply inserted in that node. If the updater is not nil and the owner node already
-// has some existing data then the value returned by updater(existing_data) is inserted into the owner node.
+// Match returns the data associated with the largest part of owner or nil if
+// there are none.
+//
+// If the tree "map" contains
+//  "www.example.com.": "www-example-com"
+//  "example.org.": "www-example-org"
+// then
+//  t.Match(".") == nil
+//  t.Match("com.") == nil
+//  t.Match("example.com.") == nil
+//  t.Match("www.example.com.") == "www-example-com"
+//  t.Match("ns.www.example.com.") == "www-example-com"
+//  t.Match("org.") == nil
+//  t.Match("example.org.") == "www-example-org"
+//  t.Match("www.example.org.") == "www-example-org"
+//
+// In other words, Match returns the most recent (last seen) data item present
+// in the tree when walking the DNS name hiearchy.
+func (t *Tree) Match(owner string) interface{} {
+	_, node, match := t.getnode(owner)
+	switch x := node.(type) {
+	case indexnode:
+		return match
+	case mixednode:
+		return x.data
+	default:
+		if node != nil {
+			return node
+		}
+
+		return match
+	}
+	panic("unreachable")
+}
+
+// Add will add data to Tree. If the owner node has no data yet, the data will
+// be simply inserted in that node. If the updater is not nil and the owner
+// node already has some existing data then the value returned by
+// updater(existing_data) is inserted into the owner node.
 func (t *Tree) Add(owner string, data interface{}, updater func(interface{}) interface{}) {
 	nv := namev(owner)
 	n := len(nv)

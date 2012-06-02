@@ -338,3 +338,80 @@ func TestString2Seconds(t *testing.T) {
 		t.Fatalf("%s != %s", g, e)
 	}
 }
+
+func TestMatch(t *testing.T) {
+	tr := NewTree()
+	if g := tr.Match("."); g != nil {
+		t.Fatal()
+	}
+
+	tr.Put("org.", 42)
+	if g := tr.Match("."); g != nil {
+		t.Fatal()
+	}
+
+	if g := tr.Match("org."); g != 42 {
+		t.Fatal()
+	}
+
+	if g := tr.Match("example.org."); g != 42 {
+		t.Fatal()
+	}
+
+	tr.Put(".", 0)
+	if g := tr.Match("."); g != 0 {
+		t.Fatal()
+	}
+
+	if g := tr.Match("org."); g != 42 {
+		t.Fatal()
+	}
+
+	if g := tr.Match("example.org."); g != 42 {
+		t.Fatal()
+	}
+
+	tr = NewTree()
+	tr.Put("www.example.com.", "com")
+	tr.Put("example.org.", "org")
+	for _, v := range []struct {
+		q string
+		e interface{}
+	}{
+		{".", nil},
+		{"com.", nil},
+		{"example.com.", nil},
+		{"www.example.com.", "com"},
+		{"ns.www.example.com.", "com"},
+		{"org.", nil},
+		{"example.org.", "org"},
+		{"www.example.org.", "org"},
+	} {
+		if g := tr.Match(v.q); g != v.e {
+			t.Error(g, v.e)
+		}
+	}
+
+	tr = NewTree()
+	tr.Put(".", "")
+	tr.Put("com.", "com")
+	tr.Put("example.com.", "example.com")
+	tr.Put("www.example.com.", "www.example.com")
+	for _, v := range []struct {
+		q string
+		e interface{}
+	}{
+		{".", ""},
+		{"foo.", ""},
+		{"com.", "com"},
+		{"foo.com.", "com"},
+		{"example.com.", "example.com"},
+		{"foo.example.com.", "example.com"},
+		{"www.example.com.", "www.example.com"},
+		{"foo.www.example.com.", "www.example.com"},
+	} {
+		if g := tr.Match(v.q); g != v.e {
+			t.Error(g, v.e)
+		}
+	}
+}

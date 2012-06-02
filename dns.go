@@ -109,13 +109,14 @@ func RootedName(name string) string {
 	return name + "."
 }
 
-// Seconds2String converts epoch seconds to a string with the YYYYMMDDHHmmSS format.
+// Seconds2String converts epoch seconds to a string with the YYYYMMDDHHmmSS
+// format.
 func Seconds2String(epochSecs int64) string {
 	return time.Unix(int64(epochSecs), 0).UTC().Format(timeLayout)
 }
 
-// String2Seconds converts s to epoch seconds. Input string s must be in the YYYYMMDDHHmmSS format
-// or a plain unsigned decadic number < 2^32.
+// String2Seconds converts s to epoch seconds. Input string s must be in the
+// YYYYMMDDHHmmSS format or a plain unsigned decadic number < 2^32.
 func String2Seconds(s string) (secs int64, err error) {
 	if len(s) > 10 { // human readable format
 		var t time.Time
@@ -134,7 +135,8 @@ func String2Seconds(s string) (secs int64, err error) {
 	return
 }
 
-// RevLookupName returns a domain name for the DNS reverse lookup or "" if ip is not a valid IP address.
+// RevLookupName returns a domain name for the DNS reverse lookup or "" if ip
+// is not a valid IP address.
 func RevLookupName(ip net.IP) string {
 	if x := ip.To4(); x != nil {
 		return fmt.Sprintf("%d.%d.%d.%d.in-addr.arpa.", x[3], x[2], x[1], x[0])
