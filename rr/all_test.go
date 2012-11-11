@@ -973,7 +973,7 @@ func TestTreePut(t *testing.T) {
 func TestDHCID(t *testing.T) {
 
 	// 3.6.1.  Example 1
-	// 
+	//
 	//    A DHCP server allocates the IPv6 address 2001:DB8::1234:5678 to a
 	//    client that included the DHCPv6 client-identifier option data 00:01:
 	//    00:06:41:2d:f1:66:01:02:03:04:05:06 in its DHCPv6 request.  The
@@ -984,14 +984,14 @@ func TestDHCID(t *testing.T) {
 	//    performing a SHA-256 hash computation across a buffer containing the
 	//    14 octets from the client-id option and the FQDN (represented as
 	//    specified in Section 3.5).
-	// 
+	//
 	//      chi6.example.com.     AAAA    2001:DB8::1234:5678
 	//      chi6.example.com.     DHCID   ( AAIBY2/AuCccgoJbsaxcQc9TUapptP69l
 	//                                      OjxfNuVAA2kjEA= )
-	// 
+	//
 	//    If the DHCID RR type is not supported, the RDATA would be encoded
 	//    [13] as:
-	// 
+	//
 	//      \# 35 ( 000201636fc0b8271c82825bb1ac5c41cf5351aa69b4febd94e8f17cd
 	//             b95000da48c40 )
 
@@ -1010,7 +1010,7 @@ func TestDHCID(t *testing.T) {
 	}
 
 	// 3.6.2.  Example 2
-	// 
+	//
 	//    A DHCP server allocates the IPv4 address 192.0.2.2 to a client that
 	//    included the DHCP client-identifier option data 01:07:08:09:0a:0b:0c
 	//    in its DHCP request.  The server updates the name "chi.example.com"
@@ -1020,14 +1020,14 @@ func TestDHCID(t *testing.T) {
 	//    type to 1 for SHA-256, and performing a SHA-256 hash computation
 	//    across a buffer containing the seven octets from the client-id option
 	//    and the FQDN (represented as specified in Section 3.5).
-	// 
+	//
 	//      chi.example.com.      A       192.0.2.2
 	//      chi.example.com.      DHCID   ( AAEBOSD+XR3Os/0LozeXVqcNc7FwCfQdW
 	//                                      L3b/NaiUDlW2No= )
-	// 
+	//
 	//    If the DHCID RR type is not supported, the RDATA would be encoded
 	//    [13] as:
-	// 
+	//
 	//      \# 35 ( 0001013920fe5d1dceb3fd0ba3379756a70d73b17009f41d58bddbfcd
 	//              6a2503956d8da )
 
@@ -1046,7 +1046,7 @@ func TestDHCID(t *testing.T) {
 	}
 
 	// 3.6.3.  Example 3
-	// 
+	//
 	//    A DHCP server allocating the IPv4 address 192.0.2.3 to a client with
 	//    the Ethernet MAC address 01:02:03:04:05:06 using domain name
 	//    "client.example.com" uses the client's link-layer address to identify
@@ -1056,14 +1056,14 @@ func TestDHCID(t *testing.T) {
 	//    1-octet 'htype' value for Ethernet, 0x01, followed by the six octets
 	//    of the Ethernet MAC address, and the domain name (represented as
 	//    specified in Section 3.5).
-	// 
+	//
 	//      client.example.com.   A       192.0.2.3
 	//      client.example.com.   DHCID   ( AAABxLmlskllE0MVjd57zHcWmEH3pCQ6V
 	//                                      ytcKD//7es/deY= )
-	// 
+	//
 	//    If the DHCID RR type is not supported, the RDATA would be encoded
 	//    [13] as:
-	// 
+	//
 	//      \# 35 ( 000001c4b9a5b249651343158dde7bcc77169841f7a4243a572b5c283
 	//              fffedeb3f75e6 )
 

@@ -99,7 +99,7 @@ type RxRRHandler func(serial int, r *rr.RR) bool
 // for every DNS RR found in the answer section of 'm'. Usage example:
 //	err := xfr.RxAll(myConn, myZone, HandleMsg(myRRHandler), myErrHandler)
 // The record handler 'h' sees the first SOA record, and all subsequent RRs including the final,
-// "closing" SOA RR. 
+// "closing" SOA RR.
 func HandleRxMsg(h RxRRHandler) RxMsgHandler {
 	n := 0
 	return func(serial int, m *msg.Message) bool {

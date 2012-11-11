@@ -802,7 +802,7 @@ asking:
 	//
 	//   NODATA is indicated by an answer with the RCODE set to NOERROR and
 	//   no relevant answers in the answer section.  The authority section
-	//   will contain an SOA record, or there will be no NS records there.	
+	//   will contain an SOA record, or there will be no NS records there.
 	case reply.RCODE == msg.RC_NO_ERROR && reply.ANCOUNT == 0 && (len(soas) == 1 || len(ns) == 0):
 		r.cache.Add(reply.Answer, soas, ns, reply.Additional)
 

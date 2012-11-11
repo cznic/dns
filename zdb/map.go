@@ -12,7 +12,7 @@ import (
 	"github.com/cznic/fileutil/storage"
 )
 
-/* 
+/*
 
 Chunk layout:
 
@@ -205,7 +205,7 @@ func (s *Store) Get(partition uint32, key []byte) (value []byte, ok bool, err er
 		}
 
 		next := s.getHandle(chunk)
-		if next == 0 { // not found 
+		if next == 0 { // not found
 			return nil, false, nil
 		}
 

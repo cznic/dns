@@ -104,12 +104,12 @@ func (c *Cfg) Conf() (f *Conf, changed bool, err error) {
 // A Conf holds the data found in a resolver configuration file,
 // e.g. '/etc/resolv.conf'. See also resolv.conf(5)
 type Conf struct {
-	// Internet address (in dot notation) of a name server that the resolver should query. 
+	// Internet address (in dot notation) of a name server that the resolver should query.
 	Nameserver []net.IP
 	// Local domain name.
 	Domain string
 	// Resolver queries having fewer than ndots dots (default  is  1)
-	// in them will be attempted using each component of the search path 
+	// in them will be attempted using each component of the search path
 	// in turn until a match is found.
 	Search []string
 	// This option allows addresses returned by a resolver to be sorted.

@@ -172,7 +172,7 @@ func (c *Compiler) Write(r *rr.RR) (err error) {
 
 // Load attempts to load a zone/master (RFC1034/5.1) file from fname.
 // On syntax error the errHandler is invoked if it's not nil, otherwise
-// the loading is aborted and Error returned. 
+// the loading is aborted and Error returned.
 // If errHandler is not nil and returns false the loading is also aborted.
 // On unrecoverable errors like file not found the load is aborted
 // and Error returned.

@@ -581,7 +581,7 @@ func (o Opcode) String() string {
 }
 
 // QTYPE fields appear in the question part of a query.  QTYPES are a
-// superset of rr.TYPEs, hence all TYPEs are valid QTYPEs. 
+// superset of rr.TYPEs, hence all TYPEs are valid QTYPEs.
 type QType uint16
 
 // QTYPE codes

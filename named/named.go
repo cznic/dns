@@ -6,7 +6,7 @@
 
 // WIP: Package named supports named.conf formatted data (see also `man named.conf`).
 // Supported are conversions from a file or string to an internal representation and back to a string.
-// Documentation comments in this package are often excerpts from the BIND 9.7 ARM 
+// Documentation comments in this package are often excerpts from the BIND 9.7 ARM
 // available at http://www.isc.org/files/arm97.pdf. See also the LICENSE-BIND file.
 package named
 
@@ -713,7 +713,7 @@ type Options struct {
 	ACacheEnable           bool // If yes, additional section caching is enabled.
 
 	// These options control the behavior of an authoritative
-	// server when answering queries which have additional data, or when following CNAME and 
+	// server when answering queries which have additional data, or when following CNAME and
 	// DNAME chains.
 	AdditionalFromAuth  bool
 	AdditionalFromCache bool
@@ -722,7 +722,7 @@ type Options struct {
 	AllowQuery            AddressMatchList      // Specifies which hosts are allowed to ask ordinary DNS questions.
 	AllowQueryOn          AddressMatchList      // Specifies which local addresses can accept ordinary DNS questions.
 	AllowQueryCache       AddressMatchList      // Specifies which hosts are allowed to get answers from the cache.
-	AllowQueryCacheOn     AddressMatchList      // Specifies which local addresses can give answers from the cache. 
+	AllowQueryCacheOn     AddressMatchList      // Specifies which local addresses can give answers from the cache.
 	AllowRecursion        AddressMatchList      // Specifies which hosts are allowed to make recursive queries through this server.
 	AllowRecursionOn      AddressMatchList      // Specifies which local addresses can accept recursive queries.
 	AllowTransfer         AddressMatchList      // Specifies which hosts are allowed to receive zone transfers from the server.
@@ -750,15 +750,15 @@ type Options struct {
 	CleaningInterval      int                   // This interval is effectively obsolete.
 	ClientsPerQuery       int                   // The initial number of recursive simultaneous clients for any given query (<qname,qtype,qclass>) that the server will accept before dropping additional clients.
 	Coresize              SizeSpec              // The maximum size of a core dump.
-	Datasize              SizeSpec              // The maximum amount of data memory the server may use. 
+	Datasize              SizeSpec              // The maximum amount of data memory the server may use.
 	DeallocateOnExit      bool                  // This option was used in e.g. BIND 8 to enable checking for memory leaks on exit.
 	Dialup                DialupOption          // If yes, then the server treats all zones as if they are doing zone transfers across a dial-on-deman dialup link, which can be brought up by traffic originating from this server.
 	Directory             string                // The working directory of the server.
-	DisableAlgorithms     []DisabledAlgorithms  // Disable the specified DNSSEC algorithms at and below the specified name. 
+	DisableAlgorithms     []DisabledAlgorithms  // Disable the specified DNSSEC algorithms at and below the specified name.
 	DisableEmptyZone      []string              // Disable individual empty zones.
 	DNSSecAcceptExpired   bool                  // Accept expired signatures when verifying DNSSEC signatures.
 	DNSSecDnsKeyKskOnly   bool                  // When this option and update-check-ksk are both set to yes, only key-signing keys (that is, keys with the KSK bit set) will be used to sign the DNSKEY RRset at the zone apex.
-	DNSSecEnable          bool                  // Enable DNSSEC support in named. Unless set to yes, named behaves as if it does not support DNSSEC. 
+	DNSSecEnable          bool                  // Enable DNSSEC support in named. Unless set to yes, named behaves as if it does not support DNSSEC.
 	DNSSecLookaside       []DNSSecDelegation    // When set, dnssec-lookaside provides the validator with an alternate method to validate DNSKEY records at the top of a zone.
 	DNSSecMustBeSecure    []DNSSecMustBeSecured // Specify hierarchies which must be or may not be secure (signed and validated).
 	DNSSecSecure2Insecure bool                  // Allow a dynamic zone to transition from secure to insecure (i.e., signed to unsigned) by deleting all of the DNSKEY records.
@@ -811,7 +811,7 @@ type Options struct {
 	MatchMappedAddresses bool             // (Obsolete) If yes, then an IPv4-mapped IPv6 address will match any address match list entries that match the corresponding IPv4 address.
 	MaxACacheSize        SizeSpec         // The maximum amount of memory in bytes to use for the server’s acache.
 	MaxCacheSize         SizeSpec         // The maximum amount of memory to use for the server’s cache, in bytes.
-	MaxCacheTtl          int              // Sets the maximum time for which the server will cache ordinary (positive) answers. 
+	MaxCacheTtl          int              // Sets the maximum time for which the server will cache ordinary (positive) answers.
 	MaxIxfrLogSize       uint64           // (Obsolete) Accepted and ignored for BIND 8 compatibility. The option max-journal-size performs a similar function in BIND 9.
 	MaxJournalSize       SizeSpec         // Sets a maximum size for each journal file.
 	MaxClientsPerQuery   int              // The maximum number of recursive simultaneous clients for any given query (<qname,qtype,qclass>) that the server will accept before dropping additional clients.
@@ -861,7 +861,7 @@ type Options struct {
 
 	// Slave servers will periodically query master servers to find out if zone serial numbers
 	// have changed. Each such query uses a minute amount of the slave server’s network bandwidth.
-	// To limit the amount of bandwidth used, BIND 9 limits the rate at which queries are sent. 
+	// To limit the amount of bandwidth used, BIND 9 limits the rate at which queries are sent.
 	SerialQueryRate int
 
 	SerialQueries                  uint64           // (Obsolete) In BIND 8, the serial-queries option set the maximum number of concurrent serial number queries allowed to be outstanding at any given time.
@@ -1372,7 +1372,7 @@ func (m *Masters) String() string {
 	return str(m)
 }
 
-// A zone is a point of delegation in the DNS tree. A zone consists of those contiguous 
+// A zone is a point of delegation in the DNS tree. A zone consists of those contiguous
 // parts of the domain tree for which a name server has complete information and over which it has
 // authority. It contains all domain names from a certain point downward in the domain tree except those
 // which are delegated to other zones. A delegation point is marked by one or more NS records in the

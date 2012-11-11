@@ -86,9 +86,9 @@ Unassigned   104-248
 Unassigned   258-32767
 //TA           32768   DNSSEC Trust Authorities               [Weiler] done
 //DLV          32769   DNSSEC Lookaside Validation            [RFC4431] done
-Unassigned   32770-65279  
+Unassigned   32770-65279
 Private use  65280-65534
-Reserved     65535 
+Reserved     65535
 
 Note: In [RFC1002], two types are defined.  It is not clear that these
 are in use, though if so their assignment does conflict with those above.
@@ -524,17 +524,17 @@ func (rd DNAME) String() string {
 }
 
 // DNSSEC Algorithm Types
-// 
+//
 // The DNSKEY, RRSIG, and DS RRs use an 8-bit number to identify the
 // security algorithm being used.  These values are stored in the
 // "Algorithm number" field in the resource record RDATA.
-// 
+//
 // Some algorithms are usable only for zone signing (DNSSEC), some only
 // for transaction security mechanisms (SIG(0) and TSIG), and some for
 // both.  Those usable for zone signing may appear in DNSKEY, RRSIG, and
 // DS RRs.  Those usable for transaction security would be present in
 // SIG(0) and KEY RRs, as described in [RFC2931].
-// 
+//
 //	                             Zone
 //	Value Algorithm [Mnemonic]  Signing  References   Status
 //	----- -------------------- --------- ----------  ---------
@@ -548,7 +548,7 @@ func (rd DNAME) String() string {
 //	253   Private [PRIVATEDNS]     y      see below  OPTIONAL
 //	254   Private [PRIVATEOID]     y      see below  OPTIONAL
 //	255   reserved
-//	
+//
 //	6 - 251  Available for assignment by IETF Standards Action.
 type AlgorithmType byte
 
@@ -693,7 +693,7 @@ type DNSKEY struct {
 	// owner name MUST be the name of a zone.  If bit 7 has value 0, then
 	// the DNSKEY record holds some other type of DNS public key and MUST
 	// NOT be used to verify RRSIGs that cover RRsets.
-	// 
+	//
 	// Bit 15 of the Flags field is the Secure Entry Point flag, described
 	// in [RFC3757].  If bit 15 has value 1, then the DNSKEY record holds a
 	// key intended for use as a secure entry point.  This flag is only
@@ -705,7 +705,7 @@ type DNSKEY struct {
 	// to generate signatures legally.  A DNSKEY RR with the SEP set and the
 	// Zone Key flag not set MUST NOT be used to verify RRSIGs that cover
 	// RRsets.
-	// 
+	//
 	// Bits 0-6 and 8-14 are reserved: these bits MUST have value 0 upon
 	// creation of the DNSKEY RR and MUST be ignored upon receipt.
 	Flags uint16
@@ -1431,7 +1431,7 @@ type KEY struct {
 	// owner name MUST be the name of a zone.  If bit 7 has value 0, then
 	// the KEY record holds some other type of DNS public key and MUST
 	// NOT be used to verify RRSIGs that cover RRsets.
-	// 
+	//
 	// Bit 15 of the Flags field is the Secure Entry Point flag, described
 	// in [RFC3757].  If bit 15 has value 1, then the KEY record holds a
 	// key intended for use as a secure entry point.  This flag is only
@@ -1443,7 +1443,7 @@ type KEY struct {
 	// to generate signatures legally.  A KEY RR with the SEP set and the
 	// Zone Key flag not set MUST NOT be used to verify RRSIGs that cover
 	// RRsets.
-	// 
+	//
 	// Bits 0-6 and 8-14 are reserved: these bits MUST have value 0 upon
 	// creation of the KEY RR and MUST be ignored upon receipt.
 	Flags uint16
@@ -2047,7 +2047,7 @@ type NAPTR struct {
 	// lighter weight protocols.  A client MAY look at records with higher
 	// preference values if it has a good reason to do so such as not
 	// supporting some protocol or service very well.
-	// 
+	//
 	// The important difference between Order and Preference is that once a
 	// match is found the client MUST NOT consider records with a different
 	// Order but they MAY process records with the same Order but different
@@ -2058,7 +2058,7 @@ type NAPTR struct {
 	// communicate a higher quality of service to rules that are considered
 	// the same from an authority standpoint but not from a simple load
 	// balancing standpoint.
-	// 
+	//
 	// It is important to note that DNS contains several load balancing
 	// mechanisms and if load balancing among otherwise equal services
 	// should be needed then methods such as SRV records or multiple A
@@ -2069,7 +2069,7 @@ type NAPTR struct {
 	// rewriting and interpretation of the fields in the record.  Flags are
 	// single characters from the set A-Z and 0-9.  The case of the
 	// alphabetic characters is not significant.  The field can be empty.
-	// 
+	//
 	// It is up to the Application specifying how it is using this Database
 	// to define the Flags in this field.  It must define which ones are
 	// terminal and which ones are not.
@@ -2084,7 +2084,7 @@ type NAPTR struct {
 	// applied to the original string held by the client in order to
 	// construct the next domain name to lookup.  See the DDDS Algorithm
 	// specification for the syntax of this field.
-	// 
+	//
 	// As stated in the DDDS algorithm, The regular expressions MUST NOT be
 	// used in a cumulative fashion, that is, they should only be applied
 	// to the original string held by the client, never to the domain name
@@ -2098,7 +2098,7 @@ type NAPTR struct {
 	// used when the regular expression is a simple replacement operation.
 	// Any value in this field MUST be a fully qualified domain-name.  Name
 	// compression is not to be used for this field.
-	// 
+	//
 	// This field and the REGEXP field together make up the Substitution
 	// Expression in the DDDS Algorithm.  It is simply a historical
 	// optimization specifically for DNS compression that this field
@@ -2183,7 +2183,7 @@ func (rd *NODATA) String() string {
 	return fmt.Sprintf("%s", rd.Type)
 }
 
-// NXDOMAIN is used for negative caching of authoritave answers 
+// NXDOMAIN is used for negative caching of authoritave answers
 // for queried non existing domain names.
 type NXDOMAIN struct{}
 
@@ -2349,7 +2349,7 @@ type NSEC struct {
 	// Owner names of RRsets for which the given zone is not authoritative
 	// (such as glue records) MUST NOT be listed in the Next Domain Name
 	// unless at least one authoritative RRset exists at the same owner
-	// name.	
+	// name.
 	NextDomainName string
 	// The Type Bit Maps field identifies the RRset types that exist at the
 	// NSEC RR's owner name.
@@ -2807,7 +2807,7 @@ type RR struct {
 	// used for the transaction in progress, and should not be
 	// cached.  For example, SOA records are always distributed
 	// with a zero TTL to prohibit caching.  Zero values can
-	// also be used for extremely volatile data. 
+	// also be used for extremely volatile data.
 	TTL int32
 	//The format of this information varies according to the TYPE and CLASS of the resource record.
 	RData dns.Wirer
@@ -3526,11 +3526,11 @@ func (rd *RP) String() string {
 
 // RRSIG holds the zone RRSIG RData (RFC4034)
 type RRSIG struct {
-	// The Type Covered field identifies the type of the RRset that is covered 
+	// The Type Covered field identifies the type of the RRset that is covered
 	// by this RRSIG record.
 	Type Type
 	//  The Algorithm Number field identifies the cryptographic algorithm used
-	// to create the signature. 
+	// to create the signature.
 	Algorithm AlgorithmType
 	// The Labels field specifies the number of labels in the original RRSIG RR owner name.
 	Labels byte
@@ -3685,11 +3685,11 @@ func (rd *RT) String() string {
 // is authenticated in the secure Domain Name System (DNS). As such it is the
 // heart of the security provided.
 type SIG struct {
-	// The Type Covered field identifies the type of the RRset that is covered 
+	// The Type Covered field identifies the type of the RRset that is covered
 	// by this SIG record.
 	Type Type
 	//  The Algorithm Number field identifies the cryptographic algorithm used
-	// to create the signature. 
+	// to create the signature.
 	Algorithm AlgorithmType
 	// The Labels field specifies the number of labels in the original SIG RR owner name.
 	Labels byte
@@ -4045,7 +4045,7 @@ const (
 type SSHFP struct {
 	// This algorithm number octet describes the algorithm of the public
 	// key.  The following values are assigned:
-	// 
+	//
 	//           Value    Algorithm name
 	//           -----    --------------
 	//           0        reserved
@@ -4055,7 +4055,7 @@ type SSHFP struct {
 	// The fingerprint type octet describes the message-digest algorithm
 	// used to calculate the fingerprint of the public key.  The following
 	// values are assigned:
-	// 
+	//
 	//           Value    Fingerprint type
 	//           -----    ----------------
 	//           0        reserved
@@ -4064,7 +4064,7 @@ type SSHFP struct {
 	// The fingerprint is calculated over the public key blob as described
 	// in: Ylonen, T. and C. Lonvick, Ed., "The Secure Shell (SSH)
 	// Transport Layer Protocol", RFC 4253, January 2006.
-	// 
+	//
 	// The message-digest algorithm is presumed to produce an opaque octet
 	// string output, which is placed as-is in the RDATA fingerprint field.
 	Fingerprint []byte
@@ -4299,7 +4299,7 @@ var TKEYModes = map[TKEYMode]string{
 
 // TKEY represents TKEY RR RDATA [RFC2930]. TKEY RR can be used in a number of
 // different modes to establish and delete such shared secret keys between a
-// DNS resolver and server. 
+// DNS resolver and server.
 type TKEY struct {
 	// The algorithm name is in the form of a domain name with the same
 	// meaning as in [RFC 2845].  The algorithm determines how the secret
@@ -4433,10 +4433,10 @@ type TLSAUsage byte
 Values of TLSAUsage
    Value    Short description
   ------------------------------------------------
-   0        Pass PKIX and chain through CA       
-   1        Pass PKIX and match EE               
+   0        Pass PKIX and chain through CA
+   1        Pass PKIX and match EE
    2        Pass PKIX and trusted via certificate
-   3        Match certificate                    
+   3        Match certificate
    4-254    Unassigned
    255      Private use
 */
@@ -4453,9 +4453,9 @@ type TLSASelector byte
 
 /*
 Values of TLSASelector
-   Value    Short description   
+   Value    Short description
    -----------------------------
-   0        Full Certificate    
+   0        Full Certificate
    1        SubjectPublicKeyInfo
    2-254    Unassigned
    255      Private use

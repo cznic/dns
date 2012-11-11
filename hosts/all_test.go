@@ -59,7 +59,7 @@ func Test1(t *testing.T) {
 	var f File
 	err := f.Load(Sys)
 	if err != nil {
-		// Just log, this is not a test fail. 
+		// Just log, this is not a test fail.
 		// There's no guarantee that this file exists and is valid at the user's site.
 		t.Log(err)
 		return
