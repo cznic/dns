@@ -109,23 +109,6 @@ func hd(t *testing.T, msg string, b []byte) {
 	}
 }
 
-func TestExchange0(t *testing.T) {
-	m := &Message{}
-	m.Header.ID = GenID()
-	m.Question.A("localhost", rr.CLASS_IN)
-	ch := make(ExchangeChan, 10)
-	c, err := net.DialUDP("udp", nil, &net.UDPAddr{net.ParseIP("127.0.0.1"), 7})
-	if err != nil {
-		t.Fatal(10, err)
-	}
-
-	defer c.Close()
-
-	c.SetDeadline(time.Now().Add(time.Millisecond))
-	close(m.GoExchange(c, 2000, ch))
-	<-time.Tick(1e9)
-}
-
 func TestExchange1(t *testing.T) {
 	m := &Message{}
 	m.Header.ID = GenID()

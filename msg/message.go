@@ -530,20 +530,14 @@ type ExchangeChan chan ExchangeReply
 
 // GoExchangeBuf invokes ExchangeBuf in a separate goroutine and reports the
 // result back using the supplied reply channel. The goroutine returns after
-// sending the result.  Channel communication errors are ignored, so e.g. if
-// the reply channel is closed when the goroutine wants to send results back
-// through it, the goroutine returns without panic.  The reply channel may be
-// nil on invocation, then it is created by this method (buffered with a
-// default size).
+// sending the result. The reply channel may be nil on invocation, then it is
+// created by this method (buffered with a default size).
 func (m *Message) GoExchangeBuf(conn net.Conn, rxbuf []byte, reply ExchangeChan) ExchangeChan {
 	if reply == nil {
 		reply = make(ExchangeChan, 100)
 	}
 	go func() {
 		_, rx, err := m.ExchangeBuf(conn, rxbuf)
-		defer func() {
-			_ = recover() // catch and discard panic due to e.g. possibly already closed reply channel
-		}()
 		reply <- ExchangeReply{rx, err}
 	}()
 	return reply
