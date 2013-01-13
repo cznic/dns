@@ -14,7 +14,6 @@ package hosts
 
 
 import (
-	"fmt"
 	"net"
 )
 
