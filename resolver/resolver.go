@@ -670,7 +670,14 @@ asking:
 						r.log.Log("asking %q @ %s, Q: %s", srv.name, ip, m.Question)
 					}
 				}
-				c, err := net.DialUDP("udp", nil, &net.UDPAddr{ip, 53})
+				adr, err := net.ResolveUDPAddr("udp", ip.String()+":53")
+				if err != nil {
+					if r.log.Level >= dns.LOG_ERRORS {
+						r.log.Log("FAIL net.ResolveUDPAddr: %s", err)
+					}
+					continue
+				}
+				c, err := net.DialUDP("udp", nil, adr)
 				if err != nil {
 					if r.log.Level >= dns.LOG_ERRORS {
 						r.log.Log("FAIL net.DialUDP: %s", err)

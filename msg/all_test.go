@@ -7,12 +7,17 @@
 package msg
 
 import (
+	"fmt"
 	"github.com/cznic/dns"
 	"github.com/cznic/dns/rr"
 	"net"
 	"testing"
 	"time"
 )
+
+func udpAddr(ip net.IP, port uint16) (*net.UDPAddr, error) {
+	return net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", ip, port))
+}
 
 func test0b(t *testing.T, domain string, addr net.IP, all bool) {
 	buf := dns.NewWirebuf()
@@ -28,7 +33,10 @@ func test0b(t *testing.T, domain string, addr net.IP, all bool) {
 	t.Log(msg)
 	hd(t, "enc", buf.Buf)
 
-	raddr := &net.UDPAddr{addr, 53}
+	raddr, err := udpAddr(addr, 53)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	c, err := net.DialUDP("udp", nil, raddr)
 	if err != nil {
@@ -114,7 +122,12 @@ func TestExchange1(t *testing.T) {
 	m.Header.ID = GenID()
 	m.Question.A("localhost", rr.CLASS_IN)
 	ch := make(ExchangeChan, 10)
-	c, err := net.DialUDP("udp", nil, &net.UDPAddr{net.ParseIP("127.0.0.1"), 7})
+	addr, err := net.ResolveUDPAddr("udp", "127.0.0.1:7")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	c, err := net.DialUDP("udp", nil, addr)
 	if err != nil {
 		t.Fatal(10, err)
 	}
@@ -135,7 +148,12 @@ func TestExchange2(t *testing.T) {
 	m.Header.ID = GenID()
 	m.Question.NS("google.com", rr.CLASS_IN)
 	ch := make(ExchangeChan, 10)
-	c, err := net.DialUDP("udp", nil, &net.UDPAddr{net.ParseIP("8.8.8.8"), 53})
+	addr, err := net.ResolveUDPAddr("udp", "8.8.8.8:53")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	c, err := net.DialUDP("udp", nil, addr)
 	if err != nil {
 		t.Fatal(10, err)
 	}
@@ -160,16 +178,28 @@ func TestExchange3(t *testing.T) {
 	m2.Header.ID = GenID()
 	m2.Question.STAR("google.cz", rr.CLASS_IN)
 	m2.RD = true
-	c, err := net.DialUDP("udp", nil, &net.UDPAddr{net.ParseIP("8.8.8.8"), 53})
+	addr, err := net.ResolveUDPAddr("udp", "8.8.8.8:53")
 	if err != nil {
-		t.Fatal(10, err)
+		t.Fatal(err)
+	}
+
+	c, err := net.DialUDP("udp", nil, addr)
+	if err != nil {
+		t.Fatal(err)
 	}
 
 	defer c.Close()
-	c.SetDeadline(time.Now().Add(5 * time.Second))
-	c2, err := net.DialUDP("udp", nil, &net.UDPAddr{net.ParseIP("8.8.4.4"), 53})
+	addr, err = net.ResolveUDPAddr("udp", "8.8.4.4:53")
 	if err != nil {
-		t.Fatal(20, err)
+		t.Error(err)
+		return
+	}
+
+	c.SetDeadline(time.Now().Add(5 * time.Second))
+	c2, err := net.DialUDP("udp", nil, addr)
+	if err != nil {
+		t.Error(err)
+		return
 	}
 
 	defer c2.Close()
@@ -178,14 +208,16 @@ func TestExchange3(t *testing.T) {
 
 	re := <-ch
 	if re.error != nil {
-		t.Fatal(30, re.error)
+		t.Error(re.error)
+		return
 	}
 
 	t.Log(re.Message)
 
 	re = <-ch
 	if re.error != nil {
-		t.Fatal(40, re.error)
+		t.Error(40, re.error)
+		return
 	}
 
 	t.Log(re.Message)
