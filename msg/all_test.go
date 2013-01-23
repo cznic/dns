@@ -53,7 +53,7 @@ func test0b(t *testing.T, domain string, addr net.IP, all bool) {
 	}
 
 	if n != len(buf.Buf) {
-		t.Fatal("%d != %d", n, len(buf.Buf))
+		t.Fatalf("%d != %d", n, len(buf.Buf))
 	}
 
 	rbuf := make([]byte, 2000)

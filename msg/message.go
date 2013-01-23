@@ -936,7 +936,7 @@ func (r RCODE) String() string {
 	case RC_REFUSED:
 		return "RC_REFUSED"
 	}
-	return fmt.Sprint("%d!", r)
+	return fmt.Sprintf("%d!", r)
 }
 
 func decodeRRs(rrs *rr.RRs, n uint16, b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {

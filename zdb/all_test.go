@@ -92,7 +92,7 @@ func TestDelta(t *testing.T) {
 	s := Store{HashWidth: 20, PtrBytes: 4}
 	delta, exp := s.delta(), int64(4)*1024*1024+16
 	if delta != exp {
-		t.Fatal("delta(20, 4): expected %d(0x%x), got %d(0x%x)", exp, exp, delta, delta)
+		t.Fatalf("delta(20, 4): expected %d(0x%x), got %d(0x%x)", exp, exp, delta, delta)
 	}
 
 	t.Logf("delta(20, 4): %d(0x%x)", delta, delta)
