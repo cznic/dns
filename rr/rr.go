@@ -2271,7 +2271,7 @@ func (rd *NSAP) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err e
 }
 
 func (rd *NSAP) String() string {
-	return fmt.Sprintf("0x%x", rd.NSAP)
+	return fmt.Sprintf("0x%x", rd.NSAP) // CANNOT be replace by `%#x`
 }
 
 // NSAP_PTR has a function analogous to the PTR record used for IP addresses
@@ -2849,7 +2849,7 @@ func (rr *RR) Encode(b *dns.Wirebuf) {
 // Implementation of dns.Wirer
 func (rr *RR) Decode(b []byte, pos *int, sniffer dns.WireDecodeSniffer) (err error) {
 	if *pos >= len(b) {
-		return fmt.Errorf("(*rr.RR).Decode() - buffer underflow, len(b) %d(0x%x), pos %d(0x%x)", len(b), len(b), *pos, *pos)
+		return fmt.Errorf("(*rr.RR).Decode() - buffer underflow, len(b) %d(%#x), pos %d(%#x)", len(b), len(b), *pos, *pos)
 	}
 
 	p0 := &b[*pos]

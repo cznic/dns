@@ -46,7 +46,7 @@ func (j *job) compression(id int, rtag string, src []byte) {
 				id,
 				1,
 				SOC_ZIP,
-				"%s\ndn: %q, ofs %d(0x%x)\nexp:\n%sgot:\n%s",
+				"%s\ndn: %q, ofs %d(%#x)\nexp:\n%sgot:\n%s",
 				rtag, dn, srcX0, srcX0,
 				hex.Dump(cmp.Buf[dumpx:cmpX9+1]),
 				hex.Dump(src[dumpx:srcX9+1]),

@@ -184,7 +184,7 @@ func (m *Header) Encode(b *dns.Wirebuf) {
 
 func bufp0(b []byte, pos *int) (p *byte, err error) {
 	if *pos >= len(b) {
-		return nil, errors.New(fmt.Sprintf("Can't decode, wire buffer has not enough data (ofs 0x%x)", *pos))
+		return nil, errors.New(fmt.Sprintf("Can't decode, wire buffer has not enough data (ofs %#x)", *pos))
 	}
 
 	return &b[*pos], nil

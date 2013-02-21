@@ -92,10 +92,10 @@ func TestDelta(t *testing.T) {
 	s := Store{HashWidth: 20, PtrBytes: 4}
 	delta, exp := s.delta(), int64(4)*1024*1024+16
 	if delta != exp {
-		t.Fatalf("delta(20, 4): expected %d(0x%x), got %d(0x%x)", exp, exp, delta, delta)
+		t.Fatalf("delta(20, 4): expected %d(%#x), got %d(%#x)", exp, exp, delta, delta)
 	}
 
-	t.Logf("delta(20, 4): %d(0x%x)", delta, delta)
+	t.Logf("delta(20, 4): %d(%#x)", delta, delta)
 }
 
 func testNewOpen(t *testing.T, pth string, hashWidth, ptrBytes int) (e error) {
@@ -122,7 +122,7 @@ func testNewOpen(t *testing.T, pth string, hashWidth, ptrBytes int) (e error) {
 	}
 
 	t.Logf(
-		"%s: %s, HashWidth %d, PtrBytes %d, file size %d(0x%x), s.delta() %d(0x%x)",
+		"%s: %s, HashWidth %d, PtrBytes %d, file size %d(%#x), s.delta() %d(%#x)",
 		me(), fn, s.HashWidth, s.PtrBytes, fi.Size(), fi.Size(), s.delta(), s.delta(),
 	)
 

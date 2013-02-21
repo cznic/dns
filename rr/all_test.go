@@ -476,7 +476,7 @@ func Test0(t *testing.T) {
 						break
 					}
 					if c1 := line1[j]; c2 != c1 {
-						t.Errorf("@ 0x%x 0x%x != 0x%x", j, c2, c1)
+						t.Errorf("@ %#x %#x != %#x", j, c2, c1)
 						break
 					}
 				}
