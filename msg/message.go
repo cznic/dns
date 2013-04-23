@@ -391,7 +391,7 @@ func SendWire(conn net.Conn, w []byte) (err error) {
 			return
 		}
 
-		if nw != len(w) {
+		if nw != len(b) {
 			return fmt.Errorf("Message.Send: write %d != %d", nw, len(b))
 		}
 	}
