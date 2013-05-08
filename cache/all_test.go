@@ -18,12 +18,8 @@ import (
 
 var optPerc = flag.Int("perc", 0, "% of domains with one expired RR in BenchmarkCacheGetExpired")
 
-func init() {
-	flag.Parse()
-}
-
 func TestSecs0(t *testing.T) {
-	if delta := Secs0() - time.Now().Unix(); delta < 0 || delta > 1 {
+	if delta := time.Now().Unix() - Secs0(); delta < 0 {
 		t.Fatal(delta)
 	}
 }

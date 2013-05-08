@@ -13,6 +13,7 @@ import (
 	"math"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -20,7 +21,7 @@ var secs0 = time.Now().Unix()
 
 // Secs0 returns the app start time in epoch seconds.
 func Secs0() int64 {
-	return secs0
+	return atomic.LoadInt64(&secs0)
 }
 
 // Cache is a cache holding DNS RRs. Cache is organized as a dns.Tree.
