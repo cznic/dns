@@ -120,7 +120,6 @@ func (s *DomainName) decode(b []byte, pos *int) (err error) {
 		}
 
 	}
-	panic("unreachable")
 }
 
 // Implementation of Wirer

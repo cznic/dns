@@ -167,7 +167,6 @@ func (t *Tree) Get(owner string) interface{} {
 	default:
 		return x
 	}
-	panic("unreachable")
 }
 
 // Match returns the data associated with the largest part of owner or nil if
@@ -202,7 +201,6 @@ func (t *Tree) Match(owner string) interface{} {
 
 		return match
 	}
-	panic("unreachable")
 }
 
 // Add will add data to Tree. If the owner node has no data yet, the data will

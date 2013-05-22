@@ -55,7 +55,6 @@ func (l *lex) getc(c byte) byte {
 		}
 		panic(err)
 	}
-	panic("unreachable")
 }
 
 
