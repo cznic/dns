@@ -12,12 +12,13 @@ package named
 import (
 	"errors"
 	"fmt"
-	"io"
 	"math"
 	"net"
 	"strconv"
 	"strings"
 	"unicode"
+
+	"github.com/cznic/fileutil"
 )
 
 type lexStackItem struct {
@@ -62,7 +63,7 @@ func (l *lex) getc(c byte) byte {
 		}
 		return b
 	} else {
-		if err == io.EOF {
+		if fileutil.IsEOF(err) {
 			l.peek = 0
 			return 0
 		}

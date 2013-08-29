@@ -15,12 +15,13 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"github.com/cznic/dns/rr"
-	"io"
 	"net"
 	"strconv"
 	"strings"
 	"unicode"
+
+	"github.com/cznic/dns/rr"
+	"github.com/cznic/fileutil"
 )
 
 type lexStackItem struct {
@@ -69,7 +70,7 @@ func (l *lex) getc(c byte) byte {
 		l.peek = b
 		return b
 	} else {
-		if err == io.EOF {
+		if fileutil.IsEOF(err) {
 			l.peek = 0
 			return 0
 		}

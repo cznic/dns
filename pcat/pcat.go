@@ -13,6 +13,8 @@ package pcat
 import (
 	"fmt"
 	"io"
+
+	"github.com/cznic/fileutil"
 )
 
 type lex struct {
@@ -46,7 +48,7 @@ func (l *lex) getc() (b byte, err error) {
 	b, err = l.src.ReadByte()
 	if err != nil {
 		b = 0
-		if err != io.EOF {
+		if !fileutil.IsEOF(err) {
 			return
 		}
 		err = nil
@@ -77,11 +79,11 @@ func Scan(name string, src io.ByteReader, handler func(*Record) bool) (err error
 	l := newLex(src)
 
 	defer func() {
-		switch e := recover(); {
-		case e == nil, e == io.EOF:
-			// nop
-		default:
-			err = fmt.Errorf("%s:%d:%d %s", name, l.line, l.column, e)
+		if e := recover(); e != nil {
+			x, ok := e.(error)
+			if !ok || !fileutil.IsEOF(x) {
+				err = fmt.Errorf("%s:%d:%d %s", name, l.line, l.column, e)
+			}
 		}
 	}()
 

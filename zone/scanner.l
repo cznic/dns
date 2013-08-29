@@ -16,15 +16,16 @@ package zone
 import(
 	"bufio"
 	"bytes"
-	"github.com/cznic/dns/rr"
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"io"
 	"net"
 	"strconv"
 	"strings"
 	"unicode"
+
+	"github.com/cznic/dns/rr"
+	"github.com/cznic/fileutil"
 )
 
 
@@ -77,7 +78,7 @@ func (l *lex) getc(c byte) byte {
 		l.peek = b
 		return b
 	} else {
-		if err == io.EOF {
+		if fileutil.IsEOF(err) {
 			l.peek = 0
 			return 0
 		}
