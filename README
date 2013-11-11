@@ -4,37 +4,37 @@ http://git.nic.cz/redmine/projects/godns/repository
 Packages in this repository:
 
 Install: $ go get github.com/cznic/dns
-Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns
+Godocs: http://godoc.org/github.com/cznic/dns
 
 Install: $ go get github.com/cznic/dns/cache
-Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns/cache
+Godocs: http://godoc.org/github.com/cznic/dns/cache
 
 Install: $ go get github.com/cznic/dns/hosts
-Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns/hosts
+Godocs: http://godoc.org/github.com/cznic/dns/hosts
 
 Install: $ go get github.com/cznic/dns/msg
-Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns/msg
+Godocs: http://godoc.org/github.com/cznic/dns/msg
 
 Install: $ go get github.com/cznic/dns/named
-Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns/named
+Godocs: http://godoc.org/github.com/cznic/dns/named
 
 Install: $ go get github.com/cznic/dns/pcat
-Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns/pcat
+Godocs: http://godoc.org/github.com/cznic/dns/pcat
 
 Install: $ go get github.com/cznic/dns/resolv
-Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns/resolv
+Godocs: http://godoc.org/github.com/cznic/dns/resolv
 
 Install: $ go get github.com/cznic/dns/resolver
-Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns/resolver
+Godocs: http://godoc.org/github.com/cznic/dns/resolver
 
 Install: $ go get github.com/cznic/dns/rr
-Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns/rr
+Godocs: http://godoc.org/github.com/cznic/dns/rr
 
 Install: $ go get github.com/cznic/dns/xfr
-Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns/xfr
+Godocs: http://godoc.org/github.com/cznic/dns/xfr
 
 Install: $ go get github.com/cznic/dns/zdb
-Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns/zdb
+Godocs: http://godoc.org/github.com/cznic/dns/zdb
 
 Install: $ go get github.com/cznic/dns/zone
-Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns/zone
+Godocs: http://godoc.org/github.com/cznic/dns/zone
