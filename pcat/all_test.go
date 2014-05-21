@@ -12,6 +12,8 @@ import (
 	"regexp"
 	"strings"
 	"testing"
+	"io/ioutil"
+	"path/filepath"
 )
 
 type testCase struct {
@@ -131,7 +133,14 @@ func TestDB(t *testing.T) {
 		parts = 10
 	)
 
-	fn := "temp_db"
+	tempDir, err := ioutil.TempDir("", "test-pcat-")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defer os.RemoveAll(tempDir)
+
+	fn := filepath.Join(tempDir, "temp_db")
 	db, err := NewDB(fn)
 	if err != nil {
 		t.Fatal(err)
@@ -142,7 +151,6 @@ func TestDB(t *testing.T) {
 		if db != nil {
 			err = db.Close()
 		}
-		os.Remove(fn)
 		if err != nil {
 			t.Fatal(err)
 		}
