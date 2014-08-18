@@ -1,6 +1,0 @@
-- WIP SNAPSHOT - UNFINISHED - NOT COMPLETE - DO NOT USE - API MAY CHANGE -
-
-Packages in this repository:
-
-Install: $ go get github.com/cznic/dns/proxy
-Godocs: http://gopkgdoc.appspot.com/pkg/github.com/cznic/dns/proxy
