@@ -18,6 +18,7 @@ import (
 	"net"
 	"os"
 	"strings"
+	"sync"
 )
 
 // System resolv.conf name
@@ -38,11 +39,14 @@ const (
 )
 
 // Cfg represents a resolv.conf with a change/modification guard/handler.
+// Methods of Cfg are synchronized; multiple goroutines may invoke them
+// concurrently.
 type Cfg struct {
 	cfg     *Conf
 	changed bool
 	mfile   *fileutil.GoMFile
 	logger  *dns.Logger
+	mu      sync.Mutex
 }
 
 // NewCfg returns a newly created Cfg with resolv.Conf initialized from file fname of an Error of any.
@@ -87,12 +91,18 @@ func NewCfg(fname string, logger *dns.Logger) (c *Cfg, err error) {
 
 // SetChanged forces next Conf() to handle modification of the wrapped resolv.Conf.
 func (c *Cfg) SetChanged() {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	c.mfile.SetChanged()
 }
 
 // Conf returns a resolv.Conf from Cfg and an indicator of its source file has been changed/modificated
 // compared to the last invocation of this function or an Error if any.
 func (c *Cfg) Conf() (f *Conf, changed bool, err error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	if _, err = c.mfile.File(); err != nil {
 		return
 	}
