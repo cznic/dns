@@ -13,23 +13,28 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/cznic/dns"
-	"github.com/cznic/fileutil"
 	"io/ioutil"
 	"net"
 	"os"
 	"strings"
+	"sync"
+
+	"github.com/cznic/dns"
+	"github.com/cznic/fileutil"
 )
 
 // System hosts name
 var Sys = "/etc/hosts" //TODO:LSB only
 
 // Cfg represents a hosts.File with a change/modification guard/handler.
+// Methods of Cfg are synchronized; multiple goroutines may invoke them
+// concurrently.
 type Cfg struct {
 	cfg     *File
 	changed bool
 	mfile   *fileutil.GoMFile
 	logger  *dns.Logger
+	mu      sync.Mutex
 }
 
 // NewCfg returns a newly created Cfg with hosts.File initialized from file fname or an Error of any.
@@ -74,12 +79,18 @@ func NewCfg(fname string, logger *dns.Logger) (c *Cfg, err error) {
 
 // SetChanged forces next File() to handle modification of the wrapped hosts.File.
 func (c *Cfg) SetChanged() {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	c.mfile.SetChanged()
 }
 
 // File returns a hosts.File from Cfg and an indicator of its source file has been changed/modificated
 // compared to the last invocation of this function or an Error if any.
 func (c *Cfg) File() (f *File, changed bool, err error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	if _, err = c.mfile.File(); err != nil {
 		return
 	}
